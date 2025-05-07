@@ -18,7 +18,14 @@ public class ProviderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idProveedor",nullable = false)
     private Long id;
-    private String nombre;
-    private String producto;
-
+    @Column(name = "razon_social",nullable = false, length = 254)
+    private String razonSocial;
+    @Column(nullable = false, length = 11)
+    private String CUIT;
+    @Column(name = "direccion_fiscal",nullable = false,length = 254)
+    private String direccionFiscal;
+    @Column
+    private String telefono;
+    @Column(nullable = false)
+    private String mail;
 }
