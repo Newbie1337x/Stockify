@@ -1,4 +1,4 @@
-package org.stockify.model;
+package org.stockify.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

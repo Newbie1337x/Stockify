@@ -1,6 +1,6 @@
 package org.stockify.service;
 import org.springframework.stereotype.Service;
-import org.stockify.model.ProductEntity;
+import org.stockify.model.entity.ProductEntity;
 import org.stockify.repository.ProductRepository;
 import org.stockify.service.exceptions.ProductNotFoundException;
 
