@@ -1,13 +1,12 @@
 package org.stockify.model.entity;
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -30,9 +29,10 @@ public class ProductEntity {
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "stock_id", nullable = false)
-    private StockEntity stock;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "product_categories",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<CategoryEntity> categories;
 
 }
