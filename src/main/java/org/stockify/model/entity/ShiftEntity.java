@@ -12,12 +12,14 @@ public class ShiftEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "name")
+    private String name;
     @Column(name = "entry_time")
     private LocalDateTime entryTime;
     @Column(name = "exit_time")
     private LocalDateTime exitTime;
     @OneToMany(mappedBy = "shiftEntity")
-    private List<PosEntity> posEntity;
+    private List<SessionPosEntity> posSessionEntities;
 
 
 }

@@ -15,5 +15,4 @@ public class StockifyApplication {
         System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
         SpringApplication.run(StockifyApplication.class, args);
     }
-
 }
