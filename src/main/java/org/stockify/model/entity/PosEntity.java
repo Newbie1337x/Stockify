@@ -1,0 +1,22 @@
+package org.stockify.model.entity;
+import jakarta.persistence.*;
+import lombok.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@Builder
+@Entity
+@Table(name = "pos")
+public class PosEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "current_amount")
+    private Double currentAmount;
+
+}
