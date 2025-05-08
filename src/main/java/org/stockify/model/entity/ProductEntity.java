@@ -29,6 +29,10 @@ public class ProductEntity {
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
+    @ColumnDefault("0")
+    @Column(name = "stock", precision = 10, scale = 5)
+    private BigDecimal stock;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "product_categories",
             joinColumns = @JoinColumn(name = "product_id"),
