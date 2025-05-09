@@ -1,8 +1,14 @@
 package org.stockify.model.controller;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.model.dto.request.ProductRequest;
+import org.stockify.model.dto.response.BulkProductResponse;
 import org.stockify.model.dto.response.CategoryResponse;
 import org.stockify.model.dto.response.ProductResponse;
 import org.stockify.model.service.ProductService;
@@ -20,13 +26,22 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
-        if (productService.findAll().isEmpty()) {
+    public ResponseEntity<Page<ProductResponse>> listProducts(
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC)
+            Pageable pageable) {
+
+        Page<ProductResponse> products = productService.findAll(pageable);
+
+        if (products.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(productService.findAll());
+        return ResponseEntity.ok(products);
     }
 
+    @PostMapping("/bulk")
+    public ResponseEntity<BulkProductResponse> bulkSaveProducts(@RequestBody List<ProductRequest> products) {
+        return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(productService.saveAll(products));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable int id) {
@@ -56,32 +71,11 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.patch(id,product));
     }
 
-    //Categories logic
     @GetMapping("/filter")
     public ResponseEntity<List<ProductResponse>> filterByCategories(@RequestParam Set<Integer> categoriesIds) {
         return ResponseEntity.ok().body(productService.filterByCategories(categoriesIds));
     }
 
-    @DeleteMapping("/{idProduct}/categories/{idcat}")
-    public ResponseEntity<ProductResponse> removeCategoryFromProduct(
-            @PathVariable("idProduct") int productId,
-            @PathVariable("idcat")    int categoryId
-    ) {
-
-        return ResponseEntity.ok(productService.deleteCategoryFromProduct(categoryId, productId));
-    }
-
-    @DeleteMapping("/{idProduct}/categories")
-    public ResponseEntity<ProductResponse> removeAllCategoryFromProduct(
-            @PathVariable("idProduct") int productId
-    ) {
-       return ResponseEntity.ok(productService.deleteAllCategoryFromProduct(productId));
-    }
-
-    @GetMapping("/{idProduct}/categories")
-    public ResponseEntity<List<CategoryResponse>> getCategoriesFromProduct(@PathVariable("idProduct") int productId) {
-       return ResponseEntity.ok(productService.findCategoriesByProductId(productId).stream().toList()) ;
-    }
 
 
 }

@@ -2,8 +2,12 @@ package org.stockify.model.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.stockify.model.dto.request.ProductRequest;
+import org.stockify.model.dto.response.BulkItemResponse;
+import org.stockify.model.dto.response.BulkProductResponse;
 import org.stockify.model.dto.response.CategoryResponse;
 import org.stockify.model.dto.response.ProductResponse;
 import org.stockify.model.entity.CategoryEntity;
@@ -14,6 +18,8 @@ import org.stockify.model.mapper.CategoryMapper;
 import org.stockify.model.mapper.ProductMapper;
 import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.repository.ProductRepository;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,12 +43,14 @@ public class ProductService {
         return productMapper.toResponse(getProductById(id));
     }
 
-    public List<ProductResponse> findAll() {
-        List<ProductResponse> products = productMapper.toResponseList(productRepository.findAll());
-        if (products.isEmpty()) {
-            logger.warn("Products list is empty");
+    public Page<ProductResponse> findAll(Pageable pageable) {
+        Page<ProductEntity> page = productRepository.findAll(pageable);
+
+        if (page.isEmpty()) {
+            logger.warn("Products list is empty for pageable: {}", pageable);
         }
-        return products;
+
+        return page.map(productMapper::toResponse);
     }
 
     public ProductResponse save(ProductRequest request) {
@@ -50,6 +58,34 @@ public class ProductService {
         ProductEntity product = productMapper.toEntity(request);
         product.setCategories(getCategoriesFromNames(request.getCategories()));
         return productMapper.toResponse(productRepository.save(product));
+    }
+
+    public BulkProductResponse saveAll(List<ProductRequest> requests) {
+        List<BulkItemResponse> results = new ArrayList<>();
+        int created = 0, skipped = 0, error = 0;
+
+        for (ProductRequest req : requests) {
+            try {
+                save(req);
+                created++;
+                results.add(new BulkItemResponse(req.getName(), "CREATED", null));
+            } catch (DuplicatedUniqueConstraintException ex) {
+                skipped++;
+                results.add(new BulkItemResponse(
+                        req.getName(),
+                        "SKIPPED",
+                        "Duplicado, se saltó este ítem"
+                ));
+            } catch (Exception ex) {
+                error++;
+                results.add(new BulkItemResponse(
+                        req.getName(),
+                        "ERROR",
+                        ex.getMessage()
+                ));
+            }
+        }
+        return new BulkProductResponse(requests.size(),created,skipped,error,results);
     }
 
     public void deleteById(int id) {
@@ -73,6 +109,7 @@ public class ProductService {
     }
 
     public List<ProductResponse> filterByCategories(Set<Integer> categories) {
+
         return productMapper.toResponseList(
                 productRepository.findDistinctByCategoriesId(categories, categories.size())
         );
