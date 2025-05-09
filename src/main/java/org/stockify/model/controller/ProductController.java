@@ -3,11 +3,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.model.dto.request.ProductRequest;
+import org.stockify.model.dto.response.CategoryResponse;
 import org.stockify.model.dto.response.ProductResponse;
-import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.service.ProductService;
-import org.stockify.model.entity.ProductEntity;
-
 import java.util.List;
 import java.util.Set;
 
@@ -16,9 +14,9 @@ import java.util.Set;
 public class ProductController {
 
     private final ProductService productService;
-
     public ProductController(ProductService productService) {
         this.productService = productService;
+
     }
 
     @GetMapping
@@ -70,14 +68,19 @@ public class ProductController {
             @PathVariable("idcat")    int categoryId
     ) {
 
-        return ResponseEntity.ok(productService.removeCategoryFromProduct(categoryId, productId));
+        return ResponseEntity.ok(productService.deleteCategoryFromProduct(categoryId, productId));
     }
 
     @DeleteMapping("/{idProduct}/categories")
     public ResponseEntity<ProductResponse> removeAllCategoryFromProduct(
             @PathVariable("idProduct") int productId
     ) {
-       return ResponseEntity.ok(productService.removeAllCategoryFromProduct(productId));
+       return ResponseEntity.ok(productService.deleteAllCategoryFromProduct(productId));
+    }
+
+    @GetMapping("/{idProduct}/categories")
+    public ResponseEntity<List<CategoryResponse>> getCategoriesFromProduct(@PathVariable("idProduct") int productId) {
+       return ResponseEntity.ok(productService.findCategoriesByProductId(productId).stream().toList()) ;
     }
 
 

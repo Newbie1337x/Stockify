@@ -8,6 +8,7 @@ import org.stockify.model.entity.CategoryEntity;
 import org.stockify.util.StringUtils;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring",uses = StringUtils.class)
 public interface CategoryMapper {
@@ -16,5 +17,6 @@ public interface CategoryMapper {
     CategoryEntity toEntity(CategoryRequest dto);
     CategoryResponse toResponse(CategoryEntity entity);
     List<CategoryResponse> toResponseList(List<CategoryEntity> entities);
+    Set<CategoryResponse> toResponseSet(Set<CategoryEntity> entities);
 
 }

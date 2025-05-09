@@ -3,6 +3,10 @@ package org.stockify.model.controller;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +20,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
+
+
     private final CategoryService categoryService;
     private final Logger logger = LoggerFactory.getLogger(CategoryController.class.getName());
 
@@ -24,13 +30,15 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> categories = categoryService.findAll();
-        if (categories.isEmpty()) {
-            logger.warn("category list is empty");
+    public ResponseEntity<Page<CategoryResponse>> listCategories(
+            @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC)
+            Pageable pageable
+    ) {
+        Page<CategoryResponse> page = categoryService.findAll(pageable);
+        if (page.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(categories);
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")

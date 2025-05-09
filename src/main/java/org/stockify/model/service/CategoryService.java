@@ -1,6 +1,9 @@
 package org.stockify.model.service;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.stockify.model.dto.request.CategoryRequest;
 import org.stockify.model.dto.response.CategoryResponse;
@@ -9,9 +12,6 @@ import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.CategoryMapper;
 import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.exception.DuplicatedUniqueConstraintException;
-import org.stockify.util.StringUtils;
-
-import java.util.List;
 
 @Service
 public class CategoryService {
@@ -24,75 +24,63 @@ public class CategoryService {
         this.categoryMapper = categoryMapper;
     }
 
+    public Page<CategoryResponse> findAll(Pageable pageable) {
+        Page<CategoryEntity> page = categoryRepository.findAll(pageable);
 
-    public List<CategoryResponse> findAll() {
-        List<CategoryEntity> categories = categoryRepository.findAll();
-
-        if (categories.isEmpty()) {
-            logger.warn("category list is empty");
+        if (page.isEmpty()) {
+            logger.warn("category list is empty for pageable: {}", pageable);
         }
 
-        return categoryMapper.toResponseList(categories);
+        return page.map(categoryMapper::toResponse);
+    }
+    public CategoryResponse findById(int id) {
+        return categoryMapper.toResponse(findEntityById(id));
     }
 
-    public CategoryResponse findById(int id) throws NotFoundException {
-        CategoryEntity category = categoryRepository
-                .findById(id)
-                .orElseThrow(() ->
-                        new NotFoundException("Category with ID " + id + " not found"));
-
-        return categoryMapper.toResponse(category);
-    }
-
-    public CategoryResponse save(CategoryRequest categoryRequestDTO) throws DuplicatedUniqueConstraintException {
-
-        String name = StringUtils.capitalizeFirst(categoryRequestDTO.name());
-
-        if(categoryRepository.existsByName(name)){
-            throw new DuplicatedUniqueConstraintException("Category with name " + name + " already exists");
-        }
-
-        return categoryMapper
-                .toResponse
-                        (categoryRepository.save(categoryMapper.toEntity(categoryRequestDTO)));
-
+    public CategoryResponse save(CategoryRequest request) {
+        validateNameUniqueness(request.getName());
+        CategoryEntity entity = categoryMapper.toEntity(request);
+        return categoryMapper.toResponse(categoryRepository.save(entity));
     }
 
     public void deleteById(int id) {
         categoryRepository.deleteById(id);
     }
 
-    public void update(int id, CategoryRequest categoryRequestDTO)
-            throws NotFoundException, DuplicatedUniqueConstraintException {
-
-        categoryRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
-
-        String name = StringUtils.capitalizeFirst(categoryRequestDTO.name());
-
-        if(categoryRepository.existsByName(name)){
-            throw new DuplicatedUniqueConstraintException("Category with name " + name + " already exists");
-        }
-
-        categoryRepository.save(categoryMapper.toEntity(categoryRequestDTO));
+    public void update(int id, CategoryRequest request) {
+        findEntityById(id);
+        validateNameUniqueness(request.getName());
+        categoryRepository.save(categoryMapper.toEntity(request));
     }
 
-    public void patch(int id, CategoryRequest categoryRequestDTO) throws NotFoundException, DuplicatedUniqueConstraintException {
+    public void patch(int id, CategoryRequest request) {
+        CategoryEntity category = findEntityById(id);
+        validateNameUniquenessForUpdate(request.getName(), id);
+        updateNameIfPresent(category, request.getName());
+        categoryRepository.save(category);
+    }
 
-        CategoryEntity category = categoryRepository.findById(id)
+    private CategoryEntity findEntityById(int id) {
+        return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
+    }
 
-        String name = StringUtils.capitalizeFirst(categoryRequestDTO.name());
-
-        if(categoryRepository.existsByName(categoryRequestDTO.name())){
+    private void validateNameUniqueness(String name) {
+        if (categoryRepository.existsByNameIgnoreCase(name)) {
             throw new DuplicatedUniqueConstraintException("Category with name " + name + " already exists");
         }
+    }
 
-        if(categoryRequestDTO.name() != null){
-            category.setName(categoryRequestDTO.name());
+    private void validateNameUniquenessForUpdate(String name, int id) {
+        if (categoryRepository.existsByNameIgnoreCaseAndIdNot(name, id)) {
+            throw new DuplicatedUniqueConstraintException("Category with name " + name + " already exists");
         }
-        categoryRepository.save(category);
+    }
+
+    private void updateNameIfPresent(CategoryEntity category, String name) {
+        if (name != null) {
+            category.setName(name);
+        }
     }
 
 }

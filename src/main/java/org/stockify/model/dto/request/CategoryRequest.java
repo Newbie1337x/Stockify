@@ -1,13 +1,16 @@
 package org.stockify.model.dto.request;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
+import lombok.Data;
 
-import java.util.Set;
+@Data
+@Builder
+public class CategoryRequest {
 
+    @NotNull
+    @Size(min = 1, max = 60)
+    private String name;
 
-public record CategoryRequest(
-        @NotNull
-        @Size(min = 1, max = 60)
-        String name
-)
-{}
+}
