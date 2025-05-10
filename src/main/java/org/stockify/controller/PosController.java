@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.model.dto.request.PosAmountRequest;
 import org.stockify.model.dto.request.PosRequest;
+import org.stockify.model.dto.request.PosStatusRequest;
 import org.stockify.model.dto.response.PosResponse;
+import org.stockify.model.enums.Status;
 import org.stockify.model.service.PosService;
 
 import java.util.List;
@@ -32,11 +34,31 @@ public class PosController {
         return posService.findAll().isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(posService.findAll());
     }
 
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PosResponse> getById(@PathVariable Long id)
+    {
+        return ResponseEntity.ok(posService.findById(id));
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<List<PosResponse>> getByStatus(@RequestParam Status status)
+    {
+        return ResponseEntity.ok(posService.findByStatus(status));
+    }
+
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> patchAmount(@PathVariable long id, @RequestBody @Valid PosAmountRequest posAmountRequest)
+    public ResponseEntity<?> patchAmount(@PathVariable Long id, @RequestBody @Valid PosAmountRequest posAmountRequest)
     {
         posService.patchAmount(id,posAmountRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/toggle")
+        public ResponseEntity<String>patchToggleStatus(@PathVariable long id)
+    {
+        return ResponseEntity.ok("Sucessfull the pos is " + posService.toggleStatus(id));
+    }
+
 
 }

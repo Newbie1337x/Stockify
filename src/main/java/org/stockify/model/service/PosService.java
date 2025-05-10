@@ -1,11 +1,14 @@
 package org.stockify.model.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.stockify.model.dto.request.PosAmountRequest;
 import org.stockify.model.dto.request.PosRequest;
+import org.stockify.model.dto.request.PosStatusRequest;
 import org.stockify.model.dto.response.PosResponse;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
+import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.PosMapper;
 import org.stockify.model.repository.PosRepository;
 
@@ -34,29 +37,40 @@ public class PosService {
         return posEntities.stream().map(posMapper::toDto).toList();
     }
 
-    public List<PosResponse> findById(Long id)
+    public PosResponse findById(Long id)
     {
-        return posRepository.findById(id)
+        PosEntity posEntity = posRepository
+                .findById(id)
+                .orElseThrow
+                        (() -> new EntityNotFoundException("POS with ID " + id + " not found"));
+        return posMapper.toDto(posEntity);
+    }
+    public List<PosResponse> findByStatus(Status statusRequest) {
+        return posRepository.findByStatus(statusRequest)
                 .stream()
                 .map(posMapper::toDto)
                 .toList();
     }
 
-   public void patchStatus(Long id, Status status)
-   {
-       posRepository.findById(id).ifPresent(posEntity -> {
-           posEntity.setStatus(status);
-           posRepository.save(posEntity);
-       });
-   }
 
-   public void patchAmount(Long id, PosAmountRequest posAmountRequest)
+    public Status toggleStatus(Long id) {
+        // Recupera o lanza excepción si no existe
+        PosEntity pos = posRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("POS not found: " + id));
+        Status next = (pos.getStatus() == Status.ONLINE)
+                ? Status.OFFLINE
+                : Status.ONLINE;
+        pos.setStatus(next);
+        posRepository.save(pos);
+        return next;
+    }
+
+    public void patchAmount(Long id, PosAmountRequest posAmountRequest)
    {
        posRepository.findById(id).ifPresent(posEntity -> {
            posEntity.setCurrentAmount(posAmountRequest.getCurrentAmount());
            posRepository.save(posEntity);
        });
    }
-
 
 }
