@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DialectOverride;
 
 @Entity
 @Data
@@ -37,7 +38,6 @@ public class ProviderEntity {
     @Column(name = "nombre_contacto",nullable = false)
     private String nombre;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private boolean activo;
-
 }

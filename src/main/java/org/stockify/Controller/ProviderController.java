@@ -8,6 +8,7 @@ import org.stockify.Model.Services.ProviderService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/provider")
@@ -54,14 +55,22 @@ public class ProviderController {
     }
 
     @PostMapping
-    public String createProvider(ProviderEntity providerEntity) {
-        providerService.save(providerEntity);
-        return "Provider created";
+    public ResponseEntity<String> createProvider(@RequestBody ProviderEntity providerEntity) {
+        if(providerService.save(providerEntity)) {;
+            return ResponseEntity.ok("proveedor creado correctamente");
+        }
+        return ResponseEntity.badRequest().body("Error al crear el proveedor");
     }
 
-    @PutMapping
-    public String updateProvider() {
-        return "Provider updated";
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateProvider(
+            @PathVariable Long id,
+            @RequestBody ProviderEntity providerEntity) {
+        if (providerEntity.getId() == null || !id.equals(providerEntity.getId())) {
+            return ResponseEntity.badRequest().body("El ID del path y del cuerpo deben coincidir y no pueden ser nulos");
+        }
+        providerService.update(providerEntity);
+        return ResponseEntity.ok("Proveedor actualizado correctamente");
     }
 
     @PatchMapping

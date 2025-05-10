@@ -16,10 +16,15 @@ public class ProviderService {
 
     //---Crud operations---
 
-    public Boolean save(ProviderEntity providerEntity) {
+    public boolean save(ProviderEntity providerEntity) {
         if (providerEntity.getId() != null) {
-            ProviderEntity existingProvider = providerRepo.findById(providerEntity.getId()).orElseThrow();
+            ProviderEntity existingProvider = providerRepo.findById(providerEntity.getId()).orElse(null);
             if (existingProvider != null) {
+                if (!existingProvider.isActivo()) {
+                    existingProvider.setActivo(true);
+                    providerRepo.save(existingProvider);
+                    return true;
+                }
                 return false;
             }
         }
@@ -68,7 +73,7 @@ public class ProviderService {
 
     public void logicalDelete(ProviderEntity provider) {
         provider.setActivo(false);
-        providerRepo.save(provider);
+        update(provider);
     }
 
     /* TODO Gestión de productos. arreglar con el repo de productos
