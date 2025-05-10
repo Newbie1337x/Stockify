@@ -1,8 +1,6 @@
 package org.stockify.model.controller;
 
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,8 +12,6 @@ import org.stockify.model.dto.request.CategoryRequest;
 import org.stockify.model.dto.response.CategoryResponse;
 import org.stockify.model.service.CategoryService;
 
-
-import java.util.List;
 @Validated
 @RestController
 @RequestMapping("/api/categories")
@@ -23,7 +19,6 @@ public class CategoryController {
 
 
     private final CategoryService categoryService;
-    private final Logger logger = LoggerFactory.getLogger(CategoryController.class.getName());
 
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
@@ -31,7 +26,7 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<Page<CategoryResponse>> listCategories(
-            @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC)
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC)
             Pageable pageable
     ) {
         Page<CategoryResponse> page = categoryService.findAll(pageable);
@@ -59,8 +54,7 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable int id, @Valid @RequestBody CategoryRequest categoryRequestDTO) {
-        categoryService.update(id, categoryRequestDTO);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(categoryService.update(id, categoryRequestDTO));
     }
 
     @PatchMapping("/{id}")

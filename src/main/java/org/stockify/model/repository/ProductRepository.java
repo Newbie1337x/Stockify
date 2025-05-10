@@ -21,18 +21,19 @@ public interface ProductRepository extends JpaRepository<ProductEntity,Integer> 
     @Query("SELECT p.categories FROM ProductEntity p WHERE p.id = :prodID")
     Set<CategoryEntity> findCategoriesByProductId(@Param("prodID") int prodID);
 
+    @Query("""
+    SELECT p
+    FROM ProductEntity p
+    JOIN p.categories c
+    WHERE LOWER(c.name) IN :names
+    GROUP BY p.id
+    HAVING COUNT(DISTINCT c.id) >= :size
+""")
+    Page<ProductEntity> findByAllCategoryNames(
+            @Param("names") Set<String> names,
+            @Param("size") long size
+             ,Pageable pageable
+    );
 
-        @Query("""
-      SELECT p
-      FROM ProductEntity p
-      JOIN p.categories c
-      WHERE c.id IN :ids
-      GROUP BY p.id
-      HAVING COUNT(DISTINCT c.id) >= :size
-      """)
-        List<ProductEntity> findDistinctByCategoriesId(
-                @Param("ids") Set<Integer> ids,
-                @Param("size") long size
-        );
 
 }

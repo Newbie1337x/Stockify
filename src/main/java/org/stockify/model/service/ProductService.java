@@ -108,12 +108,15 @@ public class ProductService {
         return productMapper.toResponse(productRepository.save(product));
     }
 
-    public List<ProductResponse> filterByCategories(Set<Integer> categories) {
+    public Page<ProductResponse> filterByCategories(Set<String> categories, Pageable pageable) {
+        // Obtener la página de ProductEntity
+        Page<ProductEntity> page = productRepository.findByAllCategoryNames(categories, categories.size(), pageable);
 
-        return productMapper.toResponseList(
-                productRepository.findDistinctByCategoriesId(categories, categories.size())
-        );
+        // Convertir la página de ProductEntity a una página de ProductResponse
+        return page.map(productMapper::toResponse);  // Asumiendo que tienes un ProductMapper para la conversión
     }
+
+
 
     public ProductResponse deleteCategoryFromProduct(int categoryId, int productId) {
         ProductEntity product = getProductById(productId);
@@ -141,6 +144,8 @@ public class ProductService {
         return categoryMapper.toResponseSet(productRepository.findCategoriesByProductId(productId));
 
     }
+
+
 
     private ProductEntity getProductById(int id) {
         return productRepository.findById(id)

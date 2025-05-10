@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.model.dto.request.ProductRequest;
 import org.stockify.model.dto.response.BulkProductResponse;
-import org.stockify.model.dto.response.CategoryResponse;
 import org.stockify.model.dto.response.ProductResponse;
 import org.stockify.model.service.ProductService;
 import java.util.List;
@@ -27,16 +26,24 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> listProducts(
-            @PageableDefault(sort = "name", direction = Sort.Direction.ASC)
-            Pageable pageable) {
+            @RequestParam(required = false) Set<String> categories,
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        Page<ProductResponse> products;
 
-        Page<ProductResponse> products = productService.findAll(pageable);
+        if (categories == null || categories.isEmpty()) {
+            products = productService.findAll(pageable);
+        } else {
+            products = productService.filterByCategories(categories, pageable);
+        }
 
         if (products.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+
         return ResponseEntity.ok(products);
     }
+
 
     @PostMapping("/bulk")
     public ResponseEntity<BulkProductResponse> bulkSaveProducts(@RequestBody List<ProductRequest> products) {
@@ -71,10 +78,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.patch(id,product));
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<List<ProductResponse>> filterByCategories(@RequestParam Set<Integer> categoriesIds) {
-        return ResponseEntity.ok().body(productService.filterByCategories(categoriesIds));
-    }
+
 
 
 

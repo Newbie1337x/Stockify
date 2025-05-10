@@ -47,10 +47,11 @@ public class CategoryService {
         categoryRepository.deleteById(id);
     }
 
-    public void update(int id, CategoryRequest request) {
+    public CategoryResponse update(int id, CategoryRequest request) {
         findEntityById(id);
         validateNameUniqueness(request.getName());
-        categoryRepository.save(categoryMapper.toEntity(request));
+
+        return  categoryMapper.toResponse(categoryRepository.save(categoryMapper.toEntity(request)));
     }
 
     public void patch(int id, CategoryRequest request) {
