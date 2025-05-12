@@ -1,8 +1,8 @@
 package org.stockify.model.mapper;
 
 import org.mapstruct.*;
-import org.stockify.model.dto.request.ProductRequest;
-import org.stockify.model.dto.response.ProductResponse;
+import org.stockify.dto.request.ProductRequest;
+import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
 

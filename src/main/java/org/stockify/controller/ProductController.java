@@ -1,4 +1,4 @@
-package org.stockify.model.controller;
+package org.stockify.controller;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,9 +7,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.model.dto.request.ProductRequest;
-import org.stockify.model.dto.response.BulkProductResponse;
-import org.stockify.model.dto.response.ProductResponse;
+import org.stockify.dto.request.ProductRequest;
+import org.stockify.dto.response.BulkProductResponse;
+import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.service.ProductService;
 import java.util.List;
 import java.util.Set;

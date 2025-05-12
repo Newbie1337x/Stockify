@@ -1,4 +1,4 @@
-package org.stockify.model.dto.response;
+package org.stockify.dto.response;
 
 import java.time.LocalDateTime;
 

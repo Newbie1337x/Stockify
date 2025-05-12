@@ -1,23 +1,18 @@
 package org.stockify.model.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.stockify.model.dto.response.ErrorResponse;
+import org.stockify.dto.response.ErrorResponse;
 import java.time.LocalDateTime;
 
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
 
     @ExceptionHandler(DuplicatedUniqueConstraintException.class)
     public ResponseEntity<ErrorResponse> handleDuplicatedUniqueConstraintException(

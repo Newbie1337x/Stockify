@@ -1,4 +1,4 @@
-package org.stockify.model.controller;
+package org.stockify.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -8,8 +8,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.model.dto.request.CategoryRequest;
-import org.stockify.model.dto.response.CategoryResponse;
+import org.stockify.dto.request.CategoryRequest;
+import org.stockify.dto.response.CategoryResponse;
 import org.stockify.model.service.CategoryService;
 
 @Validated

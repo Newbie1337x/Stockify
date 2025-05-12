@@ -1,9 +1,9 @@
-package org.stockify.model.controller;
+package org.stockify.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.model.dto.response.CategoryResponse;
-import org.stockify.model.dto.response.ProductResponse;
+import org.stockify.dto.response.CategoryResponse;
+import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.service.ProductService;
 
 import java.util.List;

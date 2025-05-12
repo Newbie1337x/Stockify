@@ -1,8 +1,8 @@
 package org.stockify.model.mapper;
 
 import org.mapstruct.*;
-import org.stockify.model.dto.request.CategoryRequest;
-import org.stockify.model.dto.response.CategoryResponse;
+import org.stockify.dto.request.CategoryRequest;
+import org.stockify.dto.response.CategoryResponse;
 import org.stockify.model.entity.CategoryEntity;
 
 import java.util.Set;
