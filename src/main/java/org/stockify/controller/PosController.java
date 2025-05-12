@@ -4,10 +4,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.model.dto.request.PosAmountRequest;
-import org.stockify.model.dto.request.PosRequest;
-import org.stockify.model.dto.request.PosStatusRequest;
-import org.stockify.model.dto.response.PosResponse;
+import org.stockify.dto.request.PosAmountRequest;
+import org.stockify.dto.request.PosRequest;
+import org.stockify.dto.response.PosResponse;
 import org.stockify.model.enums.Status;
 import org.stockify.model.service.PosService;
 

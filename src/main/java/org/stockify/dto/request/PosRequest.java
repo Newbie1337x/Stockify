@@ -1,4 +1,4 @@
-package org.stockify.model.dto.request;
+package org.stockify.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.stockify.model.dto.response.PosResponse;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
 

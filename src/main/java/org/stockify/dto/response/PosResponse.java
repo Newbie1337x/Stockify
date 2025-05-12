@@ -1,4 +1,4 @@
-package org.stockify.model.dto.response;
+package org.stockify.dto.response;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;

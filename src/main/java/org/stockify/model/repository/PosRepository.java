@@ -2,7 +2,6 @@ package org.stockify.model.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.stockify.model.dto.response.PosResponse;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
 

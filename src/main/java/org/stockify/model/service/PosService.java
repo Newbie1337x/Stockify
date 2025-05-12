@@ -2,10 +2,9 @@ package org.stockify.model.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import org.stockify.model.dto.request.PosAmountRequest;
-import org.stockify.model.dto.request.PosRequest;
-import org.stockify.model.dto.request.PosStatusRequest;
-import org.stockify.model.dto.response.PosResponse;
+import org.stockify.dto.request.PosAmountRequest;
+import org.stockify.dto.request.PosRequest;
+import org.stockify.dto.response.PosResponse;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
 import org.stockify.model.exception.NotFoundException;
