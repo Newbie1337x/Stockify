@@ -13,10 +13,6 @@ import java.util.Set;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity,Integer> {
-    boolean existsByNameIgnoreCase(String name);
-    @Query("SELECT COUNT(p) > 0 FROM ProductEntity p WHERE LOWER(p.name) = LOWER(:name) AND p.id <> :id")
-    boolean existsByNameIgnoreCaseAndIdNot(@Param("name") String name, @Param("id") int id);
-
 
     @Query("SELECT p.categories FROM ProductEntity p WHERE p.id = :prodID")
     Set<CategoryEntity> findCategoriesByProductId(@Param("prodID") int prodID);

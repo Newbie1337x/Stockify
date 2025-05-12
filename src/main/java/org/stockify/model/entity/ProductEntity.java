@@ -14,12 +14,12 @@ import java.util.Set;
 @Table(name = "products")
 public class ProductEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "products_id_gen")
-    @SequenceGenerator(name = "products_id_gen", sequenceName = "products_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     @Column(name = "id", nullable = false)
     private Integer id;
-
-    @Column(name = "name", nullable = false)
+    
+    @Column(name = "name", unique = true ,nullable = false)
     private String name;
 
     @Column(name = "description", length = Integer.MAX_VALUE)

@@ -3,10 +3,12 @@ package org.stockify.model.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.stockify.model.dto.response.ErrorResponse;
 import java.time.LocalDateTime;
@@ -42,13 +44,19 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex, request);
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex,
+    HttpServletRequest request) {
+
+        return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
+    }
+
 
 
 
     private <T extends Throwable> ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status, T ex, HttpServletRequest request) {
 
-        logger.error("Error occurred: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
@@ -60,4 +68,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(status).body(errorResponse);
     }
+
+
 }

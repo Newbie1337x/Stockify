@@ -11,7 +11,6 @@ import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.CategoryMapper;
 import org.stockify.model.repository.CategoryRepository;
-import org.stockify.model.exception.DuplicatedUniqueConstraintException;
 
 @Service
 public class CategoryService {
@@ -38,7 +37,6 @@ public class CategoryService {
     }
 
     public CategoryResponse save(CategoryRequest request) {
-        validateNameUniqueness(request.getName());
         CategoryEntity entity = categoryMapper.toEntity(request);
         return categoryMapper.toResponse(categoryRepository.save(entity));
     }
@@ -48,40 +46,20 @@ public class CategoryService {
     }
 
     public CategoryResponse update(int id, CategoryRequest request) {
-        findEntityById(id);
-        validateNameUniqueness(request.getName());
-
-        return  categoryMapper.toResponse(categoryRepository.save(categoryMapper.toEntity(request)));
+        return categoryMapper.toResponse(
+                categoryRepository.save
+                        (categoryMapper
+                                .updateEntityFromRequest
+                                        (request,findEntityById(id))));
     }
-
     public void patch(int id, CategoryRequest request) {
         CategoryEntity category = findEntityById(id);
-        validateNameUniquenessForUpdate(request.getName(), id);
-        updateNameIfPresent(category, request.getName());
+        categoryMapper.patchEntityFromRequest(request, category);
         categoryRepository.save(category);
     }
-
+    
     private CategoryEntity findEntityById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
     }
-
-    private void validateNameUniqueness(String name) {
-        if (categoryRepository.existsByNameIgnoreCase(name)) {
-            throw new DuplicatedUniqueConstraintException("Category with name " + name + " already exists");
-        }
     }
-
-    private void validateNameUniquenessForUpdate(String name, int id) {
-        if (categoryRepository.existsByNameIgnoreCaseAndIdNot(name, id)) {
-            throw new DuplicatedUniqueConstraintException("Category with name " + name + " already exists");
-        }
-    }
-
-    private void updateNameIfPresent(CategoryEntity category, String name) {
-        if (name != null) {
-            category.setName(name);
-        }
-    }
-
-}

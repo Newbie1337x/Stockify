@@ -2,6 +2,7 @@ package org.stockify.model.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,10 @@ import org.stockify.model.mapper.CategoryMapper;
 import org.stockify.model.mapper.ProductMapper;
 import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.repository.ProductRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Service
 public class ProductService {
@@ -53,12 +53,11 @@ public class ProductService {
         return page.map(productMapper::toResponse);
     }
 
-    public ProductResponse save(ProductRequest request) {
-        validateUniqueName(request.getName());
-        ProductEntity product = productMapper.toEntity(request);
-        product.setCategories(getCategoriesFromNames(request.getCategories()));
-        return productMapper.toResponse(productRepository.save(product));
-    }
+
+    public ProductResponse save(ProductRequest request) throws DuplicatedUniqueConstraintException {
+            return productMapper.toResponse(productRepository.save(productMapper.toEntity(request)));
+        }
+
 
     public BulkProductResponse saveAll(List<ProductRequest> requests) {
         List<BulkItemResponse> results = new ArrayList<>();
@@ -69,7 +68,7 @@ public class ProductService {
                 save(req);
                 created++;
                 results.add(new BulkItemResponse(req.getName(), "CREATED", null));
-            } catch (DuplicatedUniqueConstraintException ex) {
+            } catch (DataIntegrityViolationException ex) {
                 skipped++;
                 results.add(new BulkItemResponse(
                         req.getName(),
@@ -94,17 +93,13 @@ public class ProductService {
 
     public ProductResponse update(int id, ProductRequest request) {
         ProductEntity product = getProductById(id);
-        validateUniqueNameForUpdate(request.getName(), id);
-        updateProductFields(product, request);
+        productMapper.updateEntityFromRequest(request, product);
         return productMapper.toResponse(productRepository.save(product));
     }
 
     public ProductResponse patch(int id, ProductRequest request) {
         ProductEntity product = getProductById(id);
-        if (request.getName() != null) {
-            validateUniqueNameForUpdate(request.getName(), id);
-        }
-        patchProductFields(product, request);
+        productMapper.patchEntityFromRequest(request,product);
         return productMapper.toResponse(productRepository.save(product));
     }
 
@@ -112,8 +107,6 @@ public class ProductService {
         Page<ProductEntity> page = productRepository.findByAllCategoryNames(categories, categories.size(), pageable);
         return page.map(productMapper::toResponse);
     }
-
-
 
     public ProductResponse deleteCategoryFromProduct(int categoryId, int productId) {
         ProductEntity product = getProductById(productId);
@@ -142,8 +135,6 @@ public class ProductService {
 
     }
 
-
-
     private ProductEntity getProductById(int id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product with ID " + id + " not found"));
@@ -152,48 +143,6 @@ public class ProductService {
     private CategoryEntity getCategoryById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
-    }
-
-    private void validateUniqueName(String name) {
-        if (productRepository.existsByNameIgnoreCase(name)) {
-            throw new DuplicatedUniqueConstraintException("Product with name " + name + " already exists");
-        }
-    }
-
-    private void validateUniqueNameForUpdate(String name, int id) {
-        if (productRepository.existsByNameIgnoreCaseAndIdNot(name, id)) {
-            throw new DuplicatedUniqueConstraintException("Product with name " + name + " already exists");
-        }
-    }
-
-    private Set<CategoryEntity> getCategoriesFromNames(Set<String> categoryNames) {
-        return categoryNames.stream()
-                .map(name -> categoryRepository.findByName(name)
-                        .orElseGet(() -> createCategory(name)))
-                .collect(Collectors.toSet());
-    }
-
-    private CategoryEntity createCategory(String name) {
-        CategoryEntity category = new CategoryEntity();
-        category.setName(name);
-        return categoryRepository.save(category);
-    }
-
-    private void updateProductFields(ProductEntity product, ProductRequest request) {
-        product.setName(request.getName());
-        product.setPrice(request.getPrice());
-        product.setDescription(request.getDescription());
-        product.setStock(request.getStock());
-    }
-
-    private void patchProductFields(ProductEntity product, ProductRequest request) {
-        if (request.getName() != null) product.setName(request.getName());
-        if (request.getPrice() != null) product.setPrice(request.getPrice());
-        if (request.getDescription() != null) product.setDescription(request.getDescription());
-        if (request.getStock() != null) product.setStock(request.getStock());
-        if (request.getCategories() != null && !request.getCategories().isEmpty()) {
-            product.getCategories().addAll(getCategoriesFromNames(request.getCategories()));
-        }
     }
 
 }
