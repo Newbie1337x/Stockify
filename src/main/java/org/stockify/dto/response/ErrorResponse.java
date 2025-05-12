@@ -1,3 +1,6 @@
+package org.stockify.dto.response;
+
+import java.time.LocalDateTime;
 
 /**
  * DTO de respuesta utilizado para representar detalles de un error ocurrido durante el procesamiento de una solicitud.
@@ -11,5 +14,6 @@ public record ErrorResponse(
         String path,
         LocalDateTime timestamp
 )
+
 {}
 
