@@ -25,43 +25,60 @@ public class ProviderController {
     public ResponseEntity<List<ProviderEntity>> getProvider(
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String mail),
+            @RequestParam(required = false) String mail,
             @RequestParam(required = false) String CUIT,
             @RequestParam(required = false) String direFiscal,
-            @RequestParam(required = false) String razonSocial{
+            @RequestParam(required = false) String razonSocial){
          {
-
             if (id == null && nombre == null && mail == null && CUIT == null && direFiscal == null && razonSocial == null) {
-                List<ProviderEntity> usuarios = providerService.findAll();
-                return usuarios.isEmpty()
+                List<ProviderEntity> proveedores = providerService.findAll();
+                return proveedores.isEmpty()
                         ? ResponseEntity.noContent().build()
-                        : ResponseEntity.ok(usuarios);
+                        : ResponseEntity.ok(proveedores);
             }
             if (id != null) {
-                ProviderEntity usuario = providerService.findById(id);
-                return usuario != null
-                        ? ResponseEntity.ok(Collections.singletonList(usuario))
+                ProviderEntity proveedor = providerService.findById(id);
+                return proveedor != null
+                        ? ResponseEntity.ok(Collections.singletonList(proveedor))
                         : ResponseEntity.notFound().build();
             }
             if (nombre != null) {
-                ProviderEntity usuarios = providerService.findByName(nombre);
-                return usuarios != null
-                        ? ResponseEntity.ok(Collections.singletonList(usuarios))
+                ProviderEntity proveedor = providerService.findByName(nombre);
+                return proveedor != null
+                        ? ResponseEntity.ok(Collections.singletonList(proveedor))
                         : ResponseEntity.noContent().build();
             }
             if (mail != null) {
-                ProviderEntity usuario = providerService.findByEmail(mail);
-                return usuario != null
-                        ? ResponseEntity.ok(Collections.singletonList(usuario))
+                ProviderEntity proveedor = providerService.findByEmail(mail);
+                return proveedor != null
+                        ? ResponseEntity.ok(Collections.singletonList(proveedor))
                         : ResponseEntity.noContent().build();
             }
+            if (CUIT !=null){
+                ProviderEntity proveedor = providerService.findByCUIT(CUIT);
+                return proveedor != null
+                        ? ResponseEntity.ok(Collections.singletonList(proveedor))
+                        : ResponseEntity.noContent().build();
+            }
+             if (direFiscal !=null){
+                 ProviderEntity proveedor = providerService.findByDireccionFiscal(direFiscal);
+                 return proveedor != null
+                         ? ResponseEntity.ok(Collections.singletonList(proveedor))
+                         : ResponseEntity.noContent().build();
+             }
+             if (razonSocial !=null){
+                 ProviderEntity proveedor = providerService.findByRazonSocial(razonSocial);
+                 return proveedor != null
+                         ? ResponseEntity.ok(Collections.singletonList(proveedor))
+                         : ResponseEntity.noContent().build();
+             }
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping
     public ResponseEntity<String> createProvider(@RequestBody ProviderEntity providerEntity) {
-        if(providerService.save(providerEntity)) {;
+        if(providerService.save(providerEntity)) {
             return ResponseEntity.ok("proveedor creado correctamente");
         }
         return ResponseEntity.badRequest().body("Error al crear el proveedor");
@@ -73,18 +90,20 @@ public class ProviderController {
             @RequestBody ProviderEntity providerEntity) {
         if (providerEntity.getId() == null || !id.equals(providerEntity.getId())) {
             return ResponseEntity.badRequest().body("El ID del path y del cuerpo deben coincidir y no pueden ser nulos");
-        }
+        } //comprobacion extra por si coloca un id que no buscaba reemplazar
         providerService.update(providerEntity);
         return ResponseEntity.ok("Proveedor actualizado correctamente");
     }
 
-    @PatchMapping
-    public String patchProvider() {
-        return "Provider patched";
+    @PatchMapping("/delete")
+    public ResponseEntity<String> logicalDeleteProvider(@PathVariable Long id) {
+        providerService.logicalDelete(providerService.findById(id));
+        return ResponseEntity.ok("Proveedor dado de baja correctamente");
     }
 
     @DeleteMapping
-    public String deleteProvider() {
-        return "Provider deleted";
+    public ResponseEntity<String> deleteProvider(@PathVariable Long id) {
+        providerService.delete(providerService.findById(id));
+        return ResponseEntity.ok("Proveedor eliminado correctamente");
     }
 }
