@@ -1,14 +1,16 @@
 package org.stockify.Controller;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.Model.Entities.ProviderEntity;
 import org.stockify.Model.Services.ProviderService;
 
+
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/provider")
@@ -23,10 +25,13 @@ public class ProviderController {
     public ResponseEntity<List<ProviderEntity>> getProvider(
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String mail) {
+            @RequestParam(required = false) String mail),
+            @RequestParam(required = false) String CUIT,
+            @RequestParam(required = false) String direFiscal,
+            @RequestParam(required = false) String razonSocial{
          {
 
-            if (id == null && nombre == null && mail == null) {
+            if (id == null && nombre == null && mail == null && CUIT == null && direFiscal == null && razonSocial == null) {
                 List<ProviderEntity> usuarios = providerService.findAll();
                 return usuarios.isEmpty()
                         ? ResponseEntity.noContent().build()

@@ -40,23 +40,27 @@ public class ProviderService {
     }
 
     public ProviderEntity findById(long id) {
-        return providerRepo.findById(id).orElseThrow();
+        return providerRepo.findById(id).orElseThrow(ProviderNotFoundException::new);
     }
 
     public ProviderEntity findByName(String name){
-        return providerRepo.findAll()
-                .stream()
-                .filter(provider -> provider.getNombre().equalsIgnoreCase(name) && provider.isActivo())
-                .findFirst()
-                .orElseThrow(ProviderNotFoundException::new);
+        return providerRepo.findByName(name);
     }
 
     public ProviderEntity findByEmail(String email){
-        return providerRepo.findAll()
-                .stream()
-                .filter(provider -> provider.getMail().equalsIgnoreCase(email) && provider.isActivo())
-                .findFirst()
-                .orElseThrow(ProviderNotFoundException::new);
+        return providerRepo.findByEmail(email);
+    }
+
+    public ProviderEntity findByRazonSocial(String razonSocial){
+        return providerRepo.findByRazonSocial(razonSocial);
+    }
+
+    public ProviderEntity findByCUIT(String cuit){
+        return providerRepo.findByCUIT(cuit);
+    }
+
+    public ProviderEntity findByDireccionFiscal(String direccionFiscal){
+        return providerRepo.findByDireccionFiscal(direccionFiscal);
     }
 
     public void delete(ProviderEntity provider) {
