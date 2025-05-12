@@ -35,4 +35,3 @@ build/
 src/main/resources/application-secret.properties
 !/.env
 .env
-.env
