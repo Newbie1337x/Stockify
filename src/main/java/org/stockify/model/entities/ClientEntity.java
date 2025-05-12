@@ -2,7 +2,10 @@ package org.stockify.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -34,6 +37,7 @@ public class ClientEntity {
     @Column(name = "client_phone", nullable = false, length = 20)
     private String phone;
 
-    @Column(name = "client_date_of_registration", nullable = false)
-    private Date dateOfRegistration;
+    @Column(name = "client_date_of_registration")
+    @CreationTimestamp
+    private LocalDate dateOfRegistration;
 }

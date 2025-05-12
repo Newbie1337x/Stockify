@@ -16,5 +16,4 @@ public class StockifyApplication {
 
         SpringApplication.run(StockifyApplication.class, args);
     }
-
 }

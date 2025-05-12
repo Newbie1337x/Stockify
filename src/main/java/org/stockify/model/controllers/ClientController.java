@@ -1,5 +1,9 @@
 package org.stockify.model.controllers;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.model.entities.ClientEntity;
@@ -25,5 +29,9 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientEntity>> getAllClients() {return ResponseEntity.ok(clientServices.findAll());}
+    public ResponseEntity<Page<ClientEntity>> getAllClients(@RequestParam int page, @RequestParam int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+        Page<ClientEntity> clientEntityPage = clientService.findAll(pageable);
+
+        return ResponseEntity.ok(clientEntityPage);}
 }
