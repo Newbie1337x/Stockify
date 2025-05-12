@@ -1,8 +1,12 @@
 package org.stockify.Model.DTO.Request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 public class ProviderRequestDTO {
 
-    /*
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 100)
     private String nombre;
@@ -13,5 +17,5 @@ public class ProviderRequestDTO {
 
     @Email(message = "El correo debe ser válido")
     private String email;
-    */
+
 }

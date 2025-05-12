@@ -40,11 +40,7 @@ public class ProviderService {
     }
 
     public ProviderEntity findById(long id) {
-        return providerRepo.findAll()
-                .stream()
-                .filter(provider -> provider.getId() == id)
-                .findFirst()
-                .orElseThrow(ProviderNotFoundException::new);
+        return providerRepo.findById(id).orElseThrow();
     }
 
     public ProviderEntity findByName(String name){
