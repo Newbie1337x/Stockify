@@ -109,11 +109,8 @@ public class ProductService {
     }
 
     public Page<ProductResponse> filterByCategories(Set<String> categories, Pageable pageable) {
-        // Obtener la página de ProductEntity
         Page<ProductEntity> page = productRepository.findByAllCategoryNames(categories, categories.size(), pageable);
-
-        // Convertir la página de ProductEntity a una página de ProductResponse
-        return page.map(productMapper::toResponse);  // Asumiendo que tienes un ProductMapper para la conversión
+        return page.map(productMapper::toResponse);
     }
 
 

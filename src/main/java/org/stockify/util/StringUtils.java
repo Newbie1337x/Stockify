@@ -1,5 +1,6 @@
 package org.stockify.util;
 
+@Deprecated
 public class StringUtils {
 
     public static String capitalizeFirst(String str) {
