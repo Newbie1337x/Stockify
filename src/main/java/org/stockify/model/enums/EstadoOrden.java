@@ -1,4 +1,4 @@
-package org.stockify.Model.Entities;
+package org.stockify.model.enums;
 
 public enum EstadoOrden {
     PENDIENTE,

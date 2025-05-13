@@ -1,4 +1,4 @@
-package org.stockify.Model.DTO.Response;
+package org.stockify.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +14,5 @@ public class ProviderResponseDTO {
     private String telefono;
     private String mail;
     private String name;
-    private boolean activo;
 
 }

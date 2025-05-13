@@ -1,9 +1,11 @@
-package org.stockify.Model.Repositories;
+package org.stockify.model.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
-import org.stockify.Model.Entities.ProviderEntity;
+import org.stockify.model.entities.ProviderEntity;
 import java.util.List;
 
 @Repository
@@ -16,4 +18,7 @@ public interface ProviderRepo extends JpaRepository<ProviderEntity, Long>, Pagin
     ProviderEntity findByCuit(String cuit);
 
     ProviderEntity findByMail(String mail);
+
+    Page<ProviderEntity> findAllByActivo(Pageable pageable);
+
 }

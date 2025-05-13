@@ -1,12 +1,12 @@
-package org.stockify.Model.Services;
+package org.stockify.model.services;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.stockify.Model.Entities.ProviderEntity;
-import org.stockify.Model.Exceptions.ProviderNotFoundException;
-import org.stockify.Model.Repositories.ProviderRepo;
+import org.stockify.model.entities.ProviderEntity;
+import org.stockify.model.exceptions.ProviderNotFoundException;
+import org.stockify.model.repositories.ProviderRepo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +43,12 @@ public class ProviderService {
     public List<ProviderEntity> findAll() {
         return providerRepo.findAll()
                 .stream()
+                .toList();
+    }
+
+    public List<ProviderEntity> findALlActive(){
+        return providerRepo.findAll()
+                .stream()
                 .filter(ProviderEntity::isActivo)
                 .toList();
     }
@@ -52,9 +58,13 @@ public class ProviderService {
         return providerRepo.findAll(pageable);
     }
 
+    public Page<ProviderEntity> findAllPaginatedActive(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return providerRepo.findAllByActivo(pageable);
+    }
 
     public ProviderEntity findById(long id) {
-        return providerRepo.findById(id).orElseThrow(ProviderNotFoundException::new);
+            return providerRepo.findById(id).orElseThrow(ProviderNotFoundException::new);
     }
 
     public List<ProviderEntity> findByName(String name) {

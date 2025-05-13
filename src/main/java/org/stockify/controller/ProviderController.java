@@ -1,4 +1,4 @@
-package org.stockify.Controller;
+package org.stockify.controller;
 
 
 import jakarta.validation.Valid;
@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.Model.DTO.Request.ProviderRequestDTO;
-import org.stockify.Model.DTO.Response.ProviderResponseDTO;
-import org.stockify.Model.Entities.ProviderEntity;
-import org.stockify.Model.Mapper.ProviderMapper;
-import org.stockify.Model.Services.ProviderService;
+import org.stockify.dto.request.ProviderRequestDTO;
+import org.stockify.dto.response.ProviderResponseDTO;
+import org.stockify.model.entities.ProviderEntity;
+import org.stockify.model.mapper.ProviderMapper;
+import org.stockify.model.services.ProviderService;
 
 
 import java.util.HashMap;
@@ -32,6 +32,17 @@ public class ProviderController {
 
     //---Crud operations---
 
+    /*
+    @GetMapping("/active")
+    public ResponseEntity<List<ProviderResponseDTO>> getActiveProviders() {
+        List<ProviderEntity> provedores = providerService.findALlActive();
+        if(provedores.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        List<ProviderResponseDTO> dtosLista = providerMapper.toResponseDTOList(provedores);
+        return ResponseEntity.ok(dtosLista);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<ProviderResponseDTO>> getProviders() {
         List<ProviderEntity> proveedores = providerService.findAll();
@@ -41,8 +52,30 @@ public class ProviderController {
         List<ProviderResponseDTO> dtoList = providerMapper.toResponseDTOList(proveedores);
         return ResponseEntity.ok(dtoList);
     }
+     */
 
     @GetMapping("/paginated")
+    public ResponseEntity<Map<String, Object>> getActivePaginatedProviders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+        Page<ProviderEntity> providerPage = providerService.findAllPaginatedActive(page, size);
+        if (providerPage.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        List<ProviderResponseDTO> providers = providerMapper.toResponseDTOList(providerPage.getContent());
+        Map<String, Object> response = new HashMap<>();
+        response.put("providers", providers);
+        response.put("currentPage", providerPage.getNumber());
+        response.put("totalItems", providerPage.getTotalElements());
+        response.put("totalPages", providerPage.getTotalPages());
+        response.put("hasNext", providerPage.hasNext());
+        response.put("hasPrevious", providerPage.hasPrevious());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/allpaginated")
     public ResponseEntity<Map<String, Object>> getPaginatedProviders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
@@ -62,7 +95,6 @@ public class ProviderController {
 
         return ResponseEntity.ok(response);
     }
-
 
     @GetMapping("/id/{id}")
     public ResponseEntity<ProviderResponseDTO> getProviderById(@PathVariable Long id) {

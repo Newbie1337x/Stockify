@@ -1,4 +1,4 @@
-package org.stockify.Model.DTO.Request;
+package org.stockify.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

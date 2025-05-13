@@ -1,9 +1,9 @@
-package org.stockify.Model.Mapper;
+package org.stockify.model.mapper;
 
 import org.mapstruct.Mapper;
-import org.stockify.Model.DTO.Request.ProviderRequestDTO;
-import org.stockify.Model.DTO.Response.ProviderResponseDTO;
-import org.stockify.Model.Entities.ProviderEntity;
+import org.stockify.dto.request.ProviderRequestDTO;
+import org.stockify.dto.response.ProviderResponseDTO;
+import org.stockify.model.entities.ProviderEntity;
 
 import java.util.List;
 
