@@ -2,6 +2,7 @@ package org.stockify.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.stockify.model.enums.Status;
 
 @Getter
@@ -24,5 +25,6 @@ public class EmployeeEntity {
     @Column(nullable = false)
     private Status status;
     @Column(nullable = false)
+    @ColumnDefault("true")
     private Boolean active;
 }
