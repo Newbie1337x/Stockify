@@ -1,14 +1,11 @@
 package org.stockify.Model.Entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DialectOverride;
+import lombok.*;
 
 @Entity
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
@@ -23,8 +20,8 @@ public class ProviderEntity {
     @Column(name = "razon_social",nullable = false)
     private String razonSocial;
 
-    @Column(nullable = false, length = 11)
-    private String CUIT;
+    @Column(nullable = false, length = 100)
+    private String cuit;
 
     @Column(name = "direccion_fiscal",nullable = false)
     private String direccionFiscal;
@@ -36,8 +33,8 @@ public class ProviderEntity {
     private String mail;
 
     @Column(name = "nombre_contacto",nullable = false)
-    private String nombre;
+    private String name;
 
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
-    private boolean activo;
+    @Column(nullable = false)
+    private boolean activo = true;
 }

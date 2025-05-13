@@ -1,32 +1,40 @@
 package org.stockify.Model.Services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.stockify.Model.Entities.ProviderEntity;
 import org.stockify.Model.Exceptions.ProviderNotFoundException;
 import org.stockify.Model.Repositories.ProviderRepo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ProviderService {
 
-    @Autowired
-    private ProviderRepo providerRepo;
+    private final ProviderRepo providerRepo;
+
+    public ProviderService(ProviderRepo providerRepo){
+        this.providerRepo = providerRepo;
+    }
 
     //---Crud operations---
 
     public boolean save(ProviderEntity providerEntity) {
-        if (providerEntity.getId() != null) {
-            ProviderEntity existingProvider = providerRepo.findById(providerEntity.getId()).orElse(null);
+        if (providerEntity != null && providerEntity.getMail() != null) {
+            ProviderEntity existingProvider = providerRepo.findByMail(providerEntity.getMail());
             if (existingProvider != null) {
-                if (!existingProvider.isActivo()) {
-                    existingProvider.setActivo(true);
-                    providerRepo.save(existingProvider);
-                    return true;
+                if (existingProvider.isActivo()) {
+                    return false;
                 }
-                return false;
+                existingProvider.setActivo(true);
+                providerRepo.save(existingProvider);
+                return true;
             }
+        }else {
+            throw new IllegalArgumentException("ProviderEntity or mail cannot be null");
         }
         providerRepo.save(providerEntity);
         return true;
@@ -39,28 +47,26 @@ public class ProviderService {
                 .toList();
     }
 
+    public Page<ProviderEntity> findAllPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return providerRepo.findAll(pageable);
+    }
+
+
     public ProviderEntity findById(long id) {
         return providerRepo.findById(id).orElseThrow(ProviderNotFoundException::new);
     }
 
-    public ProviderEntity findByName(String name){
-        return providerRepo.findByName(name);
-    }
-
-    public ProviderEntity findByEmail(String email){
-        return providerRepo.findByEmail(email);
+    public List<ProviderEntity> findByName(String name) {
+        return new ArrayList<>(providerRepo.findByName(name));
     }
 
     public ProviderEntity findByRazonSocial(String razonSocial){
         return providerRepo.findByRazonSocial(razonSocial);
     }
 
-    public ProviderEntity findByCUIT(String cuit){
-        return providerRepo.findByCUIT(cuit);
-    }
-
-    public ProviderEntity findByDireccionFiscal(String direccionFiscal){
-        return providerRepo.findByDireccionFiscal(direccionFiscal);
+    public ProviderEntity findByCuit(String cuit){
+        return providerRepo.findByCuit(cuit);
     }
 
     public void delete(ProviderEntity provider) {

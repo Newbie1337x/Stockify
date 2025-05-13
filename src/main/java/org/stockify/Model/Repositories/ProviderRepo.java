@@ -4,17 +4,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import org.stockify.Model.Entities.ProviderEntity;
+import java.util.List;
 
 @Repository
 public interface ProviderRepo extends JpaRepository<ProviderEntity, Long>, PagingAndSortingRepository<ProviderEntity,Long> {
 
-    ProviderEntity findByName(String name);
-
-    ProviderEntity findByEmail(String email);
+    List<ProviderEntity> findByName(String name);
 
     ProviderEntity findByRazonSocial(String razonSocial);
 
-    ProviderEntity findByCUIT(String cuit);
+    ProviderEntity findByCuit(String cuit);
 
-    ProviderEntity findByDireccionFiscal(String direccionFiscal);
+    ProviderEntity findByMail(String mail);
 }

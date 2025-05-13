@@ -34,10 +34,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -46,6 +43,12 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>java-dotenv</artifactId>
+            <version>5.2.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
         <dependency>
@@ -60,12 +63,6 @@
             <artifactId>mapstruct-processor</artifactId>
             <version>1.6.3</version>
         </dependency>
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>java-dotenv</artifactId>
-            <version>5.2.2</version>
-        </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -106,6 +103,11 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.6.3</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

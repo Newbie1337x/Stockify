@@ -7,9 +7,12 @@ import org.stockify.Model.Entities.ProviderEntity;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper (componentModel = "spring")
 public interface ProviderMapper {
+
     ProviderEntity toEntity(ProviderRequestDTO dto);
+
     ProviderResponseDTO toResponseDTO(ProviderEntity entity);
+
     List<ProviderResponseDTO> toResponseDTOList(List<ProviderEntity> entities);
 }
