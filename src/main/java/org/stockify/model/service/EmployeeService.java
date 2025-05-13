@@ -7,6 +7,7 @@ import org.stockify.model.exception.EmployeeNotFoundException;
 import org.stockify.model.dto.request.EmployeeRequest;
 import org.stockify.model.dto.response.EmployeeResponse;
 import org.stockify.model.entity.EmployeeEntity;
+import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
 
@@ -38,10 +39,10 @@ public class EmployeeService {
                 .toList());
     }
 
-    public EmployeeResponse getEmployeeById(Long id) throws EmployeeNotFoundException {
+    public EmployeeResponse getEmployeeById(Long id) {
         return employeeRepository.findById(id)
                 .map(employeeMapper::toResponseDto)
-                .orElseThrow(() -> new EmployeeNotFoundException("Empleado no encontrado con ID " + id));
+                .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
     }
 
     public List<EmployeeResponse> getEmployeeByName(String name){
@@ -76,10 +77,10 @@ public class EmployeeService {
     }
 
 
-    public Status toggleStatus(Long id) throws EmployeeNotFoundException {
+    public Status toggleStatus(Long id) {
         // Recupera o lanza excepción si no existe
         EmployeeEntity employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("POS not found: " + id));
+                .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         Status next = (employee.getStatus() == Status.ONLINE)
                 ? Status.OFFLINE
                 : Status.ONLINE;
