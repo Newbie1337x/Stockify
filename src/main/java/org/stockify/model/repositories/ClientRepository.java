@@ -7,9 +7,11 @@ import org.springframework.stereotype.Repository;
 import org.stockify.model.entities.ClientEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ClientRepository extends JpaRepository<ClientEntity, Long> {
-    List<ClientEntity> findByFirstName(String firstName);
+    Page<ClientEntity> findByFirstName(String firstName, Pageable pageable);
+    Optional<ClientEntity> findById(Long id);
     Page<ClientEntity> findAll(Pageable pageable);
 }

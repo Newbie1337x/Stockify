@@ -1,4 +1,4 @@
-package org.stockify.model.controllers;
+package org.stockify.controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,14 +10,14 @@ import org.stockify.model.entities.ClientEntity;
 import org.stockify.model.services.ClientService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/client")
 public class ClientController {
-    private final ClientService clientServices;
     private final ClientService clientService;
 
-    public ClientController(ClientService clientServices, ClientService clientService) {this.clientServices = clientServices;
+    public ClientController(ClientService clientServices, ClientService clientService) {
         this.clientService = clientService;
     }
 
@@ -29,9 +29,17 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ClientEntity>> getAllClients(@RequestParam int page, @RequestParam int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+    public ResponseEntity<Page<ClientEntity>> getAllClients(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
         Page<ClientEntity> clientEntityPage = clientService.findAll(pageable);
 
-        return ResponseEntity.ok(clientEntityPage);}
+        return ResponseEntity.ok(clientEntityPage);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientEntity> getClientById(@PathVariable Long id){
+        return ResponseEntity.ok(clientService.findById(id));
+    }
 }
+
+
