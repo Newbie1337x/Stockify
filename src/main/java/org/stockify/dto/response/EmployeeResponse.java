@@ -1,4 +1,4 @@
-package org.stockify.model.dto.response;
+package org.stockify.dto.response;
 
 import lombok.*;
 import org.stockify.model.enums.Status;

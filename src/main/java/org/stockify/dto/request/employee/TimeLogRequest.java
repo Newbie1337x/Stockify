@@ -1,4 +1,4 @@
-package org.stockify.model.dto.request;
+package org.stockify.dto.request.employee;
 
 import lombok.*;
 import org.jetbrains.annotations.NotNull;

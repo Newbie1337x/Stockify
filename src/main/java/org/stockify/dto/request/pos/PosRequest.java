@@ -1,4 +1,4 @@
-package org.stockify.dto.request;
+package org.stockify.dto.request.pos;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -9,7 +9,6 @@ import lombok.Setter;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 /**
  * DTO for {@link org.stockify.model.entity.PosEntity}
@@ -20,7 +19,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PosRequest implements Serializable{
+public class PosRequest {
     @NotNull(message = "currentAmount no debe ser nulo")
     @PositiveOrZero(message = "currentAmount debe ser positivo o cero")
     private BigDecimal currentAmount;

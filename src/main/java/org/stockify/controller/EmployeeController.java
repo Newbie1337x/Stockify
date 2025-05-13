@@ -1,10 +1,8 @@
 package org.stockify.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.model.dto.request.EmployeeRequest;
-import org.stockify.model.dto.response.EmployeeResponse;
+import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.model.exception.EmployeeNotFoundException;
 import org.stockify.model.service.EmployeeService;
 

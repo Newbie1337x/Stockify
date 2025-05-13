@@ -1,4 +1,4 @@
-package org.stockify.dto.request;
+package org.stockify.dto.request.pos;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package org.stockify.model.dto.request;
+package org.stockify.dto.request.employee;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -4,7 +4,7 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.stockify.dto.request.PosRequest;
+import org.stockify.dto.request.pos.PosRequest;
 import org.stockify.dto.response.PosResponse;
 import org.stockify.model.entity.PosEntity;
 
@@ -26,6 +26,8 @@ public interface PosMapper {
      */
     PosResponse toDto(PosEntity posEntity);
 
+
+    //Que hace bean mapping?
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     PosResponse partialUpdate(PosEntity posEntity, @MappingTarget PosResponse posResponse);
 }
