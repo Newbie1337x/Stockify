@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.stockify.model.enums.Status;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,7 +18,7 @@ import org.stockify.model.enums.Status;
 public class EmployeeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, updatable = false, unique = true)
+    @Column(name = "employee_id",nullable = false, updatable = false, unique = true)
     private Long id;
     @Column(nullable = false, length = 100)
     private String name;
@@ -24,7 +26,12 @@ public class EmployeeEntity {
     private String lastName;
     @Column(nullable = false)
     private Status status;
+    @ManyToMany(mappedBy = "employeeEntities")
+    private List<ShiftEntity> shiftEntities;
     @Column(nullable = false)
     @ColumnDefault("true")
     private Boolean active;
+    @OneToMany(mappedBy = "employee")
+    private List<SessionPosEntity> sessionPosEntities;
+
 }

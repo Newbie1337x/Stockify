@@ -30,7 +30,9 @@ public class SessionPosEntity {
 
     @Column(name = "close_amount")
     private BigDecimal closeAmount;
-
+    @ManyToOne
+    @JoinColumn(name = "employee_id")
+    private EmployeeEntity employee;
     @ManyToOne()
     @JoinColumn(name = "shift_id")
     private ShiftEntity shiftEntity;
