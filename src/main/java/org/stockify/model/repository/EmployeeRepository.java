@@ -10,6 +10,4 @@ import java.util.List;
 @Repository
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> {
 
-    @Query("SELECT * FROM employee WHERE active = TRUE")
-    List<EmployeeEntity> findAllActive();
 }
