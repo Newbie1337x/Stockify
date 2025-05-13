@@ -20,7 +20,7 @@ public class EmployeeEntity {
     private Long id;
     @Column(nullable = false, length = 100)
     private String name;
-    @Column(nullable = false, length = 100)
+    @Column(name = "last_name" ,nullable = false, length = 100)
     private String lastName;
     @Column(nullable = false)
     private Status status;
