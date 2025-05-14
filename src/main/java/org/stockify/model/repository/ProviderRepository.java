@@ -17,7 +17,7 @@ public interface ProviderRepository extends JpaRepository<ProviderEntity, Long> 
 
     ProviderEntity findByTaxId(String taxId);
 
-    ProviderEntity findByEmail(String email);
+    //ProviderEntity findByEmail(String email);
 
 
 }

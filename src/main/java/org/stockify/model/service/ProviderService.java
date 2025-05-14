@@ -29,7 +29,7 @@ public class ProviderService {
                         (providerMapper.toEntity(providerRequest)));
     }
 
-      public Page<ProviderResponse> findAll(Pageable pageable) {
+    public Page<ProviderResponse> findAll(Pageable pageable) {
         Page<ProviderEntity> page = providerRepository.findAll(pageable);
         return page.map(providerMapper::toResponseDTO);
     }
@@ -64,7 +64,7 @@ public class ProviderService {
         return providerMapper.toResponseDTO(providerRepository.save(provider));
     }
 
-        public void delete(Long id) {
+    public void delete(Long id) {
         providerRepository.deleteById(id);
     }
 

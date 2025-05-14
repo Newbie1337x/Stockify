@@ -36,16 +36,16 @@ public class ProviderController {
     @PostMapping
         public ResponseEntity<ProviderResponse> createProvider(@Valid @RequestBody ProviderRequest request) {
         return ResponseEntity.ok(providerService.save(request));
-        }
+    }
 
-        /*
+    /*
     @PutMapping("/{id}")
     public ResponseEntity<ProviderResponse> updateProvider(
             @PathVariable Long id,
             @Valid @RequestBody ProviderRequest request) {
         return ResponseEntity.ok(providerService.update(request));
         }
-*/
+    */
 
     @PatchMapping("/{id}/disable")
     public ResponseEntity<String> logicalDeleteProvider(@PathVariable Long id) {
@@ -76,7 +76,7 @@ public class ProviderController {
         } else if (taxId != null) {
             return ResponseEntity.ok(providerService.findByTaxId(taxId));
         } else {
-            return ResponseEntity.badRequest().body("Debe proporcionar al menos un parámetro de búsqueda.");
+            return listProviders(pageable);
         }
     }
 }
