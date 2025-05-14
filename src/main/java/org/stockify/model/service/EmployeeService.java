@@ -24,9 +24,10 @@ public class EmployeeService {
         this.employeeMapper = employeeMapper;
     }
 
-    public Boolean createEmployee(EmployeeRequest employeeRequest) {
+    public EmployeeEntity createEmployee(EmployeeRequest employeeRequest) {
+        EmployeeEntity employeeEntity = employeeMapper.toEntity(employeeRequest);
         employeeRepository.save(employeeMapper.toEntity(employeeRequest));
-        return true;
+        return employeeEntity;
     }
     public List<EmployeeResponse> getAllEmployees() {
         return employeeMapper.toResponseDtoList(employeeRepository.findAll());
@@ -59,7 +60,7 @@ public class EmployeeService {
                 .toList();
     }
 
-    public void delete(Long id) throws EmployeeNotFoundException {
+    public void delete(Long id) {
        EmployeeEntity employeeEntity = employeeMapper.toEntity(getEmployeeById(id));
        employeeEntity.setActive(false);
        employeeRepository.save(employeeEntity);
