@@ -42,7 +42,6 @@ public class ProviderController {
         public ResponseEntity<ProviderResponse> createProvider(@Valid @RequestBody ProviderRequest request) {
         return ResponseEntity.ok(providerService.save(request));
     }
-
     /*
     @PutMapping("/{id}")
     public ResponseEntity<ProviderResponse> updateProvider(
@@ -71,6 +70,7 @@ public class ProviderController {
     ) {
         return ResponseEntity.ok(productService.findProductsByProviderId(id, pageable));
     }
+
 
 
     //FILTERS //CONSULTAR

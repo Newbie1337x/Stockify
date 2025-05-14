@@ -61,7 +61,7 @@ public class ProductService {
 
 
     public ProductResponse save(ProductRequest request) throws DuplicatedUniqueConstraintException {
-
+//TODO MODIFICAR , REMOVER CREADO DE CATEGORIAS.
         ProductEntity product = productMapper.toEntity(request);
         
         

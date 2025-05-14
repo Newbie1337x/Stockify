@@ -8,23 +8,18 @@ import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.entity.ProviderEntity;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.ProviderMapper;
-import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.ProviderRepository;
-
-import java.util.List;
-
 
 @Service
 public class ProviderService {
 
     private final ProviderRepository providerRepository;
     private final ProviderMapper providerMapper;
-    private final ProductRepository productRepository;
 
-    public ProviderService(ProviderRepository providerRepository, ProviderMapper providerMapper, ProductRepository productRepository) {
+    public ProviderService(ProviderRepository providerRepository, ProviderMapper providerMapper) {
         this.providerRepository = providerRepository;
         this.providerMapper = providerMapper;
-        this.productRepository = productRepository;
+
     }
 
     //---Crud operations---

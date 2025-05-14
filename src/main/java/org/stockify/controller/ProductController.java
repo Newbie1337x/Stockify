@@ -40,7 +40,6 @@ public class ProductController {
         if (products.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
         return ResponseEntity.ok(products);
     }
 

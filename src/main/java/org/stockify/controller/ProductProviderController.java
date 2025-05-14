@@ -27,5 +27,4 @@ public class ProductProviderController {
     return ResponseEntity.ok(productService.assignProviderToProduct(id,request.getProvidersIds()));
     }
 
-
 }
