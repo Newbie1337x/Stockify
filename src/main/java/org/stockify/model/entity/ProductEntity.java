@@ -18,7 +18,7 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
     
     @Column(name = "name", unique = true ,nullable = false)
     private String name;
@@ -35,10 +35,18 @@ public class ProductEntity {
     private BigDecimal stock;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "product_categories",
+    @JoinTable(name = "products_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<CategoryEntity> categories;
+
+    @ManyToMany
+    @JoinTable(
+            name = "products_providers",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "provider_id")
+    )
+    private Set<ProviderEntity> providers;
 
 
     public ProductEntity(){

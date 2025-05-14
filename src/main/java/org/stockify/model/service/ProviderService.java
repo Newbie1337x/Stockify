@@ -3,11 +3,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.ProviderRequest;
+import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.entity.ProviderEntity;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.ProviderMapper;
+import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.ProviderRepository;
+
+import java.util.List;
 
 
 @Service
@@ -15,10 +19,12 @@ public class ProviderService {
 
     private final ProviderRepository providerRepository;
     private final ProviderMapper providerMapper;
+    private final ProductRepository productRepository;
 
-    public ProviderService(ProviderRepository providerRepository, ProviderMapper providerMapper) {
+    public ProviderService(ProviderRepository providerRepository, ProviderMapper providerMapper, ProductRepository productRepository) {
         this.providerRepository = providerRepository;
         this.providerMapper = providerMapper;
+        this.productRepository = productRepository;
     }
 
     //---Crud operations---
@@ -69,15 +75,20 @@ public class ProviderService {
     }
 
 
-    /* TODO Gestión de productos. arreglar con el repo de productos
 
-        listarProductosDelProveedor(proveedorId)
 
-        agregarProductoAlProveedor(proveedorId, productoData)
+      // public List<ProductResponse> listarProductosDelProveedor(int providerID) {
 
-        eliminarProductoDelProveedor(proveedorId, productoId)
+       // return productRepository.findProductEntitiesByProviderid
 
-    */
+
+        }
+
+     //   agregarProductoAlProveedor(proveedorId, productoData)
+
+       // eliminarProductoDelProveedor(proveedorId, productoId)
+
+
     /* TODO ---Gestión de órdenes de compra
 
             crearOrdenDeCompra(proveedorId, datosOrden)
@@ -95,4 +106,3 @@ public class ProviderService {
             calcularTotalCompradoAProveedor(proveedorId, periodo)
     */
 
-}

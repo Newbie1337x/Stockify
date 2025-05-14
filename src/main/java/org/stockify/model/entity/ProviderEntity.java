@@ -21,22 +21,22 @@ public class ProviderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "provider_id", nullable = false)
+    @Column(name = "provider_id", nullable = false ,unique = true)
     private Long id;
 
-    @Column(name = "business_name", nullable = false)
+    @Column(name = "business_name", nullable = false ,unique = true)
     private String businessName;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100 , unique = true)
     private String taxId;
 
     @Column(name = "tax_address", nullable = false)
     private String taxAddress;
 
-    @Column
+    @Column(unique = true)
     private String phone;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(name = "contact_name", nullable = false)
@@ -45,4 +45,6 @@ public class ProviderEntity {
     @Column(nullable = false)
     @ColumnDefault("true")
     private boolean active = true;
+
+
 }

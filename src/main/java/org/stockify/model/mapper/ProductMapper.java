@@ -5,6 +5,7 @@ import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
+import org.stockify.model.entity.ProviderEntity;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,8 +14,10 @@ import java.util.stream.Collectors;
 public interface ProductMapper {
 
     @Mapping(source = "categories", target = "categories", qualifiedByName = "entitiesToNames")
+    @Mapping(source = "providers", target = "providers", qualifiedByName = "providerEntitiesToIds")
     ProductResponse toResponse(ProductEntity entity);
 
+    @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
     ProductEntity toEntity(ProductRequest request);
@@ -30,6 +33,7 @@ public interface ProductMapper {
     /**
      * Lógica interna del update (excepto categorías)
      */
+    @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -38,6 +42,7 @@ public interface ProductMapper {
     /**
      * PATCH: ignora campos nulos, actualiza los que vienen con datos
      */
+    @Mapping(target = "providers", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "categories", target = "categories", qualifiedByName = "namesToEntities")
@@ -60,6 +65,14 @@ public interface ProductMapper {
                     e.setName(name);
                     return e;
                 })
+                .collect(Collectors.toSet());
+    }
+
+    @Named("providerEntitiesToIds")
+    default Set<Long> providerEntitiesToIds(Set<ProviderEntity> providers) {
+        if (providers == null || providers.isEmpty()) return Set.of();
+        return providers.stream()
+                .map(ProviderEntity::getId)
                 .collect(Collectors.toSet());
     }
 }

@@ -7,17 +7,22 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.ProviderRequest;
+import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProviderResponse;
+import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
 
 
 @RestController
-@RequestMapping("/provider")
+@RequestMapping("/api/provider")
 public class ProviderController {
 
     private final ProviderService providerService;
-    public ProviderController(ProviderService providerService) {
+    private final ProductService productService;
+
+    public ProviderController(ProviderService providerService, ProductService productService) {
         this.providerService = providerService;
+        this.productService = productService;
     }
 
     //---Crud operations---
@@ -57,6 +62,14 @@ public class ProviderController {
     public ResponseEntity<String> deleteProvider(@PathVariable Long id) {
         providerService.delete(id);
         return ResponseEntity.ok("Proveedor eliminado correctamente");
+    }
+
+    @GetMapping("/{id}/products")
+    public ResponseEntity<Page<ProductResponse>> listProducts(
+            @PathVariable Long id,
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.findProductsByProviderId(id, pageable));
     }
 
 
