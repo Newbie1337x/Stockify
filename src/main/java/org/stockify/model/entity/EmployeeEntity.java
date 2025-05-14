@@ -23,6 +23,7 @@ public class EmployeeEntity {
     @Column(name = "last_name" ,nullable = false, length = 100)
     private String lastName;
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Status status;
     @Column(nullable = false)
     @ColumnDefault("true")

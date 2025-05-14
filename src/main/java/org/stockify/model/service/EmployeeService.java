@@ -11,6 +11,7 @@ import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,10 +35,26 @@ public class EmployeeService {
     }
 
     public List<EmployeeResponse> getAllEmplyeesActive(){
-        return employeeMapper.toResponseDtoList(employeeRepository.findAll()
-                .stream()
-                .filter(EmployeeEntity::getActive)
-                .toList());
+        return findByStatus(Status.ONLINE);
+    }
+
+    public List<EmployeeResponse> getEmployee(Long id, String name, String lastName){
+        List<EmployeeResponse> employeeResponses = new ArrayList<>();
+        if(id != null){
+            EmployeeResponse response = getEmployeeById(id);
+            employeeResponses.add(response);
+            return employeeResponses;
+        }
+        else if (name != null){
+            employeeResponses = getEmployeeByName(name);
+            return employeeResponses;
+        }
+        else if (lastName != null){
+            employeeResponses = getEmployeeByLastName(lastName);
+            return employeeResponses;
+        }
+
+        return getAllEmplyeesActive();
     }
 
     public EmployeeResponse getEmployeeById(Long id) {
@@ -61,18 +78,22 @@ public class EmployeeService {
     }
 
     public void delete(Long id) {
-       EmployeeEntity employeeEntity = employeeMapper.toEntity(getEmployeeById(id));
-       employeeEntity.setActive(false);
-       employeeRepository.save(employeeEntity);
+       EmployeeEntity employee = employeeRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontro el empleado"));
+       employee.setActive(false);
+       employeeRepository.save(employee);
     }
 
-    public void updateEmployee(EmployeeRequest employeeEntity) {
-        employeeRepository.save(employeeMapper.toEntity(employeeEntity));
+    public EmployeeEntity updateEmployee(EmployeeRequest employeeEntity, Long id) {
+        EmployeeEntity employee = employeeMapper.toEntity(employeeEntity);
+        employee.setId(id);
+        employeeRepository.save(employee);
+        return employee;
     }
 
     public List<EmployeeResponse> findByStatus(Status statusRequest) {
         return employeeRepository.findByStatus(statusRequest)
                 .stream()
+                .filter(EmployeeEntity::getActive)
                 .map(employeeMapper::toResponseDto)
                 .toList();
     }

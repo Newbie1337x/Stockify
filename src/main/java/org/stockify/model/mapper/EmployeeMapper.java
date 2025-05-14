@@ -12,7 +12,7 @@ import java.util.List;
 public interface EmployeeMapper {
 
     EmployeeEntity toEntity(EmployeeRequest dto);
-    EmployeeEntity toEntity(EmployeeResponse dto);
+    //EmployeeEntity toResposeToEntity(EmployeeResponse dto);
     EmployeeResponse toResponseDto(EmployeeEntity dto);
     List<EmployeeResponse> toResponseDtoList(List<EmployeeEntity> entities);
 }

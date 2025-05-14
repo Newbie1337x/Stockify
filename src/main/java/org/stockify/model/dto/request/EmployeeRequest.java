@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Builder
 public class EmployeeRequest implements Serializable {
     @NotBlank
-    private String firstName;
+    private String name;
     @NotBlank
     private String lastName;
     @NotNull
