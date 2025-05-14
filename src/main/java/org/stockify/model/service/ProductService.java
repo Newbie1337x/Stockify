@@ -55,9 +55,24 @@ public class ProductService {
 
 
     public ProductResponse save(ProductRequest request) throws DuplicatedUniqueConstraintException {
-            return productMapper.toResponse(productRepository.save(productMapper.toEntity(request)));
+
+        ProductEntity product = productMapper.toEntity(request);
+        
+        
+        for (String categoryName : request.categories()) {
+            CategoryEntity category = categoryRepository.findByName(categoryName)
+                    .orElseGet(() -> {
+                        CategoryEntity newCategory = new CategoryEntity();
+                        newCategory.setName(categoryName);
+                        return categoryRepository.save(newCategory);
+                    });
+
+            product.getCategories().add(category);
         }
 
+        product = productRepository.save(product);
+        return productMapper.toResponse(product);
+    }
 
     public BulkProductResponse saveAll(List<ProductRequest> requests) {
         List<BulkItemResponse> results = new ArrayList<>();
@@ -67,18 +82,18 @@ public class ProductService {
             try {
                 save(req);
                 created++;
-                results.add(new BulkItemResponse(req.getName(), "CREATED", null));
+                results.add(new BulkItemResponse(req.name(), "CREATED", null));
             } catch (DataIntegrityViolationException ex) {
                 skipped++;
                 results.add(new BulkItemResponse(
-                        req.getName(),
+                        req.name(),
                         "SKIPPED",
                         "Duplicado, se saltó este ítem"
                 ));
             } catch (Exception ex) {
                 error++;
                 results.add(new BulkItemResponse(
-                        req.getName(),
+                        req.name(),
                         "ERROR",
                         ex.getMessage()
                 ));

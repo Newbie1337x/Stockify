@@ -6,6 +6,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -39,4 +40,8 @@ public class ProductEntity {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<CategoryEntity> categories;
 
+
+    public ProductEntity(){
+        categories = new HashSet<>();
+    }
 }
