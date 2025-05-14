@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TimeOutResponse implements Serializable {
+public class TimeOutResponse {
     private Long id;
     private LocalDate date;
     private LocalDateTime clockInTime;

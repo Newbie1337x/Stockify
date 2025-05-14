@@ -1,6 +1,8 @@
 package org.stockify.dto.request.pos;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,4 +27,7 @@ public class PosRequest {
 
     @NotNull(message = "status must not be null")
     private Status status;
+    @NotBlank
+    @Pattern(regexp = "^\\d{7,8}$\n", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
+    private String employeeDni;
 }

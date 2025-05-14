@@ -2,6 +2,8 @@ package org.stockify.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.pos.PosAmountRequest;
@@ -25,12 +27,12 @@ public class PosController {
     @PostMapping
     public ResponseEntity<PosResponse> postPos(@Valid@RequestBody PosRequest posRequest) {
         PosResponse response = posService.save(posRequest);
-        return ResponseEntity.ok(response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<PosResponse>> getPos() {
-        return posService.findAll().isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(posService.findAll());
+        return ResponseEntity.ok(posService.findAll());
     }
 
 
@@ -47,10 +49,10 @@ public class PosController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> patchAmount(@PathVariable Long id, @RequestBody @Valid PosAmountRequest posAmountRequest)
+    public ResponseEntity<Void> patchAmount(@PathVariable Long id, @RequestBody @Valid PosAmountRequest posAmountRequest)
     {
         posService.patchAmount(id,posAmountRequest);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.accepted().build();
     }
 
     @PatchMapping("/{id}/toggle")

@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-    public class PosResponse implements Serializable{
+    public class PosResponse {
     private Long id;
     private BigDecimal currentAmount;
     private Status status;

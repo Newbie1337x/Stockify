@@ -1,6 +1,7 @@
 package org.stockify.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 import org.stockify.model.enums.Status;
 
 import java.math.BigDecimal;
@@ -23,7 +24,7 @@ public class PosEntity {
     @Column(name = "current_amount")
     private BigDecimal currentAmount;
 
-    @OneToMany(mappedBy = "posEntity")
+    @OneToMany(mappedBy = "posEntity", fetch = FetchType.LAZY)
     private Set<SessionPosEntity> sessionPosEntities;
 
     @Column(name = "status")
@@ -33,6 +34,7 @@ public class PosEntity {
     @OneToOne
     @JoinColumn(name = "employee_id")
     private EmployeeEntity employee;
+
 
 
 }

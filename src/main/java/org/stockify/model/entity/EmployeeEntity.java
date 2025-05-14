@@ -20,19 +20,28 @@ public class EmployeeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "employee_id",nullable = false, updatable = false, unique = true)
     private Long id;
+
     @Column(nullable = false, length = 100)
     private String name;
+
     @Column(name = "last_name" ,nullable = false, length = 100)
     private String lastName;
+
     @Column(nullable = false,length = 8)
     private String dni;
+
     @Column(nullable = false)
     private Status status;
-    @ManyToMany(mappedBy = "employeeEntities")
-    private List<ShiftEntity> shiftEntities;
+
+
     @Column(nullable = false)
     @ColumnDefault("true")
     private Boolean active;
+
+    @ManyToMany(mappedBy = "employeeEntities")
+    private List<ShiftEntity> shiftEntities;
+
+
     @OneToMany(mappedBy = "employee")
     private List<SessionPosEntity> sessionPosEntities;
 
