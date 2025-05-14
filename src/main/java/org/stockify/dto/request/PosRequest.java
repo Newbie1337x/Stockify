@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PosRequest implements Serializable{
+public class PosRequest{
     @NotNull(message = "currentAmount no debe ser nulo")
     @PositiveOrZero(message = "currentAmount debe ser positivo o cero")
     private BigDecimal currentAmount;
