@@ -17,6 +17,6 @@ public class PosStatusRequest {
      * Estado de conexión del punto de venta (por ejemplo, ONLINE u OFFLINE).
      * No puede ser nulo.
      */
-    @NotNull(message = "status no debe ser nulo")
+    @NotNull(message = "status must not be null")
     private Status status;
 }

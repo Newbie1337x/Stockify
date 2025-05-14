@@ -2,10 +2,16 @@ package org.stockify.model.entity;
 
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@Builder
 @Entity
 @Table(name = "shifts")
 public class ShiftEntity {
@@ -19,8 +25,6 @@ public class ShiftEntity {
     private LocalDateTime entryTime;
     @Column(name = "exit_time")
     private LocalDateTime exitTime;
-    @OneToMany(mappedBy = "shiftEntity")
-    private List<SessionPosEntity> posSessionEntities;
     @ManyToMany
     @JoinTable(
             name = "shift_employee", // nombre de la tabla intermedia

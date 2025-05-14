@@ -24,6 +24,8 @@ public class EmployeeEntity {
     private String name;
     @Column(name = "last_name" ,nullable = false, length = 100)
     private String lastName;
+    @Column(nullable = false,length = 8)
+    private String dni;
     @Column(nullable = false)
     private Status status;
     @ManyToMany(mappedBy = "employeeEntities")

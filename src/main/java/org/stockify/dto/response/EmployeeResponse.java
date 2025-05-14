@@ -10,10 +10,12 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
-public class EmployeeResponse implements Serializable {
+public class EmployeeResponse {
     private Long id;
     private String name;
     private String lastName;
+    private String dni;
     private Status status;
     private Boolean active;
+
 }

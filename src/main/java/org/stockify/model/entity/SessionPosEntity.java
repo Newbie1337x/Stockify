@@ -34,9 +34,6 @@ public class SessionPosEntity {
     @JoinColumn(name = "employee_id")
     private EmployeeEntity employee;
     @ManyToOne()
-    @JoinColumn(name = "shift_id")
-    private ShiftEntity shiftEntity;
-    @ManyToOne()
     @JoinColumn(name = "pos_id")
     private PosEntity posEntity;
 

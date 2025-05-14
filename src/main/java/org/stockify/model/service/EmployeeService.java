@@ -28,6 +28,7 @@ public class EmployeeService {
         employeeRepository.save(employeeMapper.toEntity(employeeRequest));
         return true;
     }
+
     public List<EmployeeResponse> getAllEmployees() {
         return employeeMapper.toResponseDtoList(employeeRepository.findAll());
     }
@@ -43,6 +44,11 @@ public class EmployeeService {
         return employeeRepository.findById(id)
                 .map(employeeMapper::toResponseDto)
                 .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
+    }
+
+    public EmployeeResponse getEmployeeByDni(String dni)
+    {
+        return employeeRepository.findByDni(dni);
     }
 
     public List<EmployeeResponse> getEmployeeByName(String name){
@@ -76,9 +82,7 @@ public class EmployeeService {
                 .toList();
     }
 
-
     public Status toggleStatus(Long id) {
-        // Recupera o lanza excepción si no existe
         EmployeeEntity employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         Status next = (employee.getStatus() == Status.ONLINE)
