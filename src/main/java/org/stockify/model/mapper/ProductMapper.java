@@ -24,7 +24,7 @@ public interface ProductMapper {
      */
     default void updateEntityFromRequest(ProductRequest dto, @MappingTarget ProductEntity entity) {
         updateFromRequest(dto, entity);
-        entity.setCategories(namesToEntities(dto.getCategories()));
+        entity.setCategories(namesToEntities(dto.categories()));
     }
 
     /**
