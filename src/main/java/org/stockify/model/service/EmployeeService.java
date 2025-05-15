@@ -39,11 +39,15 @@ public class EmployeeService {
         return findByStatus(Status.ONLINE);
     }
 
-<<<<<<< HEAD
-    public List<EmployeeResponse> getEmployee(Long id, String name, String lastName){
+    public List<EmployeeResponse> getEmployee(Long id, String name, String lastName, String dni){
         List<EmployeeResponse> employeeResponses = new ArrayList<>();
         if(id != null){
             EmployeeResponse response = getEmployeeById(id);
+            employeeResponses.add(response);
+            return employeeResponses;
+        }
+        else if (dni != null){
+            EmployeeResponse response = getEmployeeByDni(dni);
             employeeResponses.add(response);
             return employeeResponses;
         }
@@ -59,20 +63,15 @@ public class EmployeeService {
         return getAllEmplyeesActive();
     }
 
-=======
->>>>>>> 95adcea8434b661282a0aba21dbe53c6d47f2e94
     public EmployeeResponse getEmployeeById(Long id) {
         return employeeRepository.findById(id)
                 .map(employeeMapper::toResponseDto)
                 .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
-<<<<<<< HEAD
-=======
     }
 
     public EmployeeResponse getEmployeeByDni(String dni)
     {
         return employeeRepository.findByDni(dni);
->>>>>>> 95adcea8434b661282a0aba21dbe53c6d47f2e94
     }
 
     public List<EmployeeResponse> getEmployeeByName(String name){
@@ -110,13 +109,7 @@ public class EmployeeService {
                 .toList();
     }
 
-<<<<<<< HEAD
-
     public Status toggleStatus(Long id) {
-        // Recupera o lanza excepción si no existe
-=======
-    public Status toggleStatus(Long id) {
->>>>>>> 95adcea8434b661282a0aba21dbe53c6d47f2e94
         EmployeeEntity employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         Status next = (employee.getStatus() == Status.ONLINE)

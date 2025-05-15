@@ -23,10 +23,7 @@ public class EmployeeEntity {
 
     @Column(nullable = false, length = 100)
     private String name;
-<<<<<<< HEAD
-=======
 
->>>>>>> 95adcea8434b661282a0aba21dbe53c6d47f2e94
     @Column(name = "last_name" ,nullable = false, length = 100)
     private String lastName;
 

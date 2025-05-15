@@ -2,7 +2,6 @@ package org.stockify.dto.response;
 
 import lombok.*;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -11,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TimeOutResponse {
+public class TimeLogResponse {
     private Long id;
     private LocalDate date;
     private LocalDateTime clockInTime;
