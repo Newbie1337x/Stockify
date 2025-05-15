@@ -8,11 +8,14 @@ import org.stockify.dto.request.ClientRequest;
 import org.stockify.dto.response.ClientResponse;
 import org.stockify.model.entities.ClientEntity;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface ClientMapper {
 
     ClientEntity toEnity(ClientRequest clientRequest);
     ClientResponse toDto(ClientEntity clientEntity);
+    List<ClientResponse> toDtoList(List<ClientEntity> clientEntities);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     ClientResponse partialUpdate(ClientEntity clientEntity, @MappingTarget ClientResponse clientResponse);
