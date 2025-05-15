@@ -1,4 +1,4 @@
-package org.stockify.model.dto.response;
+package org.stockify.dto.response;
 
 import lombok.*;
 import org.stockify.model.enums.Status;
@@ -10,10 +10,12 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
-public class EmployeeResponse implements Serializable {
+public class EmployeeResponse {
     private Long id;
     private String name;
     private String lastName;
+    private String dni;
     private Status status;
     private Boolean active;
+
 }

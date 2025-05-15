@@ -5,9 +5,14 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+<<<<<<< HEAD
 import org.stockify.model.dto.request.EmployeeRequest;
 import org.stockify.model.dto.response.EmployeeResponse;
 import org.stockify.model.entity.EmployeeEntity;
+=======
+import org.stockify.dto.request.employee.EmployeeRequest;
+import org.stockify.dto.response.EmployeeResponse;
+>>>>>>> 95adcea8434b661282a0aba21dbe53c6d47f2e94
 import org.stockify.model.exception.EmployeeNotFoundException;
 import org.stockify.model.service.EmployeeService;
 
@@ -25,6 +30,7 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
+<<<<<<< HEAD
     @GetMapping
     public ResponseEntity<List<EmployeeResponse>> getAllEmployees(
             @RequestParam(required = false) String name,
@@ -34,6 +40,13 @@ public class EmployeeController {
         List<EmployeeResponse> employees = new ArrayList<>();
         employees = employeeService.getEmployee(id, name, lastName);
         return ResponseEntity.ok(employees);
+=======
+
+    @GetMapping
+    public ResponseEntity<List<EmployeeResponse>> getAllEmployees() {
+        List<EmployeeResponse> employee = employeeService.getAllEmplyeesActive();
+        return new ResponseEntity<>(employee, HttpStatusCode.valueOf(200));
+>>>>>>> 95adcea8434b661282a0aba21dbe53c6d47f2e94
     }
 
     @PostMapping

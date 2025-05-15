@@ -1,9 +1,8 @@
 package org.stockify.model.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import org.stockify.dto.request.PosAmountRequest;
-import org.stockify.dto.request.PosRequest;
+import org.stockify.dto.request.pos.PosAmountRequest;
+import org.stockify.dto.request.pos.PosRequest;
 import org.stockify.dto.response.PosResponse;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
@@ -41,7 +40,7 @@ public class PosService {
         PosEntity posEntity = posRepository
                 .findById(id)
                 .orElseThrow
-                        (() -> new EntityNotFoundException("POS with ID " + id + " not found"));
+                        (() -> new NotFoundException("POS with ID " + id + " not found"));
         return posMapper.toDto(posEntity);
     }
     public List<PosResponse> findByStatus(Status statusRequest) {

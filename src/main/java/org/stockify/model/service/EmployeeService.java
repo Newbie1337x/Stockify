@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.stockify.model.enums.Status;
 import org.stockify.model.exception.EmployeeNotFoundException;
-import org.stockify.model.dto.request.EmployeeRequest;
-import org.stockify.model.dto.response.EmployeeResponse;
+import org.stockify.dto.request.employee.EmployeeRequest;
+import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.EmployeeMapper;
@@ -30,6 +30,7 @@ public class EmployeeService {
         employeeRepository.save(employeeMapper.toEntity(employeeRequest));
         return employeeEntity;
     }
+
     public List<EmployeeResponse> getAllEmployees() {
         return employeeMapper.toResponseDtoList(employeeRepository.findAll());
     }
@@ -38,6 +39,7 @@ public class EmployeeService {
         return findByStatus(Status.ONLINE);
     }
 
+<<<<<<< HEAD
     public List<EmployeeResponse> getEmployee(Long id, String name, String lastName){
         List<EmployeeResponse> employeeResponses = new ArrayList<>();
         if(id != null){
@@ -57,10 +59,20 @@ public class EmployeeService {
         return getAllEmplyeesActive();
     }
 
+=======
+>>>>>>> 95adcea8434b661282a0aba21dbe53c6d47f2e94
     public EmployeeResponse getEmployeeById(Long id) {
         return employeeRepository.findById(id)
                 .map(employeeMapper::toResponseDto)
                 .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
+<<<<<<< HEAD
+=======
+    }
+
+    public EmployeeResponse getEmployeeByDni(String dni)
+    {
+        return employeeRepository.findByDni(dni);
+>>>>>>> 95adcea8434b661282a0aba21dbe53c6d47f2e94
     }
 
     public List<EmployeeResponse> getEmployeeByName(String name){
@@ -98,9 +110,13 @@ public class EmployeeService {
                 .toList();
     }
 
+<<<<<<< HEAD
 
     public Status toggleStatus(Long id) {
         // Recupera o lanza excepción si no existe
+=======
+    public Status toggleStatus(Long id) {
+>>>>>>> 95adcea8434b661282a0aba21dbe53c6d47f2e94
         EmployeeEntity employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
         Status next = (employee.getStatus() == Status.ONLINE)
