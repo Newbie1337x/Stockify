@@ -55,11 +55,12 @@ public class PosController {
         return ResponseEntity.accepted().build();
     }
 
-    @PatchMapping("/{id}/toggle")
-        public ResponseEntity<String>patchToggleStatus(@PathVariable long id)
-    {
-        return ResponseEntity.ok("Sucessfull the pos is " + posService.toggleStatus(id));
-    }
+//    @Deprecated
+//    @PatchMapping("/{id}/toggle")
+//        public ResponseEntity<String>patchToggleStatus(@PathVariable long id)
+//    {
+//        return ResponseEntity.ok("Sucessfull the pos is " + posService.toggleStatus(id));
+//    }
 
 
 }

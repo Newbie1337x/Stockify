@@ -3,7 +3,6 @@ package org.stockify.dto.request.pos;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +21,10 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class PosRequest {
+
+    @NotNull
+    private Long idCaja;
+
     @NotNull(message = "currentAmount must not be null")
     private BigDecimal currentAmount;
 

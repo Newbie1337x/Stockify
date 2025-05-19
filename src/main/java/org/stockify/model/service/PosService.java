@@ -1,26 +1,34 @@
 package org.stockify.model.service;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.hibernate.bytecode.enhance.spi.interceptor.SessionAssociableInterceptor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.pos.PosAmountRequest;
 import org.stockify.dto.request.pos.PosRequest;
+import org.stockify.dto.request.sessionpos.SessionPosRequest;
 import org.stockify.dto.response.PosResponse;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
+import org.stockify.model.exception.InvalidSessionStatusException;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.PosMapper;
 import org.stockify.model.repository.PosRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PosService {
 
     private final PosRepository posRepository;
     private final PosMapper posMapper;
+    private final SessionPosService sessionPosService;
 
-    public PosService(PosRepository posRepository, PosMapper posMapper) {
+    public PosService(PosRepository posRepository, PosMapper posMapper, SessionPosService sessionPosService) {
         this.posRepository = posRepository;
         this.posMapper = posMapper;
+        this.sessionPosService = sessionPosService;
     }
 
     public PosResponse save(PosRequest posRequest)
@@ -69,6 +77,18 @@ public class PosService {
            posEntity.setCurrentAmount(posAmountRequest.getCurrentAmount());
            posRepository.save(posEntity);
        });
+   }
+
+   public Boolean openPos(@NotNull PosRequest posRequest,SessionPosRequest sessionPosRequest)
+   {
+       PosEntity pos = posRepository.findById(posRequest.getIdCaja()).orElseThrow(
+               () -> new NotFoundException("This POS is not Found")
+       );
+       if (pos.getStatus() == Status.OFFLINE && !sessionPosService.isOpened(pos.getId(), null)) {
+           sessionPosService.save(sessionPosRequest);
+           return true;
+       }
+       throw new InvalidSessionStatusException("This POS is already opened");
    }
 
 }
