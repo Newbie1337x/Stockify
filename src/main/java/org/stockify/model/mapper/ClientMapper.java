@@ -18,7 +18,9 @@ public interface ClientMapper {
     List<ClientResponse> toDtoList(List<ClientEntity> clientEntities);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    ClientResponse partialUpdate(ClientEntity clientEntity, @MappingTarget ClientResponse clientResponse);
+    void partialUpdateClientEntity(ClientRequest clientRequest, @MappingTarget ClientEntity clientEntity);
+
+    void updateClientEntity(ClientRequest clientRequest, @MappingTarget ClientEntity clientEntity);
 }
 
 

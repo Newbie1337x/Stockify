@@ -48,16 +48,15 @@ public class ClientController {
         return ResponseEntity.noContent().build();
     }
 
-
-    /// PUT Y PATCH A ENTIDAD O DTO ?  ? ?  ? ? ?
     @PatchMapping("/{id}")
-    public ResponseEntity<ClientResponse> updateClient(@PathVariable Long id, @RequestBody ClientRequest client) {
+    public ResponseEntity<ClientResponse> patchClient(@PathVariable Long id, @RequestBody ClientRequest client) {
         ClientResponse updatedClient = clientService.updateClientPartial(id, client);
         return ResponseEntity.ok(updatedClient);
     }
 
-
-
+    @PutMapping("/{id}")
+    public ResponseEntity<ClientResponse> putClient(@PathVariable Long id, @RequestBody ClientRequest client) {
+        ClientResponse updatedClient = clientService.updateClientFull(id, client);
+        return ResponseEntity.ok(updatedClient);
+    }
 }
-
-

@@ -49,18 +49,16 @@ public class ClientService {
     public ClientResponse updateClientPartial (Long id, ClientRequest clientRequest) {
         ClientEntity existingClient = clientRepository.findById(id).orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
 
-        if(clientRequest.getFirstName() != null) {
-            existingClient.setFirstName(clientRequest.getFirstName());
-        }
-        if(clientRequest.getLastName() != null) {
-            existingClient.setLastName(clientRequest.getLastName());
-        }
-        if(clientRequest.getPhone() != null) {
-            existingClient.setPhone(clientRequest.getPhone());
-        }
-        if(clientRequest.getEmail() != null) {
-            existingClient.setEmail(clientRequest.getEmail());
-        }
+        clientMapper.partialUpdateClientEntity(clientRequest, existingClient);
+
+        ClientEntity updatedClient = clientRepository.save(existingClient);
+        return clientMapper.toDto(updatedClient);
+    }
+
+    public ClientResponse updateClientFull (Long id, ClientRequest clientRequest) {
+        ClientEntity existingClient = clientRepository.findById(id).orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
+
+        clientMapper.updateClientEntity(clientRequest, existingClient);
 
         ClientEntity updatedClient = clientRepository.save(existingClient);
         return clientMapper.toDto(updatedClient);
