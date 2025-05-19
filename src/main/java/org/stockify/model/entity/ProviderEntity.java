@@ -2,7 +2,10 @@ package org.stockify.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.SQLRestriction;
+
+import java.util.Set;
 
 
 @Entity
@@ -46,5 +49,6 @@ public class ProviderEntity {
     @ColumnDefault("true")
     private boolean active = true;
 
-
+    @ManyToMany(mappedBy = "providers")
+    private Set<ProductEntity> productList;
 }
