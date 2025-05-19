@@ -22,5 +22,3 @@ public interface ClientMapper {
 
     void updateClientEntity(ClientRequest clientRequest, @MappingTarget ClientEntity clientEntity);
 }
-
-

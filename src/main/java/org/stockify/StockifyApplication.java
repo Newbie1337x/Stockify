@@ -3,7 +3,9 @@ package org.stockify;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
+@ComponentScan("org.stockify.model.mapper")
 @SpringBootApplication
 public class StockifyApplication {
 
