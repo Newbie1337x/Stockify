@@ -63,7 +63,7 @@ public class ProductService {
         ProductEntity product = productMapper.toEntity(request);
 
         for (String categoryName : request.categories()) {
-            CategoryEntity category = categoryRepository.findByNameIgnoreCase(categoryName)
+            CategoryEntity category = categoryRepository.findByName(categoryName)
                     .orElseGet(() -> {
                         CategoryEntity newCategory = new CategoryEntity();
                         newCategory.setName(categoryName);

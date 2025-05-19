@@ -1,5 +1,4 @@
 package org.stockify.model.service;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -38,7 +37,7 @@ public class CategoryService {
     }
 
     public CategoryResponse save(CategoryRequest request) {
-        findByNameIgnoreCase(request.getName());
+
         CategoryEntity entity = categoryMapper.toEntity(request);
         return categoryMapper.toResponse(categoryRepository.save(entity));
     }
@@ -49,22 +48,11 @@ public class CategoryService {
 
     public CategoryResponse update(int id, CategoryRequest request) {
         CategoryEntity existingCategory = findEntityById(id);
-
-        if (!existingCategory.getName().equalsIgnoreCase(request.getName())) {
-            findByNameIgnoreCase(request.getName());
-        }
-
         CategoryEntity updatedEntity = categoryMapper.updateEntityFromRequest(request, existingCategory);
         return categoryMapper.toResponse(categoryRepository.save(updatedEntity));
     }
     public void patch(int id, CategoryRequest request) {
         CategoryEntity existingCategory = findEntityById(id);
-
-        if (request.getName() != null && !existingCategory.getName().equalsIgnoreCase(request.getName())) {
-            findByNameIgnoreCase(request.getName());
-        }
-
-
         categoryMapper.patchEntityFromRequest(request, existingCategory);
         categoryRepository.save(existingCategory);
     }
@@ -74,10 +62,5 @@ public class CategoryService {
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
     }
 
-    private void findByNameIgnoreCase(String name){
-      if (categoryRepository.existsByNameIgnoreCase(name)){
-          throw new DuplicatedUniqueConstraintException("Category with name " + name + " already exists");
-      }
-    }
 
     }
