@@ -71,8 +71,6 @@ public class ProviderController {
         return ResponseEntity.ok(productService.findProductsByProviderId(id, pageable));
     }
 
-
-
     //FILTERS //CONSULTAR
 
     @GetMapping("/search")

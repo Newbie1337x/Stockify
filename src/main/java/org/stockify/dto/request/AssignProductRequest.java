@@ -1,5 +1,6 @@
 package org.stockify.dto.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -11,4 +12,7 @@ public class AssignProductRequest {
     @NotNull
     @NotEmpty
     Set<Integer> productsId;
+    public AssignProductRequest() {
+        productsId = Set.of();
+    }
 }
