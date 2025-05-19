@@ -3,7 +3,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.ProviderRequest;
-import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.ProviderEntity;

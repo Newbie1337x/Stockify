@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.stockify.dto.request.CategoryRequest;
 import org.stockify.dto.response.CategoryResponse;
 import org.stockify.model.entity.CategoryEntity;
+import org.stockify.model.exception.DuplicatedUniqueConstraintException;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.CategoryMapper;
 import org.stockify.model.repository.CategoryRepository;
@@ -37,6 +38,7 @@ public class CategoryService {
     }
 
     public CategoryResponse save(CategoryRequest request) {
+        findByNameIgnoreCase(request.getName());
         CategoryEntity entity = categoryMapper.toEntity(request);
         return categoryMapper.toResponse(categoryRepository.save(entity));
     }
@@ -46,20 +48,36 @@ public class CategoryService {
     }
 
     public CategoryResponse update(int id, CategoryRequest request) {
-        return categoryMapper.toResponse(
-                categoryRepository.save
-                        (categoryMapper
-                                .updateEntityFromRequest
-                                        (request,findEntityById(id))));
+        CategoryEntity existingCategory = findEntityById(id);
+
+        if (!existingCategory.getName().equalsIgnoreCase(request.getName())) {
+            findByNameIgnoreCase(request.getName());
+        }
+
+        CategoryEntity updatedEntity = categoryMapper.updateEntityFromRequest(request, existingCategory);
+        return categoryMapper.toResponse(categoryRepository.save(updatedEntity));
     }
     public void patch(int id, CategoryRequest request) {
-        CategoryEntity category = findEntityById(id);
-        categoryMapper.patchEntityFromRequest(request, category);
-        categoryRepository.save(category);
+        CategoryEntity existingCategory = findEntityById(id);
+
+        if (request.getName() != null && !existingCategory.getName().equalsIgnoreCase(request.getName())) {
+            findByNameIgnoreCase(request.getName());
+        }
+
+
+        categoryMapper.patchEntityFromRequest(request, existingCategory);
+        categoryRepository.save(existingCategory);
     }
     
     private CategoryEntity findEntityById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
     }
+
+    private void findByNameIgnoreCase(String name){
+      if (categoryRepository.existsByNameIgnoreCase(name)){
+          throw new DuplicatedUniqueConstraintException("Category with name " + name + " already exists");
+      }
+    }
+
     }

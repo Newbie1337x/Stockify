@@ -25,7 +25,6 @@ import org.stockify.model.repository.ProviderRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -61,12 +60,10 @@ public class ProductService {
 
 
     public ProductResponse save(ProductRequest request) throws DuplicatedUniqueConstraintException {
-//TODO MODIFICAR , REMOVER CREADO DE CATEGORIAS.
         ProductEntity product = productMapper.toEntity(request);
-        
-        
+
         for (String categoryName : request.categories()) {
-            CategoryEntity category = categoryRepository.findByName(categoryName)
+            CategoryEntity category = categoryRepository.findByNameIgnoreCase(categoryName)
                     .orElseGet(() -> {
                         CategoryEntity newCategory = new CategoryEntity();
                         newCategory.setName(categoryName);
