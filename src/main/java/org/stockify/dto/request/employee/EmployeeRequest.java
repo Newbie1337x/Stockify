@@ -19,7 +19,7 @@ public class EmployeeRequest implements Serializable {
     private String name;
     @NotBlank
     @Size(min = 7,max = 8)
-    @Pattern(regexp = "^\\d{7,8}$\n", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
+    @Pattern(regexp = "^\\d{7,8}$", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
     private String dni;
     @NotBlank
     private String lastName;

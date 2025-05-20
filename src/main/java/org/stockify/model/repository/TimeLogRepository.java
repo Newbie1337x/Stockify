@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface TimeLogRepository extends JpaRepository<TimeLogEntity, Long> {
-    List<TimeLogResponse> findByDate(LocalDate date);
-    List<TimeLogResponse> findByClockInTime(LocalTime clockInTime);
-    List<TimeLogResponse> findByClockOutTime(LocalTime clockOutTime);
+    List<TimeLogEntity> findByDate(LocalDate date);
+    List<TimeLogEntity> findByClockInTime(LocalTime clockInTime);
+    List<TimeLogEntity> findByClockOutTime(LocalTime clockOutTime);
 }

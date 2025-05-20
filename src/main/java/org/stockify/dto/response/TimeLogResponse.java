@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -13,8 +14,8 @@ import java.time.LocalDateTime;
 public class TimeLogResponse {
     private Long id;
     private LocalDate date;
-    private LocalDateTime clockInTime;
-    private LocalDateTime clockOutTime;
+    private LocalTime clockInTime;
+    private LocalTime clockOutTime;
 
     private Long employeeId;
     private String employeeFullName;

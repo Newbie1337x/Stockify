@@ -1,15 +1,32 @@
 package org.stockify.model.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.stockify.dto.request.employee.TimeLogRequest;
 import org.stockify.dto.response.TimeLogResponse;
+import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.entity.TimeLogEntity;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {EmployeeMapper.class})
 public interface TimeLogMapper {
+    @Mapping(target ="employee",expression = "java(mapEmployee(dto.getEmployeeId()))")
     TimeLogEntity toEntity(TimeLogRequest dto);
+    @Mapping(target = "employeeId", source = "employee.id")
+    @Mapping(target = "employeeFullName", expression = "java(getEmployeeFullName(dto.getEmployee()))")
     TimeLogResponse toResponse(TimeLogEntity dto);
     List<TimeLogResponse> toResponseList(List<TimeLogEntity> entities);
+
+    default EmployeeEntity mapEmployee(Long employeeId) {
+        if (employeeId == null) return null;
+        EmployeeEntity employee = new EmployeeEntity();
+        employee.setId(employeeId);
+        return employee;
+    }
+
+    default String getEmployeeFullName(EmployeeEntity employee) {
+        if (employee == null) return null;
+        return employee.getName() + " " + employee.getLastName();
+    }
 }

@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -22,9 +23,9 @@ public class TimeLogEntity {
     @Column(nullable = false)
     private LocalDate date;
     @Column(name = "clock_in_time" ,nullable = false)
-    private LocalDateTime clockInTime;
+    private LocalTime clockInTime;
     @Column(name = "clock_out_time")
-    private LocalDateTime clockOutTime;
+    private LocalTime clockOutTime;
 
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)

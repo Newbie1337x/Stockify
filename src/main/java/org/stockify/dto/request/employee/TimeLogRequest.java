@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -20,8 +21,8 @@ public class TimeLogRequest implements Serializable {
     private LocalDate date;
 
     @NotNull
-    private LocalDateTime clockInTime;
+    private LocalTime clockInTime;
 
     @NotNull
-    private LocalDateTime clockOutTime;
+    private LocalTime clockOutTime;
 }
