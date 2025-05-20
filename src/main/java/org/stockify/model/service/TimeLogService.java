@@ -83,10 +83,6 @@ public class TimeLogService {
         return timeLogMapper.toResponse(timeLogRepository.save(timeLogEntity));
     }
 
-    public void deleteTimeLog(long id) {
-        timeLogRepository.deleteById(id);
-    }
-
     
 
 }

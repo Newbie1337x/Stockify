@@ -49,10 +49,4 @@ public class TimeLogController {
         return ResponseEntity.status(201).body(timeLogService.updateTimeLog(id, timeLogRequest));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<TimeLogResponse> deleteTimeLog(@PathVariable Long id) {
-        timeLogService.deleteTimeLog(id);
-        return ResponseEntity.status(204).build();
-    }
-
 }
