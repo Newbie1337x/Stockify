@@ -3,6 +3,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.ProviderRequest;
+import org.stockify.dto.response.BulkProviderResponse;
 import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.ProviderEntity;
@@ -37,12 +38,21 @@ public class ProviderService {
                         (providerMapper.toEntity(providerRequest)));
     }
 
-    public List<ProviderResponse> saveAll(List<ProviderRequest> providers) {
-        return providers.stream()
+    public BulkProviderResponse saveAll(List<ProviderRequest> providers) {
+        List<String> errors = providers.stream()
                 .map(providerMapper::toEntity)
                 .map(providerRepository::save)
+                .filter(p -> !p.isActive())
+                .map(p -> "Error creating provider with ID: " + p.getId())
+                .toList();
+
+        List<ProviderResponse> responses = providers.stream()
+                .map(providerMapper::toEntity)
+                .map(providerRepository::save)
+                .filter(ProviderEntity::isActive)
                 .map(providerMapper::toResponseDTO)
-                .collect(Collectors.toList());
+                .toList();
+        return new BulkProviderResponse(responses, errors);
     }
 
     public Page<ProviderResponse> findAll(Pageable pageable) {

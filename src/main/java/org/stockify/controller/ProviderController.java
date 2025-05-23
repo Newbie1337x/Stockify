@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.AssignProductRequest;
 import org.stockify.dto.request.ProviderRequest;
+import org.stockify.dto.response.BulkProviderResponse;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.service.ProductService;
@@ -48,7 +49,7 @@ public class ProviderController {
     }
 
     @PostMapping("/bulk")
-    public ResponseEntity<List<ProviderResponse>> bulkSaveProviders(@Valid @RequestBody List<@Valid ProviderRequest> providers) {
+    public ResponseEntity<BulkProviderResponse> bulkSaveProviders(@Valid @RequestBody List<@Valid ProviderRequest> providers) {
         return ResponseEntity.status(HttpStatus.CREATED).body(providerService.saveAll(providers));
     }
     /*
