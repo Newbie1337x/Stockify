@@ -13,6 +13,7 @@ import org.stockify.model.repository.ProviderRepository;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ProviderService {
@@ -34,6 +35,14 @@ public class ProviderService {
         return providerMapper
                 .toResponseDTO(providerRepository.save
                         (providerMapper.toEntity(providerRequest)));
+    }
+
+    public List<ProviderResponse> saveAll(List<ProviderRequest> providers) {
+        return providers.stream()
+                .map(providerMapper::toEntity)
+                .map(providerRepository::save)
+                .map(providerMapper::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     public Page<ProviderResponse> findAll(Pageable pageable) {

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.AssignProductRequest;
@@ -12,6 +13,8 @@ import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
+
+import java.util.List;
 
 
 @RestController
@@ -42,6 +45,11 @@ public class ProviderController {
     @PostMapping
         public ResponseEntity<ProviderResponse> createProvider(@Valid @RequestBody ProviderRequest request) {
         return ResponseEntity.ok(providerService.save(request));
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<ProviderResponse>> bulkSaveProviders(@Valid @RequestBody List<@Valid ProviderRequest> providers) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(providerService.saveAll(providers));
     }
     /*
     @PutMapping("/{id}")
