@@ -11,15 +11,15 @@ import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring", uses = PosMapper.class)
 public interface SessionPosMapper {
-
+    @Mapping(source = "posEntity.id", target = "idPos")
     SessionPosResponse toDto(SessionPosEntity entity);
 
     SessionPosEntity toEntity(SessionPosResponse response);
 
-    @Mapping(target = "openingTime", defaultValue = "(java.now)")
+//    @Mapping(target = "openingTime", defaultValue = "(java.now)")
     SessionPosEntity toEntity(SessionPosRequest request);
 
-    default LocalDateTime now(){
-        return LocalDateTime.now();
-    }
+//    default LocalDateTime now(){
+//        return LocalDateTime.now();
+//    }
 }

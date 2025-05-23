@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.stockify.model.entity.PosEntity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -16,12 +17,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SessionPosResponse{
+public class SessionPosResponse {
     private Long id;
     private LocalDateTime openingTime;
     private LocalDateTime closeTime;
     private BigDecimal openingAmount;
     private BigDecimal closeAmount;
+    private BigDecimal expectedAmount;
+    private BigDecimal cashDifference;
     private EmployeeResponse employee;
-    private Long posEntityId;
+    private Long idPos;
 }

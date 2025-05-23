@@ -1,6 +1,7 @@
 package org.stockify.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.stockify.model.enums.Status;
@@ -28,6 +29,7 @@ public class EmployeeEntity {
     private String lastName;
 
     @Column(nullable = false,length = 8)
+    @Pattern(regexp = "^\\d{7,8}$", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
     private String dni;
 
     @Column(nullable = false)

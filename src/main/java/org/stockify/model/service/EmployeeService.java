@@ -3,7 +3,6 @@ package org.stockify.model.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.stockify.model.enums.Status;
-import org.stockify.model.exception.EmployeeNotFoundException;
 import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.model.entity.EmployeeEntity;
@@ -63,6 +62,11 @@ public class EmployeeService {
         return getAllEmplyeesActive();
     }
 
+    public Boolean existByDni(String dni)
+    {
+        return employeeRepository.existsByDni(dni);
+    }
+
     public EmployeeResponse getEmployeeById(Long id) {
         return employeeRepository.findById(id)
                 .map(employeeMapper::toResponseDto)
@@ -108,6 +112,12 @@ public class EmployeeService {
                 .map(employeeMapper::toResponseDto)
                 .toList();
     }
+
+    public EmployeeEntity getEmployeeEntityByDni(String dni)
+    {
+        return employeeRepository.getEmployeeEntityByDni(dni);
+    }
+
 
     public Status toggleStatus(Long id) {
         EmployeeEntity employee = employeeRepository.findById(id)
