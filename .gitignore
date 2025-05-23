@@ -35,7 +35,6 @@ build/
 src/main/resources/application-secret.properties
 !/.env
 .env
-.env
 env
 pom.xml
 src/main/resources/application.properties

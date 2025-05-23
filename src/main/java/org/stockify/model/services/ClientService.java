@@ -1,5 +1,6 @@
 package org.stockify.model.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,20 +11,20 @@ import org.stockify.model.exceptions.ClientNotFoundException;
 import org.stockify.model.mapper.ClientMapper;
 import org.stockify.model.repositories.ClientRepository;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
+
+    @Autowired
     public ClientService(ClientRepository clientRepository, ClientMapper clientMapper) {
         this.clientRepository = clientRepository;
         this.clientMapper = clientMapper;
     }
 
     public ClientResponse findById(Long id) {
-        ClientEntity clientEntity = clientRepository.findById(id).orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
+        ClientEntity clientEntity = clientRepository.findById(id)
+                .orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
         return clientMapper.toDto(clientEntity);
     }
 
@@ -35,7 +36,7 @@ public class ClientService {
     }
 
     public ClientResponse save(ClientRequest clientRequest) {
-        ClientEntity clientEntity = clientMapper.toEnity(clientRequest);
+        ClientEntity clientEntity = clientMapper.toEntity(clientRequest);
         return clientMapper.toDto(clientRepository.save(clientEntity));
     }
 
@@ -47,7 +48,8 @@ public class ClientService {
     }
 
     public ClientResponse updateClientPartial (Long id, ClientRequest clientRequest) {
-        ClientEntity existingClient = clientRepository.findById(id).orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
+        ClientEntity existingClient = clientRepository.findById(id)
+                .orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
 
         clientMapper.partialUpdateClientEntity(clientRequest, existingClient);
 
@@ -56,7 +58,8 @@ public class ClientService {
     }
 
     public ClientResponse updateClientFull (Long id, ClientRequest clientRequest) {
-        ClientEntity existingClient = clientRepository.findById(id).orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
+        ClientEntity existingClient = clientRepository.findById(id)
+                .orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
 
         clientMapper.updateClientEntity(clientRequest, existingClient);
 

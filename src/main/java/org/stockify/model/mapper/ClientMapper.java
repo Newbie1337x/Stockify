@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ClientMapper {
 
-    ClientEntity toEnity(ClientRequest clientRequest);
+    ClientEntity toEntity(ClientRequest clientRequest);
     ClientResponse toDto(ClientEntity clientEntity);
     List<ClientResponse> toDtoList(List<ClientEntity> clientEntities);
 
