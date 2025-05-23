@@ -28,7 +28,7 @@ public class EmployeeEntity {
     @Column(name = "last_name" ,nullable = false, length = 100)
     private String lastName;
 
-    @Column(nullable = false,length = 8)
+    @Column(nullable = false,length = 8, unique = true)
     @Pattern(regexp = "^\\d{7,8}$", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
     private String dni;
 
