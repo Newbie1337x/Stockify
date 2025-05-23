@@ -80,8 +80,12 @@ public class ProviderService {
         return providerMapper.toResponseDTO(providerRepository.save(provider));
     }
 
-    public void delete(Long id) {
+    public ProviderResponse delete(Long id) {;
+        ProviderResponse provider = providerMapper.toResponseDTO(providerRepository
+                .findById(id)
+                .orElseThrow(()-> new NotFoundException("Provider with ID " + id + " not found")));
         providerRepository.deleteById(id);
+        return provider;
     }
 
     public ProviderEntity findProviderById(Long id){

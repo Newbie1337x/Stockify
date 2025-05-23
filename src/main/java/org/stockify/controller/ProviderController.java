@@ -62,14 +62,12 @@ public class ProviderController {
 
     @PatchMapping("/{id}/disable")
     public ResponseEntity<String> logicalDeleteProvider(@PathVariable Long id) {
-        providerService.logicalDelete(id);
-        return ResponseEntity.ok("Proveedor dado de baja correctamente");
+        return ResponseEntity.ok("The following provider has been disabled: " + providerService.logicalDelete(id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProvider(@PathVariable Long id) {
-        providerService.delete(id);
-        return ResponseEntity.ok("Proveedor eliminado correctamente");
+        return ResponseEntity.ok("The following provider has been deleted: " + providerService.delete(id));
     }
 
     @GetMapping("/{id}/products")
