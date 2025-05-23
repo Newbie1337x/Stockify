@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stockify.dto.request.AssignProductRequest;
 import org.stockify.dto.request.ProviderRequest;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProviderResponse;
@@ -69,6 +70,14 @@ public class ProviderController {
             @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return ResponseEntity.ok(productService.findProductsByProviderId(id, pageable));
+    }
+
+    @PutMapping("/{id}/products")
+    public ResponseEntity<ProviderResponse> assingProducts(
+            @PathVariable Long id,
+            @RequestBody AssignProductRequest request
+    ){
+        return ResponseEntity.ok(providerService.assignProductsToProvider(id,request.getProductsId()));
     }
 
     //FILTERS //CONSULTAR

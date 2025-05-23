@@ -1,7 +1,7 @@
 Remover logica de crear Categorias en saveproduct \
 Agregar Productos LIST a proveedores .Hecho \
 Categorias tienen que comprobar el nombre en minuscula para evitar duplicados. Hecho \
-Remover ProductproviderController y separar logica a product y provider 
+Remover ProductproviderController y separar logica a product y provider. Hecho.
 
 Agregar GET,POST,PATCH,PUT a provider product 
 

@@ -7,6 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stockify.dto.request.AssignProvidersRequest;
 import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.BulkProductResponse;
 import org.stockify.dto.response.ProductResponse;
@@ -77,5 +78,13 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.patch(id,product));
     }
 
+    @PutMapping("/{id}/providers")
+    public ResponseEntity<ProductResponse> assignProviders(
+            @PathVariable int id,
+            @RequestBody AssignProvidersRequest request
+    ){
+
+        return ResponseEntity.ok(productService.assignProviderToProduct(id,request.getProvidersIds()));
+    }
 
 }
