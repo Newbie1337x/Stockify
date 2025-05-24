@@ -20,8 +20,6 @@ public interface ProviderRepository extends JpaRepository<ProviderEntity, Long> 
 
     ProviderEntity findByTaxId(String taxId);
 
-    //ProviderEntity findByEmail(String email);
-
     Page<ProviderEntity> findAllByProductList_Id(Pageable pageable, @Param("prodID") int prodID);
 
 

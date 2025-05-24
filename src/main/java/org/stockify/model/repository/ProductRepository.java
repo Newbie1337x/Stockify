@@ -14,7 +14,7 @@ import java.util.Set;
 public interface ProductRepository extends JpaRepository<ProductEntity,Integer> {
 
     @Query("SELECT p.categories FROM ProductEntity p WHERE p.id = :prodID")
-    Set<CategoryEntity> findCategoriesByProductId(@Param("prodID") int prodID);
+    Page<CategoryEntity> findCategoriesByProductId(@Param("prodID") int prodID, Pageable pageable);
 
     Page<ProductEntity> findAllByProviders_Id(Long providerId, Pageable pageable);
 

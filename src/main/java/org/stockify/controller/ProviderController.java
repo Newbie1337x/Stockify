@@ -72,8 +72,8 @@ public class ProviderController {
     }
 
     @PatchMapping("/{id}/disable")
-    public ResponseEntity<String> logicalDeleteProvider(@PathVariable Long id) {
-        return ResponseEntity.ok("The following provider has been disabled: " + providerService.logicalDelete(id));
+    public ResponseEntity<EntityModel<ProviderResponse>> logicalDeleteProvider(@PathVariable Long id) {
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(id)));
     }
 
     @DeleteMapping("/{id}")
@@ -93,27 +93,23 @@ public class ProviderController {
         Page<ProductResponse> productPage = productService.findProductsByProviderId(id, pageable);
         return ResponseEntity.ok(assembler.toModel(productPage));
     }
-    @PutMapping("/{id}/products")
-    public ResponseEntity<EntityModel<ProviderResponse>> assingProducts(
-            @PathVariable Long id,
-            @RequestBody AssignProductRequest request
+    @PutMapping("/{providerID}/products/{productID}")
+    public ResponseEntity<EntityModel<ProviderResponse>> assingProduct(
+            @PathVariable Long providerID,
+            @PathVariable int productID
     ){
         return ResponseEntity.ok(providerModelAssembler
-                .toModel(providerService.assignProductsToProvider(id,request.getProductsId())));
+                .toModel(providerService.assignProductToProvider(providerID,productID)));
     }
 
-    /*
-    public ResponseEntity<EntityModel<ProviderResponse>> assingProduct(
 
-    )*/
-    @PatchMapping("/{id}/products")
+    @PatchMapping("/{providerID}/products/{productID}")
     public ResponseEntity<EntityModel<ProviderResponse>> unassignProducts(
-            @PathVariable Long id,
-            @RequestBody AssignProductRequest request
+            @PathVariable Long providerID,
+            @PathVariable int productID
     )
     {
-        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.unassignProductsFromProvider(id,request.getProductsId())));
-
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.unassignProductToProvider(providerID,productID)));
     }
 
     //FILTERS //CONSULTAR

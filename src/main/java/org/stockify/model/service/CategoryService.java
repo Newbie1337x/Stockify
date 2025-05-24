@@ -51,10 +51,11 @@ public class CategoryService {
         CategoryEntity updatedEntity = categoryMapper.updateEntityFromRequest(request, existingCategory);
         return categoryMapper.toResponse(categoryRepository.save(updatedEntity));
     }
-    public void patch(int id, CategoryRequest request) {
+
+    public CategoryResponse patch(int id, CategoryRequest request) {
         CategoryEntity existingCategory = findEntityById(id);
         categoryMapper.patchEntityFromRequest(request, existingCategory);
-        categoryRepository.save(existingCategory);
+       return categoryMapper.toResponse(categoryRepository.save(existingCategory));
     }
     
     private CategoryEntity findEntityById(int id) {

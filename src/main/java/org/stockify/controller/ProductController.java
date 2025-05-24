@@ -97,29 +97,33 @@ public class ProductController {
         return ResponseEntity.ok().body(productModelAssembler.toModel(productService.patch(id,product)));
     }
 
+
+
+
     //Providers logic
 
-    @PutMapping("/{id}/providers")
-    public ResponseEntity<EntityModel<ProductResponse>> assignProviders(
-            @PathVariable int id,
-            @RequestBody AssignProvidersRequest request
+    @PutMapping("/{productID}/providers/{providerID}")
+    public ResponseEntity<EntityModel<ProductResponse>> assignProvider(
+            @PathVariable int productID,
+            @PathVariable Long providerID
     ){
         return ResponseEntity.ok(productModelAssembler
                 .toModel(productService
-                        .assignProviderToProduct(id,request.getProvidersIds())));
+                        .assignProviderToProduct(productID,providerID)));
     }
 
 
 
-    @DeleteMapping("/{id}/providers")
-    public ResponseEntity<EntityModel<ProductResponse>> unassignProviders(
-            @PathVariable int id,
-            @RequestBody AssignProvidersRequest request
+    @DeleteMapping("/{productID}/providers/{providerID}")
+    public ResponseEntity<EntityModel<ProductResponse>> unassignProvider(
+            @PathVariable int productID,
+            @PathVariable Long providerID
     ){
         return ResponseEntity.ok(productModelAssembler
                 .toModel(productService
-                        .unassignProviderFromProduct(id,request.getProvidersIds())));
+                        .unassignProviderFromProduct(productID,providerID)));
     }
+
 
     @GetMapping("/{id}/providers")
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(

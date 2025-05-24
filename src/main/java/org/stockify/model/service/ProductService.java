@@ -21,11 +21,9 @@ import org.stockify.model.mapper.ProductMapper;
 import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.ProviderRepository;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -61,7 +59,7 @@ public class ProductService {
 
 
     public ProductResponse save(ProductRequest request) throws DuplicatedUniqueConstraintException {
-//TODO MODIFICAR , REMOVER CREADO DE CATEGORIAS.
+
         ProductEntity product = productMapper.toEntity(request);
         
         
@@ -124,6 +122,9 @@ public class ProductService {
         return productMapper.toResponse(productRepository.save(product));
     }
 
+
+    //Categories Logic
+
     public Page<ProductResponse> filterByCategories(Set<String> categories, Pageable pageable) {
         Page<ProductEntity> page = productRepository.findByAllCategoryNames(categories, categories.size(), pageable);
         return page.map(productMapper::toResponse);
@@ -142,18 +143,50 @@ public class ProductService {
         return productMapper.toResponse(productRepository.save(product));
     }
 
-    public Set<CategoryResponse> findCategoriesByProductId(int productId){
-
-        if(productRepository.findById(productId).isEmpty()){
+    public Page<CategoryResponse> findCategoriesByProductId(int productId, Pageable pageable) {
+        if (productRepository.findById(productId).isEmpty()) {
             throw new NotFoundException("Product with ID " + productId + " not found");
         }
 
-        if(categoryMapper.toResponseSet(productRepository.findCategoriesByProductId(productId)).isEmpty()){
+        Page<CategoryEntity> categoryPage = productRepository.findCategoriesByProductId(productId, pageable);
+
+        if (categoryPage.isEmpty()) {
             throw new NotFoundException("Categories from " + productId + " not found");
         }
 
-        return categoryMapper.toResponseSet(productRepository.findCategoriesByProductId(productId));
+        return categoryPage.map(categoryMapper::toResponse);
+    }
 
+    public ProductResponse addCategoryToProduct(int categoryId, int productId) {
+        ProductEntity product = getProductById(productId);
+        CategoryEntity category = getCategoryById(categoryId);
+        product.getCategories().add(category);
+        return productMapper.toResponse(productRepository.save(product));
+    }
+
+    //Provider logic
+
+    public ProductResponse assignProviderToProduct(int productID, Long providerID){
+        ProductEntity product = getProductById(productID);
+        ProviderEntity provider = getProviderById(providerID);
+
+        product.getProviders().add(provider);
+        provider.getProductList().add(product);
+
+        productRepository.save(product);
+        providerRepository.save(provider);
+
+        return productMapper.toResponse(product);
+    }
+
+    public ProductResponse unassignProviderFromProduct(int productID, Long providerID){
+        ProductEntity product = getProductById(productID);
+        ProviderEntity provider = getProviderById(providerID);
+
+        product.getProviders().remove(provider);
+        provider.getProductList().remove(product);
+
+        return productMapper.toResponse(productRepository.save(product));
     }
 
     public Page<ProductResponse> findProductsByProviderId(Long providerID, Pageable pageable) {
@@ -168,6 +201,9 @@ public class ProductService {
 
         return page;
     }
+
+
+    //Auxiliar
     private ProductEntity getProductById(int id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product with ID " + id + " not found"));
@@ -178,40 +214,9 @@ public class ProductService {
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
     }
 
-
-    //Provider logic
-    public ProductResponse assignProviderToProduct(int productID, Set<Long> providerIDs) {
-
-        ProductEntity product = getProductById(productID);
-        List<ProviderEntity> providers = providerRepository.findAllById(providerIDs);
-
-        for (ProviderEntity provider : providers) {
-            product.getProviders().add(provider);
-            provider.getProductList().add(product);
-        }
-
-        productRepository.save(product);
-        providerRepository.saveAll(providers);
-
-        return productMapper.toResponse(product);
+    private ProviderEntity getProviderById(Long id) {
+        return providerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));
     }
-
-
-    public ProductResponse unassignProviderFromProduct(int productID, Set<Long> providerIDs) {
-        ProductEntity product = getProductById(productID);
-        List<ProviderEntity> providers = providerRepository.findAllById(providerIDs);
-
-        for (ProviderEntity provider : providers) {
-            product.getProviders().remove(provider);
-            provider.getProductList().remove(product);
-        }
-
-        productRepository.save(product);
-        providerRepository.saveAll(providers);
-
-        return productMapper.toResponse(product);
-    }
-
-
 
 }

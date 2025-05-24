@@ -5,10 +5,12 @@ import org.springframework.stereotype.Service;
 import org.stockify.dto.request.ProviderRequest;
 import org.stockify.dto.response.BulkProviderResponse;
 import org.stockify.dto.response.ProviderResponse;
+import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.ProviderEntity;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.ProviderMapper;
+import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.ProviderRepository;
 
@@ -22,12 +24,13 @@ public class ProviderService {
     private final ProviderRepository providerRepository;
     private final ProductRepository productRepository;
     private final ProviderMapper providerMapper;
+    private final CategoryRepository categoryRepository;
 
-    public ProviderService(ProviderRepository providerRepository, ProductRepository productRepository, ProviderMapper providerMapper) {
+    public ProviderService(ProviderRepository providerRepository, ProductRepository productRepository, ProviderMapper providerMapper, CategoryRepository categoryRepository) {
         this.providerRepository = providerRepository;
         this.productRepository = productRepository;
         this.providerMapper = providerMapper;
-
+        this.categoryRepository = categoryRepository;
     }
 
     //---Crud operations---
@@ -61,7 +64,7 @@ public class ProviderService {
     }
 
     public ProviderResponse findById(long id) {
-        ProviderEntity provider = providerRepository.findById(id).orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));
+        ProviderEntity provider = getProviderById(id);
         return providerMapper.toResponseDTO(provider);
     }
 
@@ -84,21 +87,15 @@ public class ProviderService {
     }
 
     public ProviderResponse logicalDelete(Long id) {
-        ProviderEntity provider = providerRepository.findById(id).orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));
+        ProviderEntity provider = getProviderById(id);
         provider.setActive(false);
         return providerMapper.toResponseDTO(providerRepository.save(provider));
     }
 
     public ProviderResponse delete(Long id) {
-        ProviderResponse provider = providerMapper.toResponseDTO(providerRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found")));
+        ProviderResponse provider = providerMapper.toResponseDTO(getProviderById(id));
         providerRepository.deleteById(id);
         return provider;
-    }
-
-    public ProviderEntity findProviderById(Long id) {
-        return providerRepository.findById(id).orElseThrow(() -> new NotFoundException("Provider with ID = " + id + " not found"));
     }
 
     //Product Logic
@@ -109,49 +106,37 @@ public class ProviderService {
                 .map(providerMapper::toResponseDTO);
     }
 
-
-    public ProviderResponse assignProductsToProvider(long providerID, Set<Integer> productIDs) {
-
-        ProviderEntity provider = findProviderById(providerID);
-        List<ProductEntity> products = productRepository.findAllById(productIDs);
-
-        for (ProductEntity product : products) {
-            provider.getProductList().add(product);
-            product.getProviders().add(provider);
-        }
-        providerRepository.save(provider);
-        productRepository.saveAll(products);
-
-        return providerMapper.toResponseDTO(provider);
-    }
-
     public ProviderResponse assignProductToProvider(long providerID, int productID){
-        ProviderEntity provider = findProviderById(providerID);
-        ProductEntity product = productRepository.findById(productID).orElseThrow(()-> new NotFoundException("No se encontro el producto con el id " + productID));
+        ProviderEntity provider = getProviderById(providerID);
+        ProductEntity product = getProductById(productID);
         provider.getProductList().add(product);
         return providerMapper.toResponseDTO(provider);
     }
 
     public ProviderResponse unassignProductToProvider(Long providerID,int productID){
-        ProviderEntity provider = findProviderById(providerID);
-        ProductEntity product = productRepository.findById(productID).orElseThrow(()-> new NotFoundException("No se encontro el producto con el id " + productID));
+        ProviderEntity provider = getProviderById(providerID);
+        ProductEntity product = getProductById(productID);
         provider.getProductList().remove(product);
         return providerMapper.toResponseDTO(provider);
     }
-    
-    public ProviderResponse unassignProductsFromProvider(long providerID, Set<Integer> productIDs) {
-        ProviderEntity provider = findProviderById(providerID);
-        List<ProductEntity> products = productRepository.findAllById(productIDs);
-        for (ProductEntity product : products) {
-            provider.getProductList().remove(product);
-            product.getProviders().remove(provider);
-        }
-        providerRepository.save(provider);
-        productRepository.saveAll(products);
-        return providerMapper.toResponseDTO(provider);
+
+
+    //Auxiliar
+    private ProductEntity getProductById(int id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Product with ID " + id + " not found"));
+    }
+
+    private CategoryEntity getCategoryById(int id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
+    }
+
+    private ProviderEntity getProviderById(Long id) {
+        return providerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));
     }
 }
-
 
     /* TODO ---Gestión de órdenes de compra
 
