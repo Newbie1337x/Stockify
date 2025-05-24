@@ -1,16 +1,15 @@
-package org.stockify.model.exception;
+package org.stockify.exceptionHandlers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.stockify.dto.response.ErrorResponse;
-
-
+import org.stockify.model.exception.DuplicatedUniqueConstraintException;
+import org.stockify.model.exception.NotFoundException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
