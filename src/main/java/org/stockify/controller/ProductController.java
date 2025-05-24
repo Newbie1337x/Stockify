@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.AssignProvidersRequest;
+import org.stockify.dto.request.ProductFilterRequest;
 import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.BulkProductResponse;
 import org.stockify.dto.response.ProductResponse;
@@ -45,20 +46,15 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
-            @RequestParam(required = false) Set<String> categories,
+            ProductFilterRequest filter,
             @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        Page<ProductResponse> products;
-
-        if (categories == null || categories.isEmpty()) {
-            products = productService.findAll(pageable);
-        } else {
-            products = productService.filterByCategories(categories, pageable);
-        }
+        Page<ProductResponse> products = productService.findAll(pageable,filter);
 
         if (products.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+
         PagedModel<EntityModel<ProductResponse>> pagedModel = pagedResourcesAssembler.toModel(products, productModelAssembler);
 
         return ResponseEntity.ok(pagedModel);
@@ -96,8 +92,6 @@ public class ProductController {
 
         return ResponseEntity.ok().body(productModelAssembler.toModel(productService.patch(id,product)));
     }
-
-
 
 
     //Providers logic

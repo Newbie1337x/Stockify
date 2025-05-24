@@ -1,6 +1,4 @@
 package org.stockify.controller;
-
-import org.apache.coyote.Response;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,8 +13,6 @@ import org.stockify.model.assembler.CategoryModelAssembler;
 import org.stockify.model.assembler.ProductModelAssembler;
 import org.stockify.model.service.ProductService;
 
-import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/products/{productId}/categories")

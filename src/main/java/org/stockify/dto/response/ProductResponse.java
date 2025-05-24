@@ -6,6 +6,10 @@ public record ProductResponse(
         String name,
         double price,
         double stock,
+        String sku,
+        String barcode,
+        String description,
+        String brand,
         Set<String> categories,
         Set<Long> providers
 ) {

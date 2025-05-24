@@ -34,6 +34,21 @@ public class ProductEntity {
     @Column(name = "stock", precision = 10, scale = 5)
     private BigDecimal stock;
 
+    //Check
+    @ColumnDefault("-1")
+    @Column(name = "sku", unique = true)
+    private String sku;
+
+    @Column(name = "barcode" , unique = true)
+    private String barcode;
+
+    @Column(name = "brand")
+    private String brand;
+
+
+
+
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "products_categories",
             joinColumns = @JoinColumn(name = "product_id"),

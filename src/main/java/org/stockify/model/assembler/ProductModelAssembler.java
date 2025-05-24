@@ -6,6 +6,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 import org.stockify.controller.ProductController;
+import org.stockify.dto.request.ProductFilterRequest;
 import org.stockify.dto.response.ProductResponse;
 
 import java.util.Set;
@@ -24,7 +25,7 @@ public class ProductModelAssembler implements RepresentationModelAssembler<Produ
                         .getProductById(productResponse.id()))
                         .withSelfRel(),
                 linkTo(methodOn(ProductController.class)
-                        .listProducts(Set.of(), PageRequest.of(0, 10)))
+                        .listProducts(new ProductFilterRequest(), PageRequest.of(0, 10)))
                         .withRel("products")
         );
     }

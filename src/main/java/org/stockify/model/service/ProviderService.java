@@ -13,9 +13,7 @@ import org.stockify.model.mapper.ProviderMapper;
 import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.ProviderRepository;
-
 import java.util.List;
-import java.util.Set;
 
 
 @Service

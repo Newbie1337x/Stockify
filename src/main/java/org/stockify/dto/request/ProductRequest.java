@@ -3,7 +3,6 @@ package org.stockify.dto.request;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -15,6 +14,9 @@ public record ProductRequest(
         String description,
         BigDecimal price,
         BigDecimal stock,
+        String sku,
+        String barcode,
+        String brand,
         Set<String> categories) {
 
         public ProductRequest {

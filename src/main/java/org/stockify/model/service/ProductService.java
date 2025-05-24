@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.stockify.dto.request.ProductFilterRequest;
 import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.BulkItemResponse;
 import org.stockify.dto.response.BulkProductResponse;
@@ -21,6 +23,9 @@ import org.stockify.model.mapper.ProductMapper;
 import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.ProviderRepository;
+import org.stockify.model.specification.ProductSpecifications;
+import org.stockify.model.specification.SpecificationBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,8 +52,23 @@ public class ProductService {
         return productMapper.toResponse(getProductById(id));
     }
 
-    public Page<ProductResponse> findAll(Pageable pageable) {
-        Page<ProductEntity> page = productRepository.findAll(pageable);
+    public Page<ProductResponse> findAll(Pageable pageable, ProductFilterRequest filterRequest) {
+
+        Specification<ProductEntity> spec = new SpecificationBuilder<ProductEntity>()
+                .add(filterRequest.getPrice() != null ? ProductSpecifications.byPrice(filterRequest.getPrice()) : null)
+                .add(filterRequest.getStock() != null ? ProductSpecifications.byStock(filterRequest.getStock()) : null)
+                .add(filterRequest.getName() != null && !filterRequest.getName().isEmpty() ? ProductSpecifications.byName(filterRequest.getName()) : null)
+                .add(filterRequest.getDescription() != null && !filterRequest.getDescription().isEmpty() ? ProductSpecifications.byDescription(filterRequest.getDescription()) : null)
+                .add(filterRequest.getBarcode() != null && !filterRequest.getBarcode().isEmpty() ? ProductSpecifications.byBarCode(filterRequest.getBarcode()) : null)
+                .add(filterRequest.getSku() != null && !filterRequest.getSku().isEmpty() ? ProductSpecifications.bySku(filterRequest.getSku()) : null)
+                .add(filterRequest.getBrand() != null && !filterRequest.getBrand().isEmpty() ? ProductSpecifications.byBrand(filterRequest.getBrand()) : null)
+                .add(filterRequest.getCategory() != null && !filterRequest.getCategory().isEmpty() ? ProductSpecifications.byCategory(filterRequest.getCategory()) : null)
+                .add(filterRequest.getProvider() != null && !filterRequest.getProvider().isEmpty() ? ProductSpecifications.byProvider(filterRequest.getProvider()) : null)
+                .add(filterRequest.getProviders() != null && !filterRequest.getProviders().isEmpty() ? ProductSpecifications.byProviders(filterRequest.getProviders()) : null)
+                .add(filterRequest.getCategories() != null && !filterRequest.getCategories().isEmpty() ? ProductSpecifications.byCategories(filterRequest.getCategories()) : null)
+                .build();
+
+        Page<ProductEntity> page = productRepository.findAll(spec, pageable);
 
         if (page.isEmpty()) {
             logger.warn("Products list is empty for pageable: {}", pageable);
@@ -56,6 +76,7 @@ public class ProductService {
 
         return page.map(productMapper::toResponse);
     }
+
 
 
     public ProductResponse save(ProductRequest request) throws DuplicatedUniqueConstraintException {
@@ -124,11 +145,6 @@ public class ProductService {
 
 
     //Categories Logic
-
-    public Page<ProductResponse> filterByCategories(Set<String> categories, Pageable pageable) {
-        Page<ProductEntity> page = productRepository.findByAllCategoryNames(categories, categories.size(), pageable);
-        return page.map(productMapper::toResponse);
-    }
 
     public ProductResponse deleteCategoryFromProduct(int categoryId, int productId) {
         ProductEntity product = getProductById(productId);
