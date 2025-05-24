@@ -8,13 +8,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.ClientRequest;
 import org.stockify.dto.response.ClientResponse;
 import org.stockify.model.hateoas.ClientModelAssembler;
 import org.stockify.model.services.ClientService;
+import java.net.URI;
 
 @RestController
 @RequestMapping("/client")
@@ -28,9 +28,12 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<ClientResponse> createClient(@Valid @RequestBody ClientRequest client) {
+    public ResponseEntity<EntityModel<ClientResponse>> createClient(@Valid @RequestBody ClientRequest client) {
         ClientResponse clientResponse = clientService.save(client);
-        return new ResponseEntity<>(clientResponse, HttpStatus.CREATED);
+        EntityModel<ClientResponse> entityModel = clientModelAssembler.toModel(clientResponse);
+        return ResponseEntity
+                .created(URI.create(entityModel.getRequiredLink("self").getHref()))
+                .body(entityModel);
     }
 
     @GetMapping
@@ -59,14 +62,16 @@ public class ClientController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ClientResponse> patchClient(@PathVariable Long id,@RequestBody ClientRequest client) {
+    public ResponseEntity<EntityModel<ClientResponse>> patchClient(@PathVariable Long id,@RequestBody ClientRequest client) {
         ClientResponse updatedClient = clientService.updateClientPartial(id, client);
-        return ResponseEntity.ok(updatedClient);
+        EntityModel<ClientResponse> entityModel = clientModelAssembler.toModel(updatedClient);
+        return ResponseEntity.ok(entityModel);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClientResponse> putClient(@PathVariable Long id,@Valid @RequestBody ClientRequest client) {
+    public ResponseEntity<EntityModel<ClientResponse>> putClient(@PathVariable Long id,@Valid @RequestBody ClientRequest client) {
         ClientResponse updatedClient = clientService.updateClientFull(id, client);
-        return ResponseEntity.ok(updatedClient);
+        EntityModel<ClientResponse> entityModel = clientModelAssembler.toModel(updatedClient);
+        return ResponseEntity.ok(entityModel);
     }
 }
