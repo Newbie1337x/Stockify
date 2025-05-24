@@ -29,17 +29,14 @@ public class ProviderController {
 
     private final ProviderService providerService;
     private final ProductService productService;
-    private final ProviderMapper providerMapper;
     private final ProviderModelAssembler providerModelAssembler;
 
     public ProviderController(ProviderService providerService,
                               ProductService productService,
-                              ProviderMapper providerMapper,
                               ProviderModelAssembler providerModelAssembler) {
 
         this.providerService = providerService;
         this.productService = productService;
-        this.providerMapper = providerMapper;
         this.providerModelAssembler = providerModelAssembler;
     }
 

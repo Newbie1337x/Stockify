@@ -1,11 +1,9 @@
-Remover logica de crear Categorias en saveproduct \
-Agregar Productos LIST a proveedores .Hecho \
-Categorias tienen que comprobar el nombre en minuscula para evitar duplicados. Hecho \
-Remover ProductproviderController y separar logica a product y provider. Hecho.
-
 Agregar GET,POST,PATCH,PUT a provider product 
 
 Cambiarle el nombre a los endpoints para que esten acorde a el proyecto.    
+
+
+
 
 
 //Crear en base de datos esto.  

@@ -40,7 +40,7 @@ public class ProductEntity {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<CategoryEntity> categories;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "products_providers",
             joinColumns = @JoinColumn(name = "product_id"),

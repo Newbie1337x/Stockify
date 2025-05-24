@@ -4,6 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +14,7 @@ import org.stockify.dto.request.AssignProvidersRequest;
 import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.BulkProductResponse;
 import org.stockify.dto.response.ProductResponse;
+import org.stockify.model.assembler.ProductModelAssembler;
 import org.stockify.model.service.ProductService;
 import java.util.List;
 import java.util.Set;
@@ -20,13 +24,18 @@ import java.util.Set;
 public class ProductController {
 
     private final ProductService productService;
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+    private final ProductModelAssembler productModelAssembler;
+    private final PagedResourcesAssembler<ProductResponse> pagedResourcesAssembler;
 
+    public ProductController(ProductService productService, ProductModelAssembler productModelAssembler, PagedResourcesAssembler<ProductResponse> pagedResourcesAssembler) {
+        this.productService = productService;
+        this.productModelAssembler = productModelAssembler;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
+
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> listProducts(
+    public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
             @RequestParam(required = false) Set<String> categories,
             @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
@@ -41,7 +50,9 @@ public class ProductController {
         if (products.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(products);
+        PagedModel<EntityModel<ProductResponse>> pagedModel = pagedResourcesAssembler.toModel(products, productModelAssembler);
+
+        return ResponseEntity.ok(pagedModel);
     }
 
 
