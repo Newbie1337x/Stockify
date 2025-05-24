@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+///  QUE ATRIBUTOS SON ?¡?¡?¡?¡?
 public class ShiftEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
