@@ -61,13 +61,12 @@ public class ProviderService {
     }
 
     public ProviderResponse findById(long id) {
-        ProviderEntity provider = providerRepository.findById(id).orElseThrow(()-> new NotFoundException("Provider with ID " + id + " not found") );
+        ProviderEntity provider = providerRepository.findById(id).orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));
         return providerMapper.toResponseDTO(provider);
     }
 
-    public Page<ProviderResponse> findByName(Pageable pageable,String name)
-    {
-        Page<ProviderEntity> page = providerRepository.findByName(pageable,name);
+    public Page<ProviderResponse> findByName(Pageable pageable, String name) {
+        Page<ProviderEntity> page = providerRepository.findByName(pageable, name);
         return page.map(providerMapper::toResponseDTO);
     }
 
@@ -85,7 +84,7 @@ public class ProviderService {
     }
 
     public ProviderResponse logicalDelete(Long id) {
-        ProviderEntity provider = providerRepository.findById(id).orElseThrow(()-> new NotFoundException("Provider with ID " + id + " not found"));
+        ProviderEntity provider = providerRepository.findById(id).orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));
         provider.setActive(false);
         return providerMapper.toResponseDTO(providerRepository.save(provider));
     }
@@ -93,16 +92,23 @@ public class ProviderService {
     public ProviderResponse delete(Long id) {
         ProviderResponse provider = providerMapper.toResponseDTO(providerRepository
                 .findById(id)
-                .orElseThrow(()-> new NotFoundException("Provider with ID " + id + " not found")));
+                .orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found")));
         providerRepository.deleteById(id);
         return provider;
     }
 
-    public ProviderEntity findProviderById(Long id){
-        return providerRepository.findById(id).orElseThrow(()->new NotFoundException("Provider with ID = "+id+" not found"));
+    public ProviderEntity findProviderById(Long id) {
+        return providerRepository.findById(id).orElseThrow(() -> new NotFoundException("Provider with ID = " + id + " not found"));
     }
 
     //Product Logic
+
+    public Page<ProviderResponse> findAllProvidersByProductID(int productID, Pageable pageable) {
+        return providerRepository
+                .findAllByProductList_Id(pageable, productID)
+                .map(providerMapper::toResponseDTO);
+    }
+
 
     public ProviderResponse assignProductsToProvider(long providerID, Set<Integer> productIDs) {
 
@@ -119,20 +125,32 @@ public class ProviderService {
         return providerMapper.toResponseDTO(provider);
     }
 
+    public ProviderResponse assignProductToProvider(long providerID, int productID){
+        ProviderEntity provider = findProviderById(providerID);
+        ProductEntity product = productRepository.findById(productID).orElseThrow(()-> new NotFoundException("No se encontro el producto con el id " + productID));
+        provider.getProductList().add(product);
+        return providerMapper.toResponseDTO(provider);
+    }
 
-
-
-
-    // public List<ProductResponse> listarProductosDelProveedor(int providerID) {
-
-       // return productRepository.findProductEntitiesByProviderid
-
-
+    public ProviderResponse unassignProductToProvider(Long providerID,int productID){
+        ProviderEntity provider = findProviderById(providerID);
+        ProductEntity product = productRepository.findById(productID).orElseThrow(()-> new NotFoundException("No se encontro el producto con el id " + productID));
+        provider.getProductList().remove(product);
+        return providerMapper.toResponseDTO(provider);
+    }
+    
+    public ProviderResponse unassignProductsFromProvider(long providerID, Set<Integer> productIDs) {
+        ProviderEntity provider = findProviderById(providerID);
+        List<ProductEntity> products = productRepository.findAllById(productIDs);
+        for (ProductEntity product : products) {
+            provider.getProductList().remove(product);
+            product.getProviders().remove(provider);
         }
-
-     //   agregarProductoAlProveedor(proveedorId, productoData)
-
-       // eliminarProductoDelProveedor(proveedorId, productoId)
+        providerRepository.save(provider);
+        productRepository.saveAll(products);
+        return providerMapper.toResponseDTO(provider);
+    }
+}
 
 
     /* TODO ---Gestión de órdenes de compra

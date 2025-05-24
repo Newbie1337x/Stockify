@@ -7,9 +7,10 @@ import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.service.ProductService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/api/products/categories")
+@RequestMapping("/api/products/{productId}/categories")
 public class ProductCategoryController {
 
     private final ProductService productService;
@@ -18,26 +19,22 @@ public class ProductCategoryController {
         this.productService = productService;
     }
 
-
-    @DeleteMapping("/{productId}/categories/{categoryId}")
+    @DeleteMapping("/{categoryId}")
     public ResponseEntity<ProductResponse> removeCategoryFromProduct(
             @PathVariable int productId,
             @PathVariable int categoryId) {
         return ResponseEntity.ok(productService.deleteCategoryFromProduct(categoryId, productId));
     }
 
-    @DeleteMapping("/{productId}/categories")
+    @DeleteMapping
     public ResponseEntity<ProductResponse> removeAllCategoriesFromProduct(
             @PathVariable int productId) {
         return ResponseEntity.ok(productService.deleteAllCategoryFromProduct(productId));
     }
 
-    @GetMapping("/{productId}/categories")
-    public ResponseEntity<List<CategoryResponse>> getCategoriesFromProduct(
+    @GetMapping
+    public ResponseEntity<Set<CategoryResponse>> getCategoriesFromProduct(
             @PathVariable int productId) {
-        return ResponseEntity.ok(productService.findCategoriesByProductId(productId).stream().toList());
+        return ResponseEntity.ok(productService.findCategoriesByProductId(productId));
     }
-
-
-
 }

@@ -180,17 +180,38 @@ public class ProductService {
 
 
     //Provider logic
-
-
-
     public ProductResponse assignProviderToProduct(int productID, Set<Long> providerIDs) {
 
         ProductEntity product = getProductById(productID);
         List<ProviderEntity> providers = providerRepository.findAllById(providerIDs);
-        product.getProviders().addAll(providers);
 
-        return productMapper.toResponse(productRepository.save(product));
+        for (ProviderEntity provider : providers) {
+            product.getProviders().add(provider);
+            provider.getProductList().add(product);
+        }
+
+        productRepository.save(product);
+        providerRepository.saveAll(providers);
+
+        return productMapper.toResponse(product);
     }
+
+
+    public ProductResponse unassignProviderFromProduct(int productID, Set<Long> providerIDs) {
+        ProductEntity product = getProductById(productID);
+        List<ProviderEntity> providers = providerRepository.findAllById(providerIDs);
+
+        for (ProviderEntity provider : providers) {
+            product.getProviders().remove(provider);
+            provider.getProductList().remove(product);
+        }
+
+        productRepository.save(product);
+        providerRepository.saveAll(providers);
+
+        return productMapper.toResponse(product);
+    }
+
 
 
 }

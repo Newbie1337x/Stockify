@@ -20,6 +20,7 @@ import org.stockify.model.mapper.ProviderMapper;
 import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
 
+import java.security.Provider;
 import java.util.List;
 
 
@@ -61,8 +62,8 @@ public class ProviderController {
     }
 
     @PostMapping
-        public ResponseEntity<ProviderResponse> createProvider(@Valid @RequestBody ProviderRequest request) {
-        return ResponseEntity.ok(providerService.save(request));
+        public ResponseEntity<EntityModel<ProviderResponse>> createProvider(@Valid @RequestBody ProviderRequest request) {
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.save(request)));
     }
 
     @PostMapping("/bulk")
@@ -80,20 +81,39 @@ public class ProviderController {
         return ResponseEntity.ok("The following provider has been deleted: " + providerService.delete(id));
     }
 
-    @GetMapping("/{id}/products")
-    public ResponseEntity<Page<ProductResponse>> listProducts(
-            @PathVariable Long id,
-            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable
-    ) {
-        return ResponseEntity.ok(productService.findProductsByProviderId(id, pageable));
-    }
 
+    //Products Logic
+
+    @GetMapping("/{id}/products")
+    public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
+            @PathVariable Long id,
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
+            PagedResourcesAssembler<ProductResponse> assembler
+    ) {
+        Page<ProductResponse> productPage = productService.findProductsByProviderId(id, pageable);
+        return ResponseEntity.ok(assembler.toModel(productPage));
+    }
     @PutMapping("/{id}/products")
-    public ResponseEntity<ProviderResponse> assingProducts(
+    public ResponseEntity<EntityModel<ProviderResponse>> assingProducts(
             @PathVariable Long id,
             @RequestBody AssignProductRequest request
     ){
-        return ResponseEntity.ok(providerService.assignProductsToProvider(id,request.getProductsId()));
+        return ResponseEntity.ok(providerModelAssembler
+                .toModel(providerService.assignProductsToProvider(id,request.getProductsId())));
+    }
+
+    /*
+    public ResponseEntity<EntityModel<ProviderResponse>> assingProduct(
+
+    )*/
+    @PatchMapping("/{id}/products")
+    public ResponseEntity<EntityModel<ProviderResponse>> unassignProducts(
+            @PathVariable Long id,
+            @RequestBody AssignProductRequest request
+    )
+    {
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.unassignProductsFromProvider(id,request.getProductsId())));
+
     }
 
     //FILTERS //CONSULTAR

@@ -1,7 +1,8 @@
-Agregar GET,POST,PATCH,PUT a provider product 
+
 
 Cambiarle el nombre a los endpoints para que esten acorde a el proyecto.    
-
+Tira un error en un bean de Hateaos en productController, consultar.
+(El programa funciona igual.)
 
 
 
