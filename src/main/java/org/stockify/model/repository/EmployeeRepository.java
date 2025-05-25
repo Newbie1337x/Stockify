@@ -1,5 +1,7 @@
 package org.stockify.model.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.stockify.dto.response.EmployeeResponse;
@@ -17,4 +19,9 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long> 
     Boolean existsByDni(String dni);
 
     EmployeeEntity getEmployeeEntityByDni(String dni);
+
+    Page<EmployeeEntity> getEmployeeEntitiesByName(String name, Pageable pageable);
+    Page<EmployeeEntity> getEmployeeEntitiesByLastName(String lastName, Pageable pageable);
+    Page<EmployeeEntity> findByStatus(Status status, Pageable pageable);
+
 }

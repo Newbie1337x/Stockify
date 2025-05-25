@@ -1,6 +1,9 @@
 package org.stockify.model.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.stockify.model.enums.Status;
 import org.stockify.dto.request.employee.EmployeeRequest;
@@ -34,36 +37,31 @@ public class EmployeeService {
         return employeeMapper.toResponseDtoList(employeeRepository.findAll());
     }
 
-    public List<EmployeeResponse> getAllEmplyeesActive(){
+    public List<EmployeeResponse> getAllEmplyeesActive() {
         return findByStatus(Status.ONLINE);
     }
 
-    public List<EmployeeResponse> getEmployee(Long id, String name, String lastName, String dni){
-        List<EmployeeResponse> employeeResponses = new ArrayList<>();
-        if(id != null){
-            EmployeeResponse response = getEmployeeById(id);
-            employeeResponses.add(response);
-            return employeeResponses;
-        }
-        else if (dni != null){
-            EmployeeResponse response = getEmployeeByDni(dni);
-            employeeResponses.add(response);
-            return employeeResponses;
-        }
-        else if (name != null){
-            employeeResponses = getEmployeeByName(name);
-            return employeeResponses;
-        }
-        else if (lastName != null){
-            employeeResponses = getEmployeeByLastName(lastName);
-            return employeeResponses;
+    public Page<EmployeeResponse> getEmployees(Long id, String name, String lastName, String dni, Pageable pageable) {
+        if (id != null) {
+            EmployeeEntity entity = getEmployeeEntityById(id);
+            return new PageImpl<>(List.of(employeeMapper.toResponseDto(entity)), pageable, 1);
+        } else if (dni != null) {
+            EmployeeEntity entity = getEmployeeEntityByDni(dni);
+            return new PageImpl<>(List.of(employeeMapper.toResponseDto(entity)), pageable, 1);
+        } else if (name != null) {
+            return employeeRepository.getEmployeeEntitiesByName(name, pageable)
+                    .map(employeeMapper::toResponseDto);
+        } else if (lastName != null) {
+            return employeeRepository.getEmployeeEntitiesByLastName(lastName, pageable)
+                    .map(employeeMapper::toResponseDto);
         }
 
-        return getAllEmplyeesActive();
+        return employeeRepository.findByStatus(Status.ONLINE, pageable)
+                .map(employeeMapper::toResponseDto);
     }
 
-    public Boolean existByDni(String dni)
-    {
+
+    public Boolean existByDni(String dni) {
         return employeeRepository.existsByDni(dni);
     }
 
@@ -73,19 +71,22 @@ public class EmployeeService {
                 .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
     }
 
-    public EmployeeResponse getEmployeeByDni(String dni)
-    {
+    public EmployeeEntity getEmployeeEntityById(Long id) {
+        return employeeRepository.findById(id).orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
+    }
+
+    public EmployeeResponse getEmployeeByDni(String dni) {
         return employeeRepository.findByDni(dni);
     }
 
-    public List<EmployeeResponse> getEmployeeByName(String name){
-        return  employeeRepository.getEmployeeEntitiesByName(name)
+    public List<EmployeeResponse> getEmployeeByName(String name) {
+        return employeeRepository.getEmployeeEntitiesByName(name)
                 .stream()
                 .map(employeeMapper::toResponseDto)
                 .toList();
     }
 
-    public List<EmployeeResponse> getEmployeeByLastName(String lastName){
+    public List<EmployeeResponse> getEmployeeByLastName(String lastName) {
         return employeeRepository.getEmployeeEntitiesByLastName(lastName)
                 .stream()
                 .map(employeeMapper::toResponseDto)
@@ -93,9 +94,9 @@ public class EmployeeService {
     }
 
     public void delete(Long id) {
-       EmployeeEntity employee = employeeRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontro el empleado"));
-       employee.setActive(false);
-       employeeRepository.save(employee);
+        EmployeeEntity employee = employeeRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontro el empleado"));
+        employee.setActive(false);
+        employeeRepository.save(employee);
     }
 
     public EmployeeEntity updateEmployee(EmployeeRequest employeeEntity, Long id) {
@@ -113,8 +114,7 @@ public class EmployeeService {
                 .toList();
     }
 
-    public EmployeeEntity getEmployeeEntityByDni(String dni)
-    {
+    public EmployeeEntity getEmployeeEntityByDni(String dni) {
         return employeeRepository.getEmployeeEntityByDni(dni);
     }
 
