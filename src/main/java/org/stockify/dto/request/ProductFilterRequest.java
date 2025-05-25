@@ -1,7 +1,10 @@
 package org.stockify.dto.request;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,4 +20,8 @@ public class ProductFilterRequest {
     private String category;
     private List<String> categories;
     private List<String> providers;
+    @Size(min = 2,max = 2, message = "priceBetween need 2 params")
+    private List<Double> priceBetween;
+    private Double priceGreater;
+    private Double priceLess;
 }

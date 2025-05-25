@@ -66,6 +66,13 @@ public class ProductService {
                 .add(filterRequest.getProvider() != null && !filterRequest.getProvider().isEmpty() ? ProductSpecifications.byProvider(filterRequest.getProvider()) : null)
                 .add(filterRequest.getProviders() != null && !filterRequest.getProviders().isEmpty() ? ProductSpecifications.byProviders(filterRequest.getProviders()) : null)
                 .add(filterRequest.getCategories() != null && !filterRequest.getCategories().isEmpty() ? ProductSpecifications.byCategories(filterRequest.getCategories()) : null)
+                .add(filterRequest.getPriceGreater() != null ? ProductSpecifications.byPriceGreaterThan(filterRequest.getPriceGreater()) : null)
+                .add(filterRequest.getPriceLess() != null ? ProductSpecifications.byPriceLessThan(filterRequest.getPriceLess()) : null)
+                .add(filterRequest.getPriceBetween() != null && filterRequest.getPriceBetween().size() == 2
+                        ? ProductSpecifications.byPriceBetween(
+                        filterRequest.getPriceBetween().get(0),
+                        filterRequest.getPriceBetween().get(1))
+                        : null)
                 .build();
 
         Page<ProductEntity> page = productRepository.findAll(spec, pageable);
