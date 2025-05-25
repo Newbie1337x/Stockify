@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.stockify.model.enums.Status;
 import org.stockify.dto.request.employee.EmployeeRequest;
@@ -12,6 +13,7 @@ import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
+import org.stockify.model.specification.EmployeeSpecifications;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,7 @@ public class EmployeeService {
     }
 
     public Page<EmployeeResponse> getEmployees(Long id, String name, String lastName, String dni, Pageable pageable) {
+        /*
         if (id != null) {
             EmployeeEntity entity = getEmployeeEntityById(id);
             return new PageImpl<>(List.of(employeeMapper.toResponseDto(entity)), pageable, 1);
@@ -58,6 +61,17 @@ public class EmployeeService {
 
         return employeeRepository.findByStatus(Status.ONLINE, pageable)
                 .map(employeeMapper::toResponseDto);
+
+         */
+
+        Specification<EmployeeEntity> spec = Specification
+                .where(EmployeeSpecifications.isActive())
+                .and(EmployeeSpecifications.hasName(name))
+                .and(EmployeeSpecifications.hasLastName(lastName))
+                .and(EmployeeSpecifications.hasDni(dni));
+
+        Page<EmployeeEntity> entities = employeeRepository.findAll(spec, pageable);
+        return entities.map(employeeMapper::toResponseDto);
     }
 
 
