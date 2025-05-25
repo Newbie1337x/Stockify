@@ -1,12 +1,16 @@
 package org.stockify.model.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.employee.TimeLogRequest;
 import org.stockify.dto.response.TimeLogResponse;
 import org.stockify.model.entity.TimeLogEntity;
 import org.stockify.model.mapper.TimeLogMapper;
 import org.stockify.model.repository.TimeLogRepository;
+import org.stockify.model.specification.TimeLogSpecifications;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -33,34 +37,32 @@ public class TimeLogService {
         System.out.println(timeLogEntity);
         return timeLogRepository.save(timeLogEntity);
     }
-    
-    public List<TimeLogResponse> getTimeLogs(Long id, String date, String clockInTime, String clockOutTime) {
-        List<TimeLogResponse> timeLogResponses = new ArrayList<>();
-        if (id != null){
-            timeLogResponses.add(getTimeLogById(id));
-            return timeLogResponses;
-        } else if (date != null) {
-            timeLogResponses = getTimeLogByDate(date);
-            return timeLogResponses;
-        }
-        else if (clockInTime != null) {
-            timeLogResponses = getTimeLogByClockInTime(clockInTime);
-            return timeLogResponses;
-        }
-        else if (clockOutTime != null) {
-            timeLogResponses = getTimeLogByClockOutTime(clockOutTime);
-            return timeLogResponses;
-        }
-        return getAllTimeLogs();
-    }
 
-    public List<TimeLogResponse> getAllTimeLogs() {
-        return timeLogMapper.toResponseList(timeLogRepository.findAll());
+    public Page<TimeLogResponse> getTimeLogs(
+            Long employeeId, String date, String clockInTime, String clockOutTime, Pageable pageable
+    ) {
+        LocalDate parsedDate = (date != null) ? LocalDate.parse(date) : null;
+        LocalTime inTime = (clockInTime != null) ? LocalTime.parse(clockInTime) : null;
+        LocalTime outTime = (clockOutTime != null) ? LocalTime.parse(clockOutTime) : null;
+
+        Specification<TimeLogEntity> spec = Specification
+                .where(TimeLogSpecifications.hasEmployeeId(employeeId))
+                .and(TimeLogSpecifications.hasDate(parsedDate))
+                .and(TimeLogSpecifications.hasClockInTime(inTime))
+                .and(TimeLogSpecifications.hasClockOutTime(outTime));
+
+        return timeLogRepository.findAll(spec, pageable).map(timeLogMapper::toResponse);
     }
 
     public TimeLogResponse getTimeLogById(long id) {
         return timeLogMapper.toResponse(timeLogRepository.findById(id).get());
     }
+
+    /*
+    public List<TimeLogResponse> getAllTimeLogs() {
+        return timeLogMapper.toResponseList(timeLogRepository.findAll());
+    }
+
 
     public List<TimeLogResponse> getTimeLogByDate(String date) {
         LocalDate localDate = LocalDate.parse(date);
@@ -76,6 +78,8 @@ public class TimeLogService {
         LocalTime localTime = LocalTime.parse(clockOutTime);
         return timeLogMapper.toResponseList(timeLogRepository.findByClockOutTime(localTime));
     }
+
+     */
 
     public TimeLogResponse updateTimeLog(long id, TimeLogRequest timeLogRequest) {
         TimeLogEntity timeLogEntity = timeLogMapper.toEntity(timeLogRequest);

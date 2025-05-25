@@ -44,26 +44,6 @@ public class EmployeeService {
     }
 
     public Page<EmployeeResponse> getEmployees(Long id, String name, String lastName, String dni, Pageable pageable) {
-        /*
-        if (id != null) {
-            EmployeeEntity entity = getEmployeeEntityById(id);
-            return new PageImpl<>(List.of(employeeMapper.toResponseDto(entity)), pageable, 1);
-        } else if (dni != null) {
-            EmployeeEntity entity = getEmployeeEntityByDni(dni);
-            return new PageImpl<>(List.of(employeeMapper.toResponseDto(entity)), pageable, 1);
-        } else if (name != null) {
-            return employeeRepository.getEmployeeEntitiesByName(name, pageable)
-                    .map(employeeMapper::toResponseDto);
-        } else if (lastName != null) {
-            return employeeRepository.getEmployeeEntitiesByLastName(lastName, pageable)
-                    .map(employeeMapper::toResponseDto);
-        }
-
-        return employeeRepository.findByStatus(Status.ONLINE, pageable)
-                .map(employeeMapper::toResponseDto);
-
-         */
-
         Specification<EmployeeEntity> spec = Specification
                 .where(EmployeeSpecifications.isActive())
                 .and(EmployeeSpecifications.hasName(name))
@@ -85,6 +65,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
     }
 
+    /*
     public EmployeeEntity getEmployeeEntityById(Long id) {
         return employeeRepository.findById(id).orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
     }
@@ -105,7 +86,7 @@ public class EmployeeService {
                 .stream()
                 .map(employeeMapper::toResponseDto)
                 .toList();
-    }
+    }*/
 
     public void delete(Long id) {
         EmployeeEntity employee = employeeRepository.findById(id).orElseThrow(() -> new NotFoundException("No se encontro el empleado"));
