@@ -10,7 +10,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.dto.request.AssignProvidersRequest;
 import org.stockify.dto.request.ProductFilterRequest;
 import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.BulkProductResponse;
@@ -21,9 +20,7 @@ import org.stockify.model.assembler.ProviderModelAssembler;
 import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/products")
@@ -31,14 +28,15 @@ public class ProductController {
 
     private final ProductService productService;
     private final ProductModelAssembler productModelAssembler;
-    private final PagedResourcesAssembler<ProductResponse> pagedResourcesAssembler;
     private final ProviderModelAssembler providerModelAssembler;
     private final ProviderService providerService;
 
-    public ProductController(ProductService productService, ProductModelAssembler productModelAssembler, PagedResourcesAssembler<ProductResponse> pagedResourcesAssembler, ProviderModelAssembler providerModelAssembler, ProviderService providerService) {
+    public ProductController(ProductService productService,
+                             ProductModelAssembler productModelAssembler,
+                             ProviderModelAssembler providerModelAssembler,
+                             ProviderService providerService) {
         this.productService = productService;
         this.productModelAssembler = productModelAssembler;
-        this.pagedResourcesAssembler = pagedResourcesAssembler;
         this.providerModelAssembler = providerModelAssembler;
         this.providerService = providerService;
     }
@@ -47,7 +45,8 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
             ProductFilterRequest filter,
-            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
+            PagedResourcesAssembler<ProductResponse> assembler
     ) {
         Page<ProductResponse> products = productService.findAll(pageable,filter);
 
@@ -55,7 +54,7 @@ public class ProductController {
             return ResponseEntity.noContent().build();
         }
 
-        PagedModel<EntityModel<ProductResponse>> pagedModel = pagedResourcesAssembler.toModel(products, productModelAssembler);
+        PagedModel<EntityModel<ProductResponse>> pagedModel = assembler.toModel(products, productModelAssembler);
 
         return ResponseEntity.ok(pagedModel);
     }

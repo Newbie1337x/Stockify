@@ -1,8 +1,8 @@
 
 
 Cambiarle el nombre a los endpoints para que esten acorde a el proyecto.    
-Tira un error en un bean de Hateaos en productController, consultar.
-(El programa funciona igual.)
+Tira un error en un bean de Hateaos en productController, resuelto.
+igualmente consultar por tercer parametro null en assembler.
 
 
 
