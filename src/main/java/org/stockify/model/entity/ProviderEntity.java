@@ -15,10 +15,6 @@ import java.util.Set;
 @Table(name = "providers")
 
 
-//TEMPORAL , MAS ADELANTE IMPLEMENTAR FILTER PARA QUE POR EJEMPLO EL ADMINISTRADOR PUEDA VER LOS DESACTIVADOS TAMBIEN.
-@SQLRestriction("active = true")
-
-
 public class ProviderEntity {
 
     @Id

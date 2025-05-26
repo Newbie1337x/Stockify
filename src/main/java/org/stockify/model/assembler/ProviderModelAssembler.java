@@ -7,6 +7,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 import org.stockify.controller.ProviderController;
+import org.stockify.dto.request.ProviderFilterRequest;
 import org.stockify.dto.response.ProviderResponse;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -24,7 +25,7 @@ public class ProviderModelAssembler implements RepresentationModelAssembler<Prov
                         .withSelfRel(),
 
                 linkTo(methodOn(ProviderController.class)
-                        .listProviders(PageRequest.of(0, 10), null))
+                        .listProviders(new ProviderFilterRequest(),PageRequest.of(0, 10), null))
                         .withRel("providers")
         );
     }

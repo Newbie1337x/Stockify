@@ -3,9 +3,10 @@ package org.stockify.dto.request;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.Set;
-@Data
+@Getter
 public class AssignProvidersRequest {
     @NotNull
     @NotEmpty

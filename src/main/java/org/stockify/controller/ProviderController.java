@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.AssignProductRequest;
+import org.stockify.dto.request.ProviderFilterRequest;
 import org.stockify.dto.request.ProviderRequest;
 import org.stockify.dto.response.BulkProviderResponse;
 import org.stockify.dto.response.ProductResponse;
@@ -44,10 +45,11 @@ public class ProviderController {
     //---Crud operations---
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
+            @Valid ProviderFilterRequest filters,
             @PageableDefault(sort = "name") Pageable pageable,
             PagedResourcesAssembler<ProviderResponse> assembler) {
 
-        Page<ProviderResponse> providerPage = providerService.findAll(pageable);
+        Page<ProviderResponse> providerPage = providerService.findAll(pageable, filters);
         PagedModel<EntityModel<ProviderResponse>> pagedModel =
                 assembler.toModel(providerPage, providerModelAssembler);
 
@@ -112,23 +114,4 @@ public class ProviderController {
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.unassignProductToProvider(providerID,productID)));
     }
 
-    //FILTERS //CONSULTAR
-
-    @GetMapping("/search")
-    public ResponseEntity<?> search(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String businessName,
-            @RequestParam(required = false) String taxId,
-            Pageable pageable) {
-
-        if (name != null) {
-            return ResponseEntity.ok(providerService.findByName(pageable, name));
-        } else if (businessName != null) {
-            return ResponseEntity.ok(providerService.findByBusinessName(businessName));
-        } else if (taxId != null) {
-            return ResponseEntity.ok(providerService.findByTaxId(taxId));
-        } else {
-            return listProviders(pageable, null);
-        }
-    }
 }

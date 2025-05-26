@@ -9,7 +9,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@Builder
 public class ProviderRequest {
 
     @NotBlank(message = "Contact name is required")
