@@ -17,6 +17,7 @@ public interface ProductMapper {
     @Mapping(source = "providers", target = "providers", qualifiedByName = "providerEntitiesToIds")
     ProductResponse toResponse(ProductEntity entity);
 
+    @Mapping(target = "stockList", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)

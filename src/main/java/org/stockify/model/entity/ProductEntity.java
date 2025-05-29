@@ -45,8 +45,11 @@ public class ProductEntity {
     @Column(name = "brand")
     private String brand;
 
-
-
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "stock",
+    joinColumns = @JoinColumn(name = "product_id"),
+    inverseJoinColumns = @JoinColumn(name = "id"))
+    private Set<StockEntity> stockList;
 
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -62,7 +65,6 @@ public class ProductEntity {
             inverseJoinColumns = @JoinColumn(name = "provider_id")
     )
     private Set<ProviderEntity> providers;
-
 
     public ProductEntity(){
         categories = new HashSet<>();

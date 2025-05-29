@@ -15,7 +15,6 @@ public interface CategoryMapper {
 
     CategoryResponse toResponse(CategoryEntity entity);
 
-    Set<CategoryResponse> toResponseSet(Set<CategoryEntity> entities);
 
     @Mapping(target = "id", ignore = true)
     CategoryEntity updateEntityFromRequest(CategoryRequest dto, @MappingTarget CategoryEntity entity);
