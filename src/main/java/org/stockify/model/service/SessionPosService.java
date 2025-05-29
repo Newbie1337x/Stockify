@@ -2,6 +2,7 @@ package org.stockify.model.service;
 
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.sessionpos.SessionPosRequest;
+import org.stockify.dto.response.SessionPosCreateResponse;
 import org.stockify.dto.response.SessionPosResponse;
 import org.stockify.model.entity.SessionPosEntity;
 import org.stockify.model.exception.NotFoundException;
@@ -21,11 +22,9 @@ public class SessionPosService {
         this.sessionPosMapper = sessionPosMapper;
     }
 
-
     /**
      * Guarda una nueva sesión POS en la base de datos a partir de un objeto de solicitud (DTO).
-     *
-     * <p>Este método convierte el DTO {@link SessionPosRequest} recibido en una entidad,
+     * Este méthod convierte el DTO {@link SessionPosRequest} recibido en una entidad,
      * lo persiste usando el repositorio, y luego convierte la entidad persistida
      * en un DTO de respuesta {@link SessionPosResponse} que se retorna.</p>
      * @param sessionPosRequest el objeto que contiene los datos de la sesión a guardar.
@@ -38,12 +37,17 @@ public class SessionPosService {
 
     /**
      * Guarda directamente una entidad de sesión POS en la base de datos.
-     * Este método recibe una entidad {@link SessionPosEntity} ya construida, la guarda
-     * en la base de datos y retorna un DTO {@link SessionPosResponse} que representa la sesión guardada
+     * Este method recibe una entidad {@link SessionPosEntity} ya construida, la guarda
+     * en la base de datos y retorna un DTO {@link org.stockify.dto.response.SessionPosCreateResponse} que representa la sesión guardada
      * @param sessionPosEntity la entidad de sesión POS que se desea guardar.
-     * @return un {@link SessionPosResponse} que representa la sesión guardada.
+     * @return un {@link SessionPosCreateResponse} que representa la sesión guardada.
      */
-    public SessionPosResponse save(SessionPosEntity sessionPosEntity){
+    public SessionPosCreateResponse save(SessionPosEntity sessionPosEntity){
+        return sessionPosMapper.toDtoCreate(repository.save(sessionPosEntity));
+    }
+
+    public SessionPosResponse update(SessionPosEntity sessionPosEntity)
+    {
         return sessionPosMapper.toDto(repository.save(sessionPosEntity));
     }
 

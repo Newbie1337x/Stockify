@@ -18,6 +18,7 @@ public interface PosMapper {
      */
     PosEntity toEntity(PosCreateRequest posCreateRequest);
 
+
     /**
      * Convierte una entidad {@link PosEntity} en un objeto de respuesta {@link PosResponse}.
      *

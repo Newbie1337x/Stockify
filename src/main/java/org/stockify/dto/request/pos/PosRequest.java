@@ -1,6 +1,5 @@
 package org.stockify.dto.request.pos;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -20,17 +19,14 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PosRequest {
-
-    @NotNull
-    private Long idCaja;
+public class PosRequest{
 
     @NotNull(message = "currentAmount must not be null")
     private BigDecimal currentAmount;
 
     @NotNull(message = "status must not be null")
     private Status status;
-    @NotBlank
-    @Pattern(regexp = "^\\d{7,8}$\n", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
+
+    @Pattern(regexp = "^\\d{7,8}$", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
     private String employeeDni;
-}
+    }

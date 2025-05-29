@@ -1,13 +1,14 @@
 package org.stockify.model.service;
 
+import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.stockify.dto.request.pos.PosAmountRequest;
 import org.stockify.dto.request.pos.PosCreateRequest;
 import org.stockify.dto.request.sessionpos.SessionPosCloseRequest;
 import org.stockify.dto.request.sessionpos.SessionPosRequest;
 import org.stockify.dto.response.PosResponse;
+import org.stockify.dto.response.SessionPosCreateResponse;
 import org.stockify.dto.response.SessionPosResponse;
 import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.entity.PosEntity;
@@ -87,8 +88,8 @@ public class PosService {
 
     /**
      * Abre una terminal POS (Point of Sale) si está disponible
-     * Este método verifica que el empleado exista y que la terminal POS esté en estado OFFLINE
-     * y sin una sesión abierta actualmente. Si todo es válido, cambia el estado de la POS a ONLINE,
+     * Este méthod verifica que el empleado exista y que la terminal POS esté en estado OFFLINE
+     * y sin una sesión abierta actualmente. Si esto es válido, cambia el estado de la POS a ONLINE,
      * vincula al empleado y registra una nueva sesión con la hora de apertura.
      *
      * @param id ID de la terminal POS a abrir.
@@ -99,12 +100,14 @@ public class PosService {
      * @throws InvalidSessionStatusException Si la POS ya está abierta o no está en estado OFFLINE.
      */
     @Transactional
-    public SessionPosResponse openPos(Long id, SessionPosRequest sessionPosRequest) {
+    public SessionPosCreateResponse openPos(Long id, SessionPosRequest sessionPosRequest) {
         String employeeDni = sessionPosRequest.getEmployeeDni();
 
-        if (!employeeService.existByDni(employeeDni)) {
-            throw new EmployeeNotFoundException("Employee with DNI " + employeeDni + " was not found.");
-        }
+    // crear un dto especifico para cuando se abre al caja
+        // Cambiar verificacion por un optional orelse throw
+    if (!employeeService.existByDni(employeeDni)) {
+      throw new EmployeeNotFoundException("Employee with DNI " + employeeDni + " was not found.");
+    }
 
         PosEntity pos = posRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("POS with ID " + id + " was not found."));
@@ -126,11 +129,10 @@ public class PosService {
         session.setOpeningTime(LocalDateTime.now());
         session.setEmployee(employee);
         session.setPosEntity(pos);
-        sessionPosService.save(session);
         posRepository.save(pos);
-        SessionPosResponse sessionPosResponse = sessionPosService.save(session);
-        sessionPosResponse.setIdPos(id);
-        return sessionPosResponse;
+        SessionPosCreateResponse sessionPosCreateResponse = sessionPosService.save(session);
+        sessionPosCreateResponse.setIdPos(id);
+        return sessionPosCreateResponse;
     }
 
     /**
@@ -144,32 +146,29 @@ public class PosService {
      */
     @Transactional
     public SessionPosResponse closePos(@NotNull Long idPos, @NotNull SessionPosCloseRequest closeRequest) {
-        PosEntity pos = posRepository.findById(idPos).orElseThrow(
-                () -> new NotFoundException("This POS is not Found")
-        );
+        PosEntity pos = posRepository.findById(idPos)
+                .orElseThrow(() -> new NotFoundException("This POS is not Found"));
 
-        if (pos.getStatus() == Status.ONLINE && sessionPosService.isOpened(pos.getId(), null)) {
-            SessionPosEntity sessionPosEntity = sessionPosService.findByIdPosAndCloseTime(idPos, null);
-
-            sessionPosEntity.setCloseTime(LocalDateTime.now());
-            sessionPosEntity.setCloseAmount(closeRequest.getCloseAmount());
-            sessionPosEntity.setExpectedAmount(pos.getCurrentAmount());
-
-            if (pos.getCurrentAmount() != null && closeRequest.getCloseAmount() != null) {
-                BigDecimal difference = closeRequest.getCloseAmount().subtract(pos.getCurrentAmount());
-                sessionPosEntity.setCashDifference(difference);
-            }
-
-            pos.setStatus(Status.OFFLINE);
-            pos.setEmployee(null);
-            pos.setCurrentAmount(BigDecimal.valueOf(0.00));
-
-            posRepository.save(pos);
-
-            return sessionPosService.save(sessionPosEntity);
+        if (pos.getStatus() != Status.ONLINE || !sessionPosService.isOpened(idPos, null)) {
+            throw new InvalidSessionStatusException("This POS is already closed");
         }
 
-        throw new InvalidSessionStatusException("This POS is already closed");
+        SessionPosEntity session = sessionPosService.findByIdPosAndCloseTime(idPos, null);
+        session.setCloseTime(LocalDateTime.now());
+        session.setCloseAmount(closeRequest.getCloseAmount());
+        session.setExpectedAmount(pos.getCurrentAmount());
+
+        if (pos.getCurrentAmount() != null && closeRequest.getCloseAmount() != null) {
+            session.setCashDifference(closeRequest.getCloseAmount().subtract(pos.getCurrentAmount()));
+        }
+
+        pos.setStatus(Status.OFFLINE);
+        pos.setEmployee(null);
+        pos.setCurrentAmount(BigDecimal.ZERO);
+        posRepository.save(pos);
+
+        return sessionPosService.update(session);
     }
+
 
 }
