@@ -7,12 +7,10 @@ import org.stockify.dto.request.ProviderFilterRequest;
 import org.stockify.dto.request.ProviderRequest;
 import org.stockify.dto.response.BulkProviderResponse;
 import org.stockify.dto.response.ProviderResponse;
-import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.ProviderEntity;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.ProviderMapper;
-import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.ProviderRepository;
 import org.stockify.model.specification.ProviderSpecification;
@@ -26,13 +24,11 @@ public class ProviderService {
     private final ProviderRepository providerRepository;
     private final ProductRepository productRepository;
     private final ProviderMapper providerMapper;
-    private final CategoryRepository categoryRepository;
 
-    public ProviderService(ProviderRepository providerRepository, ProductRepository productRepository, ProviderMapper providerMapper, CategoryRepository categoryRepository) {
+    public ProviderService(ProviderRepository providerRepository, ProductRepository productRepository, ProviderMapper providerMapper) {
         this.providerRepository = providerRepository;
         this.productRepository = productRepository;
         this.providerMapper = providerMapper;
-        this.categoryRepository = categoryRepository;
     }
 
     //---Crud operations---
@@ -44,23 +40,42 @@ public class ProviderService {
     }
 
     public BulkProviderResponse saveAll(List<ProviderRequest> providers) {
-        List<String> errors = providers.stream()
-                .map(providerMapper::toEntity)
-                .map(providerRepository::save)
-                .filter(p -> !p.isActive())
-                .map(p -> "Error creating provider with ID: " + p.getId())
-                .toList();
+        List<String> errors = new java.util.ArrayList<>();
+        List<ProviderResponse> responses = new java.util.ArrayList<>();
 
-        List<ProviderResponse> responses = providers.stream()
-                .map(providerMapper::toEntity)
-                .map(providerRepository::save)
-                .filter(ProviderEntity::isActive)
-                .map(providerMapper::toResponseDTO)
-                .toList();
+        for (ProviderRequest request : providers) {
+            try {
+                ProviderEntity entity = providerMapper.toEntity(request);
+                ProviderEntity savedEntity = providerRepository.save(entity);
+
+                if (savedEntity.isActive()) {
+                    responses.add(providerMapper.toResponseDTO(savedEntity));
+                } else {
+                    errors.add("Error creating provider with ID: " + savedEntity.getId());
+                }
+            } catch (Exception e) {
+                errors.add("Error creating provider: " + e.getMessage());
+            }
+        }
+
         return new BulkProviderResponse(responses, errors);
     }
 
     public Page<ProviderResponse> findAll(Pageable pageable, ProviderFilterRequest filterRequest) {
+        // Handle the hide parameter
+        Boolean hide = filterRequest.getHide();
+
+        // If hide is null (default), show only active providers
+        // If hide is true, show all providers (active and inactive)
+        // If hide is false, show only inactive providers
+        if (hide == null) {
+            filterRequest.setActive(true);
+        } else if (hide) {
+            filterRequest.setActive(null); // Show all providers
+        } else {
+            filterRequest.setActive(false); // Show only inactive providers
+        }
+
         Specification<ProviderEntity> specification = Specification
                 .where(ProviderSpecification.byName(filterRequest.getName()))
                 .and(ProviderSpecification.byBusinessName(filterRequest.getBusinessName()))
@@ -81,22 +96,6 @@ public class ProviderService {
         return providerMapper.toResponseDTO(provider);
     }
 
-    /*
-
-    public Page<ProviderResponse> findByName(Pageable pageable, String name) {
-        Page<ProviderEntity> page = providerRepository.findByName(pageable, name);
-        return page.map(providerMapper::toResponseDTO);
-    }
-
-    public ProviderResponse findByBusinessName(String businessName) {
-        return providerMapper.toResponseDTO(providerRepository.findByBusinessName(businessName));
-    }
-
-    public ProviderResponse findByTaxId(String taxId) {
-        return providerMapper.toResponseDTO(providerRepository.findByTaxId(taxId));
-    }
-
-    */
 
     public ProviderResponse logicalDelete(Long id) {
         ProviderEntity provider = getProviderById(id);
@@ -112,58 +111,46 @@ public class ProviderService {
 
     //Product Logic
 
-    public Page<ProviderResponse> findAllProvidersByProductID(int productID, Pageable pageable) {
+    public Page<ProviderResponse> findAllProvidersByProductID(Long productID, Pageable pageable) {
         return providerRepository
                 .findAllByProductList_Id(pageable, productID)
                 .map(providerMapper::toResponseDTO);
     }
 
-    public ProviderResponse assignProductToProvider(long providerID, int productID){
+    public ProviderResponse assignProductToProvider(Long providerID, Long productID){
         ProviderEntity provider = getProviderById(providerID);
         ProductEntity product = getProductById(productID);
         provider.getProductList().add(product);
+        product.getProviders().add(provider);
+
+        providerRepository.save(provider);
+        productRepository.save(product);
+
         return providerMapper.toResponseDTO(provider);
     }
 
-    public ProviderResponse unassignProductToProvider(Long providerID,int productID){
+    public ProviderResponse unassignProductToProvider(Long providerID, Long productID){
         ProviderEntity provider = getProviderById(providerID);
         ProductEntity product = getProductById(productID);
         provider.getProductList().remove(product);
+        product.getProviders().remove(provider);
+
+        providerRepository.save(provider);
+        productRepository.save(product);
+
         return providerMapper.toResponseDTO(provider);
     }
 
 
     //Auxiliar
-    private ProductEntity getProductById(int id) {
+    private ProductEntity getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product with ID " + id + " not found"));
     }
 
-    private CategoryEntity getCategoryById(int id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
-    }
 
     private ProviderEntity getProviderById(Long id) {
         return providerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));
     }
 }
-
-    /* TODO ---Gestión de órdenes de compra
-
-            crearOrdenDeCompra(proveedorId, datosOrden)
-
-            listarOrdenesDeCompra(proveedorId, ordenId)
-
-            obtenerOrdenDeCompra(ordenId)
-
-            actualizarEstadoOrden(ordenId, estado)
-
-      TODO ---Historial
-
-            obtenerHistorialDeCompras(proveedorId)
-
-            calcularTotalCompradoAProveedor(proveedorId, periodo)
-    */
-

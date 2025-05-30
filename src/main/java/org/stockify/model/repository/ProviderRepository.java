@@ -16,12 +16,10 @@ import java.util.Set;
 @Repository
 public interface ProviderRepository extends JpaRepository<ProviderEntity, Long>, JpaSpecificationExecutor<ProviderEntity> {
 
-    Page<ProviderEntity> findByName(Pageable pageable, String name);
+    Page<ProviderEntity> findAllByProductList_Id(Pageable pageable, @Param("prodID") Long prodID);
 
-    ProviderEntity findByBusinessName(String businessName);
+    Page<ProviderEntity> findAllByActive(Pageable pageable, boolean active);
 
-    ProviderEntity findByTaxId(String taxId);
-
-    Page<ProviderEntity> findAllByProductList_Id(Pageable pageable, @Param("prodID") int prodID);
+    Page<ProviderEntity> findAll(Pageable pageable);
 
 }

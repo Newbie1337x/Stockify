@@ -67,16 +67,7 @@ public class CategoryController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<EntityModel<CategoryResponse>> patchCategory(@PathVariable int id,@Valid @RequestBody CategoryRequest categoryRequestDTO) {
-
         return ResponseEntity.ok().body(categoryModelAssembler
                 .toModel(categoryService.patch(id, categoryRequestDTO)));
     }
-
-
-
-
-
-
-
-
 }

@@ -12,10 +12,10 @@ import org.stockify.model.entity.ProductEntity;
 import java.util.Set;
 
 @Repository
-public interface ProductRepository extends JpaRepository<ProductEntity,Integer>, JpaSpecificationExecutor<ProductEntity> {
+public interface ProductRepository extends JpaRepository<ProductEntity,Long>, JpaSpecificationExecutor<ProductEntity> {
 
     @Query("SELECT p.categories FROM ProductEntity p WHERE p.id = :prodID")
-    Page<CategoryEntity> findCategoriesByProductId(@Param("prodID") int prodID, Pageable pageable);
+    Page<CategoryEntity> findCategoriesByProductId(@Param("prodID") Long prodID, Pageable pageable);
 
     Page<ProductEntity> findAllByProviders_Id(Long providerId, Pageable pageable);
 

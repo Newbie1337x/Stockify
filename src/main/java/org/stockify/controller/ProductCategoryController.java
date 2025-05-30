@@ -30,14 +30,14 @@ public class ProductCategoryController {
 
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<EntityModel<ProductResponse>> removeCategoryFromProduct(
-            @PathVariable int productId,
+            @PathVariable Long productId,
             @PathVariable int categoryId) {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.deleteCategoryFromProduct(categoryId, productId)));
     }
 
     @PutMapping("/{categoryId}")
     public ResponseEntity<EntityModel<ProductResponse>> addCategoryToProduct(
-            @PathVariable int productId,
+            @PathVariable Long productId,
             @PathVariable int categoryId
     ){
         return ResponseEntity.ok(productModelAssembler.toModel(productService.addCategoryToProduct(categoryId, productId)));
@@ -45,13 +45,13 @@ public class ProductCategoryController {
 
     @DeleteMapping
     public ResponseEntity<EntityModel<ProductResponse>> removeAllCategoriesFromProduct(
-            @PathVariable int productId) {
+            @PathVariable Long productId) {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.deleteAllCategoryFromProduct(productId)));
     }
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<CategoryResponse>>> getCategoriesFromProduct(
-            @PathVariable int productId,
+            @PathVariable Long productId,
             @PageableDefault(sort = "name") Pageable pageable,
             PagedResourcesAssembler<CategoryResponse> assembler) {
         Page<CategoryResponse> categoryPage = productService.findCategoriesByProductId(productId, pageable);

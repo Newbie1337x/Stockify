@@ -10,44 +10,48 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.dto.request.AssignProductRequest;
 import org.stockify.dto.request.ProviderFilterRequest;
 import org.stockify.dto.request.ProviderRequest;
 import org.stockify.dto.response.BulkProviderResponse;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProviderResponse;
+import org.stockify.model.assembler.ProductModelAssembler;
 import org.stockify.model.assembler.ProviderModelAssembler;
-import org.stockify.model.mapper.ProviderMapper;
 import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
 
-import java.security.Provider;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/provider")
+@RequestMapping("/api/providers")
 public class ProviderController {
 
     private final ProviderService providerService;
     private final ProductService productService;
     private final ProviderModelAssembler providerModelAssembler;
+    private final ProductModelAssembler productModelAssembler;
 
     public ProviderController(ProviderService providerService,
                               ProductService productService,
-                              ProviderModelAssembler providerModelAssembler) {
+                              ProviderModelAssembler providerModelAssembler,
+                              ProductModelAssembler productModelAssembler) {
 
         this.providerService = providerService;
         this.productService = productService;
         this.providerModelAssembler = providerModelAssembler;
+        this.productModelAssembler = productModelAssembler;
     }
 
     //---Crud operations---
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
             @Valid ProviderFilterRequest filters,
+            @RequestParam(required = false) Boolean hide,
             @PageableDefault(sort = "name") Pageable pageable,
             PagedResourcesAssembler<ProviderResponse> assembler) {
+
+        filters.setHide(hide);
 
         Page<ProviderResponse> providerPage = providerService.findAll(pageable, filters);
         PagedModel<EntityModel<ProviderResponse>> pagedModel =
@@ -79,8 +83,8 @@ public class ProviderController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProvider(@PathVariable Long id) {
-        return ResponseEntity.ok("The following provider has been deleted: " + providerService.delete(id));
+    public ResponseEntity<EntityModel<ProviderResponse>> deleteProvider(@PathVariable Long id) {
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(id)));
     }
 
 
@@ -93,12 +97,12 @@ public class ProviderController {
             PagedResourcesAssembler<ProductResponse> assembler
     ) {
         Page<ProductResponse> productPage = productService.findProductsByProviderId(id, pageable);
-        return ResponseEntity.ok(assembler.toModel(productPage));
+        return ResponseEntity.ok(assembler.toModel(productPage, productModelAssembler));
     }
     @PutMapping("/{providerID}/products/{productID}")
-    public ResponseEntity<EntityModel<ProviderResponse>> assingProduct(
+    public ResponseEntity<EntityModel<ProviderResponse>> assignProduct(
             @PathVariable Long providerID,
-            @PathVariable int productID
+            @PathVariable Long productID
     ){
         return ResponseEntity.ok(providerModelAssembler
                 .toModel(providerService.assignProductToProvider(providerID,productID)));
@@ -108,7 +112,7 @@ public class ProviderController {
     @PatchMapping("/{providerID}/products/{productID}")
     public ResponseEntity<EntityModel<ProviderResponse>> unassignProducts(
             @PathVariable Long providerID,
-            @PathVariable int productID
+            @PathVariable Long productID
     )
     {
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.unassignProductToProvider(providerID,productID)));

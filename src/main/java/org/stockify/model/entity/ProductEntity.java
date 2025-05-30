@@ -45,11 +45,8 @@ public class ProductEntity {
     @Column(name = "brand")
     private String brand;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "stock",
-    joinColumns = @JoinColumn(name = "product_id"),
-    inverseJoinColumns = @JoinColumn(name = "id"))
-    private Set<StockEntity> stockList;
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private Set<StockEntity> stocks;
 
 
     @ManyToMany(fetch = FetchType.LAZY)

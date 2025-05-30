@@ -66,7 +66,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<ProductResponse>> getProductById(@PathVariable int id) {
+    public ResponseEntity<EntityModel<ProductResponse>> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.findById(id)));
     }
 
@@ -76,19 +76,18 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable int id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<ProductResponse>> updateProduct(@PathVariable int id, @Valid @RequestBody ProductRequest product){
+    public ResponseEntity<EntityModel<ProductResponse>> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest product){
         return ResponseEntity.ok().body(productModelAssembler.toModel(productService.update(id, product)));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<EntityModel<ProductResponse>> patchProduct(@PathVariable int id,@RequestBody ProductRequest product){
-
+    public ResponseEntity<EntityModel<ProductResponse>> patchProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest product){
         return ResponseEntity.ok().body(productModelAssembler.toModel(productService.patch(id,product)));
     }
 
@@ -97,7 +96,7 @@ public class ProductController {
 
     @PutMapping("/{productID}/providers/{providerID}")
     public ResponseEntity<EntityModel<ProductResponse>> assignProvider(
-            @PathVariable int productID,
+            @PathVariable Long productID,
             @PathVariable Long providerID
     ){
         return ResponseEntity.ok(productModelAssembler
@@ -109,7 +108,7 @@ public class ProductController {
 
     @DeleteMapping("/{productID}/providers/{providerID}")
     public ResponseEntity<EntityModel<ProductResponse>> unassignProvider(
-            @PathVariable int productID,
+            @PathVariable Long productID,
             @PathVariable Long providerID
     ){
         return ResponseEntity.ok(productModelAssembler
@@ -120,7 +119,7 @@ public class ProductController {
 
     @GetMapping("/{id}/providers")
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
-            @PathVariable int id,
+            @PathVariable Long id,
             @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
             PagedResourcesAssembler<ProviderResponse> assembler
     ){
@@ -128,9 +127,4 @@ public class ProductController {
         PagedModel<EntityModel<ProviderResponse>> pagedModel = assembler.toModel(providersPage, providerModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
-
-
-
-
-
 }

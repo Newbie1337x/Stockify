@@ -15,5 +15,6 @@ public class ProviderFilterRequest {
     private Boolean active;
     private Long id;
     private String taxAddress;
+    private Boolean hide;
 
 }
