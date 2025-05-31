@@ -62,20 +62,6 @@ public class ProviderService {
     }
 
     public Page<ProviderResponse> findAll(Pageable pageable, ProviderFilterRequest filterRequest) {
-        // Handle the hide parameter
-        Boolean hide = filterRequest.getHide();
-
-        // If hide is null (default), show only active providers
-        // If hide is true, show all providers (active and inactive)
-        // If hide is false, show only inactive providers
-        if (hide == null) {
-            filterRequest.setActive(true);
-        } else if (hide) {
-            filterRequest.setActive(null); // Show all providers
-        } else {
-            filterRequest.setActive(false); // Show only inactive providers
-        }
-
         Specification<ProviderEntity> specification = Specification
                 .where(ProviderSpecification.byName(filterRequest.getName()))
                 .and(ProviderSpecification.byBusinessName(filterRequest.getBusinessName()))
@@ -90,12 +76,10 @@ public class ProviderService {
                 .map(providerMapper::toResponseDTO);
     }
 
-
     public ProviderResponse findById(long id) {
         ProviderEntity provider = getProviderById(id);
         return providerMapper.toResponseDTO(provider);
     }
-
 
     public ProviderResponse logicalDelete(Long id) {
         ProviderEntity provider = getProviderById(id);
@@ -141,13 +125,11 @@ public class ProviderService {
         return providerMapper.toResponseDTO(provider);
     }
 
-
     //Auxiliar
     private ProductEntity getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product with ID " + id + " not found"));
     }
-
 
     private ProviderEntity getProviderById(Long id) {
         return providerRepository.findById(id)

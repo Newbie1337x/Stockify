@@ -31,11 +31,16 @@ public class ProviderSpecification {
                 phone == null ? null : criteriaBuilder.equal(root.get("phone"), phone + "%");
     }
 
-    public static Specification<ProviderEntity> byActive(Boolean status) {
-        return (root, query, criteriaBuilder) ->{
-                if ( status == null ) {
-                    return criteriaBuilder.isNotNull(root.get("active"));
-                }  return criteriaBuilder.equal(root.get("active"), status);
+    public static Specification<ProviderEntity> byActive(String status) {
+        return (root, query, criteriaBuilder) -> {
+            if (status == null) {
+                return criteriaBuilder.equal(root.get("active"), true);  //default: show active providers
+            } else if (status.equalsIgnoreCase("all")) {
+                return criteriaBuilder.isNotNull(root.get("active")); // show all providers regardless of active status if "all" is specified
+            } else {
+                Boolean activeStatus = Boolean.parseBoolean(status);  // Convert string "true" to boolean, any other value will be false
+                return criteriaBuilder.equal(root.get("active"), activeStatus);
+            }
         };
     }
 
