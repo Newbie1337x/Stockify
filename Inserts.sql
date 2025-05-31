@@ -29,20 +29,11 @@ INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact
 VALUES ('Sports Gear Supply', '321654987', '202 Sports Way, Denver, CO', '555-321-6549', 'info@sportsgearsupply.com', 'David Wilson', true);
 
 -- Stores
-INSERT INTO stores (store_name, address, city)
-VALUES ('Downtown Store', '123 Main St', 'New York');
-
-INSERT INTO stores (store_name, address, city)
-VALUES ('Westside Mall', '456 West Ave', 'Los Angeles');
-
-INSERT INTO stores (store_name, address, city)
-VALUES ('Eastside Plaza', '789 East Blvd', 'Chicago');
-
-INSERT INTO stores (store_name, address, city)
-VALUES ('Northside Center', '101 North St', 'Boston');
-
-INSERT INTO stores (store_name, address, city)
-VALUES ('Southside Outlet', '202 South Rd', 'Miami');
+INSERT INTO stores (store_name, address, city) VALUES ('Downtown Store', '123 Main St', 'New York');
+INSERT INTO stores (store_name, address, city) VALUES ('Westside Mall', '456 West Ave', 'Los Angeles');
+INSERT INTO stores (store_name, address, city) VALUES ('Eastside Plaza', '789 East Blvd', 'Chicago');
+INSERT INTO stores (store_name, address, city) VALUES ('Northside Center', '101 North St', 'Boston');
+INSERT INTO stores (store_name, address, city) VALUES ('Southside Outlet', '202 South Rd', 'Miami');
 
 -- Products
 INSERT INTO products (name, description, price, stock, sku, barcode, brand)
@@ -76,38 +67,17 @@ INSERT INTO products (name, description, price, stock, sku, barcode, brand)
 VALUES ('Yoga Mat', 'Non-slip yoga mat with carrying strap', 29.99, 0, 'YM-010', 'YM010-BARCODE', 'FitnessCo');
 
 -- Stock
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (1, 1, 25);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (1, 2, 30);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (1, 3, 50);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (2, 1, 15);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (2, 4, 40);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (2, 5, 20);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (3, 6, 10);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (3, 7, 35);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (4, 8, 25);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (4, 9, 15);
-
-INSERT INTO stock (store_id, product_id, quantity)
-VALUES (5, 10, 30);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (1, 1, 25);
+INSERT INTO stock (store_id, product_id, quantity)VALUES (1, 2, 30);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (1, 3, 50);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (2, 1, 15);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (2, 4, 40);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (2, 5, 20);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (3, 6, 10);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (3, 7, 35);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (4, 8, 25);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (4, 9, 15);
+INSERT INTO stock (store_id, product_id, quantity) VALUES (5, 10, 30);
 
 -- Products-Categories relationships
 INSERT INTO products_categories (product_id, category_id) VALUES (1, 1); -- Laptop in Electronics

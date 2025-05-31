@@ -1,4 +1,5 @@
 package org.stockify.controller;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,7 @@ public class CategoryController {
         this.categoryModelAssembler = categoryModelAssembler;
     }
 
+    @Operation(summary = "List all categories")
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<CategoryResponse>>> listCategories(
             Pageable pageable,
@@ -40,12 +42,13 @@ public class CategoryController {
         return ResponseEntity.ok(pagedModel);
     }
 
-
+    @Operation(summary = "Get a categorie by id")
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<CategoryResponse>> getCategoryById(@PathVariable int id) {
         return ResponseEntity.ok(categoryModelAssembler.toModel(categoryService.findById(id)));
     }
 
+    @Operation(summary = "Delete a category by id")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable int id) {
         categoryService.deleteById(id);
@@ -53,18 +56,21 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Create a new category")
     @PostMapping
     public ResponseEntity<EntityModel<CategoryResponse>> createCategory(@Valid @RequestBody CategoryRequest categoryRequestDTO) {
 
         return ResponseEntity.status(201).body(categoryModelAssembler.toModel(categoryService.save(categoryRequestDTO)));
     }
 
+    @Operation(summary = "Update category name by id")
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<CategoryResponse>> updateCategory(@PathVariable int id, @Valid @RequestBody CategoryRequest categoryRequestDTO) {
         return ResponseEntity.ok(categoryModelAssembler
                 .toModel(categoryService.update(id, categoryRequestDTO)));
     }
 
+    @Operation(summary = "Patch category name by id")
     @PatchMapping("/{id}")
     public ResponseEntity<EntityModel<CategoryResponse>> patchCategory(@PathVariable int id,@Valid @RequestBody CategoryRequest categoryRequestDTO) {
         return ResponseEntity.ok().body(categoryModelAssembler

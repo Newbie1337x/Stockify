@@ -1,4 +1,5 @@
 package org.stockify.controller;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +45,7 @@ public class ProviderController {
     }
 
     //---Crud operations---
+    @Operation(summary = "List all providers with optional filters")
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
             @Valid ProviderFilterRequest filters,
@@ -60,6 +62,7 @@ public class ProviderController {
         return ResponseEntity.ok(pagedModel);
     }
 
+    @Operation(summary = "Get provider by ID")
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<ProviderResponse>> getProviderById(@PathVariable Long id) {
         ProviderResponse providerResponse = providerService.findById(id);
@@ -67,21 +70,25 @@ public class ProviderController {
         return ResponseEntity.ok(entityModel);
     }
 
+    @Operation(summary = "Create a new provider")
     @PostMapping
         public ResponseEntity<EntityModel<ProviderResponse>> createProvider(@Valid @RequestBody ProviderRequest request) {
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.save(request)));
     }
 
+    @Operation(summary = "Create multiple providers")
     @PostMapping("/bulk")
     public ResponseEntity<BulkProviderResponse> bulkSaveProviders(@Valid @RequestBody List<@Valid ProviderRequest> providers) {
         return ResponseEntity.status(HttpStatus.CREATED).body(providerService.saveAll(providers));
     }
 
+    @Operation(summary = "Logically delete a provider")
     @PatchMapping("/{id}/disable")
     public ResponseEntity<EntityModel<ProviderResponse>> logicalDeleteProvider(@PathVariable Long id) {
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(id)));
     }
 
+    @Operation(summary = "Delete a provider from the system")
     @DeleteMapping("/{id}")
     public ResponseEntity<EntityModel<ProviderResponse>> deleteProvider(@PathVariable Long id) {
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(id)));
@@ -90,6 +97,7 @@ public class ProviderController {
 
     //Products Logic
 
+    @Operation(summary = "List products associated with a provider")
     @GetMapping("/{id}/products")
     public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
             @PathVariable Long id,
@@ -99,6 +107,8 @@ public class ProviderController {
         Page<ProductResponse> productPage = productService.findProductsByProviderId(id, pageable);
         return ResponseEntity.ok(assembler.toModel(productPage, productModelAssembler));
     }
+
+    @Operation(summary = "Assign a specific product to a provider")
     @PutMapping("/{providerID}/products/{productID}")
     public ResponseEntity<EntityModel<ProviderResponse>> assignProduct(
             @PathVariable Long providerID,
@@ -108,7 +118,7 @@ public class ProviderController {
                 .toModel(providerService.assignProductToProvider(providerID,productID)));
     }
 
-
+    @Operation(summary = "Unassign a specific product from a provider")
     @PatchMapping("/{providerID}/products/{productID}")
     public ResponseEntity<EntityModel<ProviderResponse>> unassignProducts(
             @PathVariable Long providerID,
