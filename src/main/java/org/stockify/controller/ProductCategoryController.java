@@ -1,4 +1,5 @@
 package org.stockify.controller;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -28,6 +29,7 @@ public class ProductCategoryController {
         this.productModelAssembler = productModelAssembler;
     }
 
+    @Operation(summary = "Remove a category from a product")
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<EntityModel<ProductResponse>> removeCategoryFromProduct(
             @PathVariable Long productId,
@@ -35,6 +37,7 @@ public class ProductCategoryController {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.deleteCategoryFromProduct(categoryId, productId)));
     }
 
+    @Operation(summary = "Add a category to a product")
     @PutMapping("/{categoryId}")
     public ResponseEntity<EntityModel<ProductResponse>> addCategoryToProduct(
             @PathVariable Long productId,
@@ -43,12 +46,14 @@ public class ProductCategoryController {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.addCategoryToProduct(categoryId, productId)));
     }
 
+    @Operation(summary = "Remove all categories from all products")
     @DeleteMapping
     public ResponseEntity<EntityModel<ProductResponse>> removeAllCategoriesFromProduct(
             @PathVariable Long productId) {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.deleteAllCategoryFromProduct(productId)));
     }
 
+    @Operation(summary = "Get all categories from a specific product")
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<CategoryResponse>>> getCategoriesFromProduct(
             @PathVariable Long productId,
