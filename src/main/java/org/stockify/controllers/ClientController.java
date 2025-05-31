@@ -10,6 +10,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stockify.dto.request.ClientFilterRequest;
 import org.stockify.dto.request.ClientRequest;
 import org.stockify.dto.response.ClientResponse;
 import org.stockify.model.hateoas.ClientModelAssembler;
@@ -38,12 +39,13 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ClientResponse>>> getAllClients(
-                                                                    @RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "20") int size,
-                                                                    PagedResourcesAssembler<ClientResponse> pagedAssembler) {
+            @ModelAttribute ClientFilterRequest filterRequest,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            PagedResourcesAssembler<ClientResponse> pagedAssembler) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
-        Page<ClientResponse> clientResponsePage = clientService.findAll(pageable);
+        Page<ClientResponse> clientResponsePage = clientService.findAll(filterRequest, pageable);
 
         return ResponseEntity.ok(pagedAssembler.toModel(clientResponsePage, clientModelAssembler));
     }

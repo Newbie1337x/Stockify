@@ -3,13 +3,16 @@ package org.stockify.model.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.stockify.dto.request.ClientFilterRequest;
 import org.stockify.dto.request.ClientRequest;
 import org.stockify.dto.response.ClientResponse;
 import org.stockify.model.entities.ClientEntity;
 import org.stockify.model.exceptions.ClientNotFoundException;
 import org.stockify.model.mapper.ClientMapper;
 import org.stockify.model.repositories.ClientRepository;
+import org.stockify.model.specifications.ClientSpecification;
 
 @Service
 public class ClientService {
@@ -28,11 +31,15 @@ public class ClientService {
         return clientMapper.toDto(clientEntity);
     }
 
-    public Page<ClientResponse> findAll(Pageable pageable) {
-        Page<ClientEntity> clients = clientRepository.findAll(pageable);
-        Page<ClientResponse> clientsDto = clients.map(clientMapper::toDto);
+    public Page<ClientResponse> findAll(ClientFilterRequest filterRequest, Pageable pageable) {
+        Specification<ClientEntity> specification = Specification
+                .where(ClientSpecification.firstNameLike(filterRequest.getFirstName()))
+                .and(ClientSpecification.lastNameLike(filterRequest.getLastName()))
+                .and(ClientSpecification.dniEquals(filterRequest.getDni()))
+                .and(ClientSpecification.phoneLike(filterRequest.getPhone()));
 
-        return clientsDto;
+        Page<ClientEntity> clients = clientRepository.findAll(specification, pageable);
+        return clients.map(clientMapper::toDto);
     }
 
     public ClientResponse save(ClientRequest clientRequest) {
@@ -48,7 +55,8 @@ public class ClientService {
     }
 
     public ClientResponse updateClientPartial (Long id, ClientRequest clientRequest) {
-        ClientEntity existingClient = clientRepository.findById(id)
+        ClientEntity existingClient =
+                clientRepository.findById(id)
                 .orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
 
         clientMapper.partialUpdateClientEntity(clientRequest, existingClient);

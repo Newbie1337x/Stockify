@@ -27,7 +27,7 @@ public class ClientEntity {
     private String lastName;
 
     @Column(name = "client_dni", nullable = false, length = 8)
-    private int dni;
+    private String dni;
 
     @Column(name = "client_email", nullable = false, length = 50)
     private String email;

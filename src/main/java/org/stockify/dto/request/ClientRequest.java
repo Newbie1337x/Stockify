@@ -20,7 +20,7 @@ public class ClientRequest {
 
     @NotBlank
     @Size(max = 8)
-    private int dni;
+    private String dni;
 
     @NotBlank
     @Email(message = "el formato de mail no es valido", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")

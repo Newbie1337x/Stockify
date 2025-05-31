@@ -1,17 +1,18 @@
-package org.stockify.dto.response;
+package org.stockify.dto.request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class ClientResponse extends RepresentationModel<ClientResponse> {
-    private Long id;
+public class ClientFilterRequest {
     private String firstName;
     private String lastName;
     private String dni;
