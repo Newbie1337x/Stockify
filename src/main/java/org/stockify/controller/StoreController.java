@@ -92,7 +92,7 @@ public class StoreController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "List all products from a specific store")
+    @Operation(summary = "List all products from a specific store which match the filter criteria")
     @GetMapping("/{id}/products")
     public ResponseEntity<PagedModel<EntityModel<ProductStoreResponse>>> getProductsFromStore(
             @PathVariable Long id, 
@@ -111,7 +111,7 @@ public class StoreController {
 
     // Stock endpoints
 
-    @Operation(summary = "List all products from a specific store with optional filters")
+    @Operation(summary = "Add a stock for a specific product and store")
     @PostMapping("/stock")
     public ResponseEntity<EntityModel<StockResponse>> addStock(@Valid @RequestBody StockRequest request) {
         StockResponse stock = stockService.addStock(request);
