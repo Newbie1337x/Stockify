@@ -49,11 +49,8 @@ public class ProviderController {
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
             @Valid ProviderFilterRequest filters,
-            @RequestParam(required = false) Boolean hide,
             @PageableDefault(sort = "name") Pageable pageable,
             PagedResourcesAssembler<ProviderResponse> assembler) {
-
-        filters.setHide(hide);
 
         Page<ProviderResponse> providerPage = providerService.findAll(pageable, filters);
         PagedModel<EntityModel<ProviderResponse>> pagedModel =

@@ -24,7 +24,7 @@ public class ProviderModelAssembler implements RepresentationModelAssembler<Prov
                         .withSelfRel(),
 
                 linkTo(methodOn(ProviderController.class)
-                        .listProviders(new ProviderFilterRequest(), null, PageRequest.of(0, 10), null))
+                        .listProviders(new ProviderFilterRequest(), PageRequest.of(0, 10), null))
                         .withRel("providers")
         );
     }
