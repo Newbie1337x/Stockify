@@ -1,11 +1,7 @@
 package org.stockify.model.specification;
 
-import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
-import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
-import org.stockify.model.entity.ProviderEntity;
-
 import java.util.List;
 
 public class ProductSpecifications {

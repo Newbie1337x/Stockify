@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.stockify.dto.request.CategoryRequest;
 import org.stockify.dto.response.CategoryResponse;
 import org.stockify.model.entity.CategoryEntity;
-import org.stockify.model.exception.DuplicatedUniqueConstraintException;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.CategoryMapper;
 import org.stockify.model.repository.CategoryRepository;

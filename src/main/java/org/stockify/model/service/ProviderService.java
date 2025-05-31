@@ -103,12 +103,12 @@ public class ProviderService {
         return providerMapper.toResponseDTO(providerRepository.save(provider));
     }
 
-    public ProviderResponse delete(Long id) {
+  /*  public ProviderResponse delete(Long id) {
         ProviderResponse provider = providerMapper.toResponseDTO(getProviderById(id));
         providerRepository.deleteById(id);
         return provider;
     }
-
+*/
     //Product Logic
 
     public Page<ProviderResponse> findAllProvidersByProductID(Long productID, Pageable pageable) {

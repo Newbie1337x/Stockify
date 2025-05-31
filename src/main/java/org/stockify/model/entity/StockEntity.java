@@ -3,7 +3,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter
@@ -12,7 +11,6 @@ import org.hibernate.annotations.ColumnDefault;
 public class StockEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ColumnDefault("nextval('stock_id_seq')")
     @Column(name = "id", nullable = false)
     private Long id;
 

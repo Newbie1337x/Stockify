@@ -1,6 +1,4 @@
 package org.stockify.model.service;
-
-import jakarta.persistence.criteria.Join;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,8 +16,6 @@ import org.stockify.model.mapper.StockMapper;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.StockRepository;
 import org.stockify.model.repository.StoreRepository;
-import org.stockify.model.specification.ProductSpecifications;
-import org.stockify.model.specification.SpecificationBuilder;
 import org.stockify.model.specification.StockSpecifications;
 
 import java.util.Optional;
@@ -43,15 +39,6 @@ public class StockService {
         this.stockMapper = stockMapper;
         this.productRepository = productRepository;
         this.storeRepository = storeRepository;
-    }
-
-    public Page<ProductStoreResponse> listProductsByStore(
-            Long storeID, Pageable pageable
-    ) {
-        Page<StockEntity> stocks = stockRepository.findByStoreId(storeID, pageable);
-        return stocks.map(stock ->
-                productStoreMapper.toResponse(stock.getProduct(), stock.getQuantity())
-        );
     }
 
     public Page<ProductStoreResponse> listProductsByStore(

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
 
-import java.util.Set;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity,Long>, JpaSpecificationExecutor<ProductEntity> {
@@ -19,19 +18,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity,Long>, Jp
 
     Page<ProductEntity> findAllByProviders_Id(Long providerId, Pageable pageable);
 
-    @Query("""
-    SELECT p
-    FROM ProductEntity p
-    JOIN p.categories c
-    WHERE LOWER(c.name) IN :names
-    GROUP BY p.id
-    HAVING COUNT(DISTINCT c.id) >= :size
-""")
-    Page<ProductEntity> findByAllCategoryNames(
-            @Param("names") Set<String> names,
-            @Param("size") long size
-             ,Pageable pageable
-    );
 
 
 }

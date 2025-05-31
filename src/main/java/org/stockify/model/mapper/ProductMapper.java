@@ -35,6 +35,7 @@ public interface ProductMapper {
     /**
      * Lógica interna del update (excepto categorías)
      */
+    @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
@@ -44,6 +45,7 @@ public interface ProductMapper {
     /**
      * PATCH: ignora campos nulos, actualiza los que vienen con datos
      */
+    @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)

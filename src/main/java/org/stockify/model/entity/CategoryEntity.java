@@ -3,7 +3,6 @@ package org.stockify.model.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter
@@ -17,7 +16,6 @@ import org.hibernate.annotations.ColumnDefault;
 public class CategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @ColumnDefault("nextval('categories_id_seq')")
     @Column(name = "id", nullable = false)
     private Integer id;
 

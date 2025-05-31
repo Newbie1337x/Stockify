@@ -5,8 +5,6 @@ import org.stockify.dto.request.CategoryRequest;
 import org.stockify.dto.response.CategoryResponse;
 import org.stockify.model.entity.CategoryEntity;
 
-import java.util.Set;
-
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
 
