@@ -1,5 +1,6 @@
 package org.stockify.model.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.stockify.dto.response.ErrorResponse;
 
-import java.time.LocalDateTime;
 
 import java.time.LocalDateTime;
 
@@ -31,9 +31,9 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex, request);
     }
 
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(
-            NotFoundException ex,
+            EntityNotFoundException ex,
             HttpServletRequest request){
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex, request);
     }
@@ -41,6 +41,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex,
                                                              HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
+    }
+
+    @ExceptionHandler(InvalidSessionStatusException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSessionStatus(
+            InvalidSessionStatusException ex,
+            HttpServletRequest request
+    ) {
         return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
     }
 

@@ -1,41 +1,52 @@
-package org.stockify.model.entity;
+    package org.stockify.model.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+    import jakarta.persistence.*;
+    import lombok.*;
+    import org.hibernate.annotations.ColumnDefault;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+    import java.math.BigDecimal;
+    import java.sql.Date;
+    import java.sql.Timestamp;
+    import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-@Builder
-@Entity
-@Table(name = "session_pos")
-public class SessionPosEntity {
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    @Builder
+    @Entity
+    @Table(name = "session_pos")
+    public class SessionPosEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(name = "opening_time",insertable = false, updatable = false, nullable = false)
-    private LocalDateTime openingTime;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+        @Temporal(TemporalType.TIMESTAMP)
+        @Column(name = "opening_time")
+        private LocalDateTime openingTime;
 
-    @Column(name = "close_time", updatable = false)
-    private LocalDateTime closeTime;
+        @Column(name = "close_time")
+        private LocalDateTime closeTime;
 
-    @Column(name = "opening_amount", nullable = false)
-    private BigDecimal openingAmount;
+        @Column(name = "opening_amount", nullable = false)
+        private BigDecimal openingAmount;
 
-    @Column(name = "close_amount")
-    private BigDecimal closeAmount;
+        @Column(name = "close_amount")
+        private BigDecimal closeAmount;
 
-    @ManyToOne()
-    @JoinColumn(name = "shift_id")
-    private ShiftEntity shiftEntity;
-    @ManyToOne()
-    @JoinColumn(name = "pos_id")
-    private PosEntity posEntity;
+        @Column(name = "cash_difference")
+        private BigDecimal cashDifference;
 
-}
+        @Column(name = "expected_amount")
+        private BigDecimal expectedAmount;
+
+        @ManyToOne
+        @JoinColumn(name = "employee_id")
+        private EmployeeEntity employee;
+
+        @ManyToOne()
+        @JoinColumn(name = "pos_id")
+        private PosEntity posEntity;
+
+    }
