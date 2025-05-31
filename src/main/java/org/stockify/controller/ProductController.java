@@ -1,4 +1,5 @@
 package org.stockify.controller;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +42,7 @@ public class ProductController {
         this.providerService = providerService;
     }
 
-
+    @Operation(summary = "List all products with optional filters")
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
             ProductFilterRequest filter,
@@ -59,33 +60,38 @@ public class ProductController {
         return ResponseEntity.ok(pagedModel);
     }
 
-
+    @Operation(summary = "Create multiple products in bulk")
     @PostMapping("/bulk")
     public ResponseEntity<BulkProductResponse> bulkSaveProducts(@RequestBody List<ProductRequest> products) {
         return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(productService.saveAll(products));
     }
 
+    @Operation(summary = "Get a product by ID")
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<ProductResponse>> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.findById(id)));
     }
 
+    @Operation(summary = "Create a new product")
     @PostMapping
     public ResponseEntity<EntityModel<ProductResponse>> createProduct(@Valid @RequestBody ProductRequest product) {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.save(product)));
     }
 
+    @Operation(summary = "Delete a product by ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Update an existing product by ID")
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<ProductResponse>> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest product){
         return ResponseEntity.ok().body(productModelAssembler.toModel(productService.update(id, product)));
     }
 
+    @Operation(summary = "Patch an existing product by ID")
     @PatchMapping("/{id}")
     public ResponseEntity<EntityModel<ProductResponse>> patchProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest product){
         return ResponseEntity.ok().body(productModelAssembler.toModel(productService.patch(id,product)));
@@ -94,6 +100,7 @@ public class ProductController {
 
     //Providers logic
 
+    @Operation(summary = "Assign a provider to a product")
     @PutMapping("/{productID}/providers/{providerID}")
     public ResponseEntity<EntityModel<ProductResponse>> assignProvider(
             @PathVariable Long productID,
@@ -105,7 +112,7 @@ public class ProductController {
     }
 
 
-
+    @Operation(summary = "Unassign a provider from a product")
     @DeleteMapping("/{productID}/providers/{providerID}")
     public ResponseEntity<EntityModel<ProductResponse>> unassignProvider(
             @PathVariable Long productID,
@@ -116,7 +123,7 @@ public class ProductController {
                         .unassignProviderFromProduct(productID,providerID)));
     }
 
-
+    @Operation(summary = "List all providers associated with a specific product")
     @GetMapping("/{id}/providers")
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
             @PathVariable Long id,
