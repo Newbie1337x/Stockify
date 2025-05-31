@@ -1,5 +1,6 @@
 package org.stockify.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +48,7 @@ public class StoreController {
     }
 
     // Store endpoints
+    @Operation(summary = "List all stores")
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<StoreResponse>>> getAllStores(
             Pageable pageable,
@@ -61,12 +63,14 @@ public class StoreController {
         return ResponseEntity.ok(pagedModel);
     }
 
+    @Operation(summary = "Get store by ID")
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<StoreResponse>> getStoreById(@PathVariable Long id) {
         StoreResponse store = storeService.findById(id);
         return ResponseEntity.ok(storeModelAssembler.toModel(store));
     }
 
+    @Operation(summary = "Create a new store")
     @PostMapping
     public ResponseEntity<EntityModel<StoreResponse>> createStore(@Valid @RequestBody StoreRequest request) {
         StoreResponse store = storeService.save(request);
@@ -74,19 +78,21 @@ public class StoreController {
         return ResponseEntity.created(URI.create("/api/stores/" + store.id())).body(storeModel);
     }
 
+    @Operation(summary = "Update store by ID")
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<StoreResponse>> updateStore(@PathVariable Long id, @Valid @RequestBody StoreRequest request) {
         StoreResponse store = storeService.update(id, request);
         return ResponseEntity.ok(storeModelAssembler.toModel(store));
     }
 
+    @Operation(summary = "Delete store by ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteStore(@PathVariable Long id) {
         storeService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-
+    @Operation(summary = "List all products from a specific store")
     @GetMapping("/{id}/products")
     public ResponseEntity<PagedModel<EntityModel<ProductStoreResponse>>> getProductsFromStore(
             @PathVariable Long id, 
@@ -103,6 +109,9 @@ public class StoreController {
         return ResponseEntity.ok(pagedModel);
     }
 
+    // Stock endpoints
+
+    @Operation(summary = "List all products from a specific store with optional filters")
     @PostMapping("/stock")
     public ResponseEntity<EntityModel<StockResponse>> addStock(@Valid @RequestBody StockRequest request) {
         StockResponse stock = stockService.addStock(request);
@@ -110,18 +119,21 @@ public class StoreController {
         return ResponseEntity.status(HttpStatus.CREATED).body(stockModel);
     }
 
+    @Operation(summary = "Update stock for a specific product and store or change the product or store related")
     @PutMapping("/stock")
     public ResponseEntity<EntityModel<StockResponse>> updateStock(@Valid @RequestBody StockRequest request) {
         StockResponse stock = stockService.updateStock(request);
         return ResponseEntity.ok(stockModelAssembler.toModel(stock));
     }
 
+    @Operation(summary = "Get stock for a specific product and store")
     @GetMapping("/stock")
     public ResponseEntity<EntityModel<StockResponse>> getStock(@RequestParam Long productId, @RequestParam Long storeId) {
         StockResponse stock = stockService.getStock(productId, storeId);
         return ResponseEntity.ok(stockModelAssembler.toModel(stock));
     }
 
+    @Operation(summary = "Remove stock for a specific product and store")
     @DeleteMapping("/stock")
     public ResponseEntity<Void> removeStock(@RequestParam Long productId, @RequestParam Long storeId) {
         stockService.removeStock(productId, storeId);
