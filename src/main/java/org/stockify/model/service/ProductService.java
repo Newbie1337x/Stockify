@@ -54,7 +54,6 @@ public class ProductService {
     public Page<ProductResponse> findAll(Pageable pageable, ProductFilterRequest filterRequest) {
         Specification<ProductEntity> spec = new SpecificationBuilder<ProductEntity>()
                 .add(filterRequest.getPrice() != null ? ProductSpecifications.byPrice(filterRequest.getPrice()) : null)
-                .add(filterRequest.getStock() != null ? ProductSpecifications.byStock(filterRequest.getStock()) : null)
                 .add(filterRequest.getName() != null && !filterRequest.getName().isEmpty() ? ProductSpecifications.byName(filterRequest.getName()) : null)
                 .add(filterRequest.getDescription() != null && !filterRequest.getDescription().isEmpty() ? ProductSpecifications.byDescription(filterRequest.getDescription()) : null)
                 .add(filterRequest.getBarcode() != null && !filterRequest.getBarcode().isEmpty() ? ProductSpecifications.byBarCode(filterRequest.getBarcode()) : null)
@@ -70,6 +69,14 @@ public class ProductService {
                         ? ProductSpecifications.byPriceBetween(
                         filterRequest.getPriceBetween().get(0),
                         filterRequest.getPriceBetween().get(1))
+                        : null)
+                .add(filterRequest.getStock() != null ? ProductSpecifications.byStock(filterRequest.getStock()) : null)
+                .add(filterRequest.getStockLessThan() != null ? ProductSpecifications.byStockLessThan(filterRequest.getStockLessThan()) : null)
+                .add(filterRequest.getStockGreaterThan() != null ? ProductSpecifications.byStockGreaterThan(filterRequest.getStockGreaterThan()) : null)
+                .add(filterRequest.getStockBetween() != null && filterRequest.getStockBetween().size() == 2
+                        ? ProductSpecifications.byStockBetween(
+                        filterRequest.getStockBetween().get(0),
+                        filterRequest.getStockBetween().get(1))
                         : null)
                 .build();
 

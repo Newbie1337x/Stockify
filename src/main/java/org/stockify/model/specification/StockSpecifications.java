@@ -107,4 +107,18 @@ public class StockSpecifications {
     public static Specification<StockEntity> byStockQuantity(Double stock) {
         return (root, query, cb) -> cb.equal(root.get("quantity"), stock);
     }
+
+    public static Specification<StockEntity> byStockQuantityGreaterThan(Double stock) {
+        return (root, query, cb) -> cb.greaterThan(root.get("quantity"), stock);
+    }
+
+    public static Specification<StockEntity> byStockQuantityLessThan(Double stock) {
+        return (root, query, cb) -> cb.lessThan(root.get("quantity"), stock);
+    }
+    public static Specification<StockEntity> byStockQuantityBetween(Double min, Double max) {
+        return (root, query, cb) -> {
+            Join<StockEntity, ProductEntity> productJoin = root.join("stock");
+            return cb.between(productJoin.get("quantity"), min, max);
+        };
+    }
 }

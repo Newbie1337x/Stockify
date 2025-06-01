@@ -7,7 +7,11 @@ import java.util.List;
 @Data
 public class ProductFilterRequest {
     private Double price;
-    private Double stock;
+    private Double Stock;
+    private Double StockGreaterThan;
+    private Double StockLessThan;
+    @Size(min = 2,max = 2, message = "stockBetween need 2 params")
+    private List<Double> StockBetween;
     private String name;
     private String description;
     private String barcode;

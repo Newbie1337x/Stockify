@@ -41,65 +41,43 @@ public class StockService {
         this.storeRepository = storeRepository;
     }
 
-    public Page<ProductStoreResponse> listProductsByStore(
-            Long storeID, Pageable pageable, ProductFilterRequest filterRequest
-    ) {
-        Specification<StockEntity> spec = Specification.where(StockSpecifications.byStoreId(storeID));
-
-        if (filterRequest != null) {
-            if (filterRequest.getStock() != null) {
-                spec = spec.and(StockSpecifications.byStockQuantity(filterRequest.getStock()));
-            }
-            if (filterRequest.getName() != null && !filterRequest.getName().isEmpty()) {
-                spec = spec.and(StockSpecifications.byProductName(filterRequest.getName()));
-            }
-            if (filterRequest.getSku() != null && !filterRequest.getSku().isEmpty()) {
-                spec = spec.and(StockSpecifications.byProductSku(filterRequest.getSku()));
-            }
-            if (filterRequest.getBarcode() != null && !filterRequest.getBarcode().isEmpty()) {
-                spec = spec.and(StockSpecifications.byProductBarCode(filterRequest.getBarcode()));
-            }
-            if (filterRequest.getBrand() != null && !filterRequest.getBrand().isEmpty()) {
-                spec = spec.and(StockSpecifications.byProductBrand(filterRequest.getBrand()));
-            }
-            if (filterRequest.getDescription() != null && !filterRequest.getDescription().isEmpty()) {
-                spec = spec.and(StockSpecifications.byProductDescription(filterRequest.getDescription()));
-            }
-            if (filterRequest.getPrice() != null) {
-                spec = spec.and(StockSpecifications.byProductPrice(filterRequest.getPrice()));
-            }
-            if (filterRequest.getPriceGreater() != null) {
-                spec = spec.and(StockSpecifications.byProductPriceGreaterThan(filterRequest.getPriceGreater()));
-            }
-            if (filterRequest.getPriceLess() != null) {
-                spec = spec.and(StockSpecifications.byProductPriceLessThan(filterRequest.getPriceLess()));
-            }
-            if (filterRequest.getPriceBetween() != null && filterRequest.getPriceBetween().size() == 2) {
-                spec = spec.and(StockSpecifications.byProductPriceBetween(
-                        filterRequest.getPriceBetween().get(0),
-                        filterRequest.getPriceBetween().get(1)
+    public Page<ProductStoreResponse> listProductsByStore (Long storeID, Pageable pageable, ProductFilterRequest filterRequest) {
+        Specification<StockEntity> spec = Specification.where(StockSpecifications.byStoreId(storeID))
+                .and(StockSpecifications.byProductBarCode(filterRequest.getBarcode()))
+                .and(StockSpecifications.byProductSku(filterRequest.getSku()))
+                .and(StockSpecifications.byProductName(filterRequest.getName()))
+                .and(StockSpecifications.byProductBrand(filterRequest.getBrand()))
+                .and(StockSpecifications.byProductDescription(filterRequest.getDescription()))
+                .and(StockSpecifications.byProductPrice(filterRequest.getPrice()))
+                .and(StockSpecifications.byProductPriceGreaterThan(filterRequest.getPriceGreater()))
+                .and(StockSpecifications.byProductPriceLessThan(filterRequest.getPriceLess()))
+                .and(StockSpecifications.byProductPriceBetween(
+                        filterRequest.getPriceBetween() != null && filterRequest.getPriceBetween().size() == 2
+                                ? filterRequest.getPriceBetween().get(0)
+                                : null,
+                        filterRequest.getPriceBetween() != null && filterRequest.getPriceBetween().size() == 2
+                                ? filterRequest.getPriceBetween().get(1)
+                                : null
+                ))
+                .and(StockSpecifications.byProductCategory(filterRequest.getCategory()))
+                .and(StockSpecifications.byProductCategories(filterRequest.getCategories()))
+                .and(StockSpecifications.byProductProvider(filterRequest.getProvider()))
+                .and(StockSpecifications.byProductProviders(filterRequest.getProviders()))
+                .and(StockSpecifications.byStockQuantity(filterRequest.getStock()))
+                .and(StockSpecifications.byStockQuantityLessThan(filterRequest.getStock()))
+                .and(StockSpecifications.byStockQuantityGreaterThan(filterRequest.getStock()))
+                .and(StockSpecifications.byStockQuantityBetween(
+                        filterRequest.getStockBetween() != null && filterRequest.getStockBetween().size() == 2
+                                ? filterRequest.getStockBetween().get(0)
+                                : null,
+                        filterRequest.getStockBetween() != null && filterRequest.getStockBetween().size() == 2
+                                ? filterRequest.getStockBetween().get(1)
+                                : null
                 ));
-            }
-            if (filterRequest.getCategory() != null && !filterRequest.getCategory().isEmpty()) {
-                spec = spec.and(StockSpecifications.byProductCategory(filterRequest.getCategory()));
-            }
-            if (filterRequest.getCategories() != null && !filterRequest.getCategories().isEmpty()) {
-                spec = spec.and(StockSpecifications.byProductCategories(filterRequest.getCategories()));
-            }
-            if (filterRequest.getProvider() != null && !filterRequest.getProvider().isEmpty()) {
-                spec = spec.and(StockSpecifications.byProductProvider(filterRequest.getProvider()));
-            }
-            if (filterRequest.getProviders() != null && !filterRequest.getProviders().isEmpty()) {
-                spec = spec.and(StockSpecifications.byProductProviders(filterRequest.getProviders()));
-            }
-        }
-
-        Page<StockEntity> stocks = stockRepository.findAll(spec, pageable);
-
-        return stocks.map(stock -> productStoreMapper.toResponse(stock.getProduct(), stock.getQuantity()));
+        Page<StockEntity> stock = stockRepository.findAll(spec, pageable);
+        return stock.map(stockEntity ->
+                productStoreMapper.toResponse(stockEntity.getProduct(), stockEntity.getQuantity()));
     }
-
-
 
     public void removeStock(Long productId, Long storeId) {
         stockRepository.deleteByProductIdAndStoreId(productId, storeId);

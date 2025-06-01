@@ -75,4 +75,18 @@ public class ProductSpecifications {
             cb.equal(root.get("stock"), stock);
     }
 
+    public static Specification<ProductEntity> byStockLessThan(Double stockLessThan) {
+        return (root, query, cb) ->
+                cb.lessThan(root.get("stock"), stockLessThan);
+    }
+
+    public static Specification<ProductEntity> byStockGreaterThan(Double stockGreaterThan) {
+        return (root, query, cb) ->
+                cb.greaterThan(root.get("stock"), stockGreaterThan);
+    }
+
+    public static Specification<ProductEntity> byStockBetween(Double aDouble, Double aDouble1) {
+        return (root, query, cb) ->
+                cb.between(root.get("stock"), aDouble, aDouble1);
+    }
 }
