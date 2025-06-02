@@ -1,6 +1,7 @@
 package org.stockify.model.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 import org.stockify.model.entity.SessionPosEntity;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SessionPosRepository extends JpaRepository<SessionPosEntity,Long> {
+public interface SessionPosRepository extends JpaRepository<SessionPosEntity,Long>, JpaSpecificationExecutor<SessionPosEntity> {
 
    Optional<SessionPosEntity> findByPosEntity_IdAndCloseTime(Long posEntityId, LocalDateTime closeTime);
 
