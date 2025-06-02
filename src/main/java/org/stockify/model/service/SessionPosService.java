@@ -1,5 +1,7 @@
 package org.stockify.model.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.sessionpos.SessionPosRequest;
 import org.stockify.dto.response.SessionPosCreateResponse;
@@ -10,6 +12,8 @@ import org.stockify.model.mapper.SessionPosMapper;
 import org.stockify.model.repository.SessionPosRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SessionPosService {
@@ -65,6 +69,36 @@ public class SessionPosService {
     public Boolean isOpened(Long id, LocalDateTime closeTime)
     {
         return repository.existsByPosEntity_IdAndCloseTime(id,closeTime);
+    }
+
+    /**
+     * Recupera todas las sesiones de POS.
+     * @return Lista de todas las sesiones de POS.
+     */
+    public List<SessionPosResponse> findAll() {
+        List<SessionPosEntity> sessions = repository.findAll();
+        return sessions.stream()
+                .map(sessionPosMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Recupera todas las sesiones de POS con paginación.
+     * @param pageable Información de paginación.
+     * @return Página de sesiones de POS.
+     */
+    public Page<SessionPosResponse> findAll(Pageable pageable) {
+        Page<SessionPosEntity> sessions = repository.findAll(pageable);
+        return sessions.map(sessionPosMapper::toDto);
+    }
+
+    /**
+     * Convierte una entidad SessionPosEntity a un DTO SessionPosResponse.
+     * @param sessionPosEntity La entidad a convertir.
+     * @return El DTO resultante.
+     */
+    public SessionPosResponse entityToDto(SessionPosEntity sessionPosEntity) {
+        return sessionPosMapper.toDto(sessionPosEntity);
     }
 
 
