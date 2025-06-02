@@ -10,10 +10,10 @@ import org.stockify.model.entity.ProviderEntity;
 @Mapper (componentModel = "spring")
 public interface ProviderMapper {
 
-    @Mapping(target = "name", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "active", ignore = true)
     ProviderEntity toEntity(ProviderRequest dto);
     ProviderResponse toResponseDTO(ProviderEntity entity);
+
 }
 

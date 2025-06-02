@@ -12,7 +12,7 @@ public class ProviderRequest {
 
     @NotBlank(message = "Contact name is required")
     @Size(min = 3, max = 100)
-    private String contactName;
+    private String name;
 
     private String phone;
 
