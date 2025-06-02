@@ -64,8 +64,8 @@ public class StockService {
                 .and(StockSpecifications.byProductProvider(filterRequest.getProvider()))
                 .and(StockSpecifications.byProductProviders(filterRequest.getProviders()))
                 .and(StockSpecifications.byStockQuantity(filterRequest.getStock()))
-                .and(StockSpecifications.byStockQuantityLessThan(filterRequest.getStock()))
-                .and(StockSpecifications.byStockQuantityGreaterThan(filterRequest.getStock()))
+                .and(StockSpecifications.byStockQuantityLessThan(filterRequest.getStockLessThan()))
+                .and(StockSpecifications.byStockQuantityGreaterThan(filterRequest.getStockGreaterThan()))
                 .and(StockSpecifications.byStockQuantityBetween(
                         filterRequest.getStockBetween() != null && filterRequest.getStockBetween().size() == 2
                                 ? filterRequest.getStockBetween().get(0)

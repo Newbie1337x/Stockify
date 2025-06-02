@@ -31,13 +31,27 @@ public class ProductSpecifications {
     }
 
     public static Specification<ProductEntity> byCategories(List<String> categories) {
-        return (root, query, cb) ->
-                root.join("categories").get("name").in(categories);
+        if (categories == null || categories.isEmpty()) {
+            return (root, query, cb) -> cb.conjunction();
+        }
+        return (root, query, cb) -> {
+            query.distinct(true);
+            return cb.or(categories.stream()
+                    .map(category -> cb.like(cb.lower(root.join("categories").get("name")), "%" + category.toLowerCase() + "%"))
+                    .toArray(jakarta.persistence.criteria.Predicate[]::new));
+        };
     }
 
     public static Specification<ProductEntity> byProviders(List<String> providers) {
-        return (root, query, cb) ->
-                root.join("providers").get("name").in(providers);
+        if (providers == null || providers.isEmpty()) {
+            return (root, query, cb) -> cb.conjunction();
+        }
+        return (root, query, cb) -> {
+            query.distinct(true);
+            return cb.or(providers.stream()
+                    .map(provider -> cb.like(cb.lower(root.join("providers").get("name")), "%" + provider.toLowerCase() + "%"))
+                    .toArray(jakarta.persistence.criteria.Predicate[]::new));
+        };
     }
 
     public static Specification<ProductEntity> byBrand(String brand) {
@@ -71,22 +85,30 @@ public class ProductSpecifications {
     }
 
     public static Specification<ProductEntity> byStock(Double stock) {
-    return (root, query, cb) ->
-            cb.equal(root.get("stock"), stock);
-    }
+    return (root, query, cb) -> {
+        query.distinct(true);
+        return cb.equal(root.join("stocks").get("quantity"), stock);
+    };
+}
 
     public static Specification<ProductEntity> byStockLessThan(Double stockLessThan) {
-        return (root, query, cb) ->
-                cb.lessThan(root.get("stock"), stockLessThan);
+        return (root, query, cb) -> {
+            query.distinct(true);
+            return cb.lessThan(root.join("stocks").get("quantity"), stockLessThan);
+        };
     }
 
     public static Specification<ProductEntity> byStockGreaterThan(Double stockGreaterThan) {
-        return (root, query, cb) ->
-                cb.greaterThan(root.get("stock"), stockGreaterThan);
+        return (root, query, cb) -> {
+            query.distinct(true);
+            return cb.greaterThan(root.join("stocks").get("quantity"), stockGreaterThan);
+        };
     }
 
-    public static Specification<ProductEntity> byStockBetween(Double aDouble, Double aDouble1) {
-        return (root, query, cb) ->
-                cb.between(root.get("stock"), aDouble, aDouble1);
+    public static Specification<ProductEntity> byStockBetween(Double min, Double max) {
+        return (root, query, cb) -> {
+            query.distinct(true);
+            return cb.between(root.join("stocks").get("quantity"), min, max);
+        };
     }
 }

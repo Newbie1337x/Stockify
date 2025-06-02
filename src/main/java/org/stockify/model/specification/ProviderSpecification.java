@@ -18,7 +18,7 @@ public class ProviderSpecification {
 
     public static Specification<ProviderEntity> byTaxId(String taxId) {
         return (root, query, criteriaBuilder) ->
-                taxId == null ? null : criteriaBuilder.equal(root.get("taxId"), taxId + "%");
+                taxId == null ? null : criteriaBuilder.like(root.get("taxId"), "%" + taxId + "%");
     }
 
     public static Specification<ProviderEntity> byEmail(String email) {
@@ -28,7 +28,7 @@ public class ProviderSpecification {
 
     public static Specification<ProviderEntity> byPhone(String phone) {
         return (root, query, criteriaBuilder) ->
-                phone == null ? null : criteriaBuilder.equal(root.get("phone"), phone + "%");
+                phone == null ? null : criteriaBuilder.like(root.get("phone"), "%" + phone + "%");
     }
 
     public static Specification<ProviderEntity> byActive(String status) {
