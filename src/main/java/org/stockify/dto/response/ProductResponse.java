@@ -2,13 +2,20 @@ package org.stockify.dto.response;
 import java.util.Set;
 
 public record ProductResponse(
-        int id,
+        Long id,
         String name,
         double price,
-        double stock,
-        Set<String> categories
+        String sku,
+        String barcode,
+        String description,
+        String brand,
+        Set<String> categories,
+        Set<Long> providers,
+        Set<StockResponse> stocks
 ) {
     public ProductResponse {
         if (categories == null) categories = Set.of();
+        if (providers == null) providers = Set.of();
+        if (stocks == null) stocks = Set.of();
     }
 }

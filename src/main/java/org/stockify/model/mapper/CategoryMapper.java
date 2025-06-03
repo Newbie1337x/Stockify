@@ -5,8 +5,6 @@ import org.stockify.dto.request.CategoryRequest;
 import org.stockify.dto.response.CategoryResponse;
 import org.stockify.model.entity.CategoryEntity;
 
-import java.util.Set;
-
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
 
@@ -15,7 +13,6 @@ public interface CategoryMapper {
 
     CategoryResponse toResponse(CategoryEntity entity);
 
-    Set<CategoryResponse> toResponseSet(Set<CategoryEntity> entities);
 
     @Mapping(target = "id", ignore = true)
     CategoryEntity updateEntityFromRequest(CategoryRequest dto, @MappingTarget CategoryEntity entity);

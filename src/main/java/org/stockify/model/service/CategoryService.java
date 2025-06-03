@@ -1,5 +1,4 @@
 package org.stockify.model.service;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -37,6 +36,7 @@ public class CategoryService {
     }
 
     public CategoryResponse save(CategoryRequest request) {
+
         CategoryEntity entity = categoryMapper.toEntity(request);
         return categoryMapper.toResponse(categoryRepository.save(entity));
     }
@@ -46,20 +46,21 @@ public class CategoryService {
     }
 
     public CategoryResponse update(int id, CategoryRequest request) {
-        return categoryMapper.toResponse(
-                categoryRepository.save
-                        (categoryMapper
-                                .updateEntityFromRequest
-                                        (request,findEntityById(id))));
+        CategoryEntity existingCategory = findEntityById(id);
+        CategoryEntity updatedEntity = categoryMapper.updateEntityFromRequest(request, existingCategory);
+        return categoryMapper.toResponse(categoryRepository.save(updatedEntity));
     }
-    public void patch(int id, CategoryRequest request) {
-        CategoryEntity category = findEntityById(id);
-        categoryMapper.patchEntityFromRequest(request, category);
-        categoryRepository.save(category);
+
+    public CategoryResponse patch(int id, CategoryRequest request) {
+        CategoryEntity existingCategory = findEntityById(id);
+        categoryMapper.patchEntityFromRequest(request, existingCategory);
+       return categoryMapper.toResponse(categoryRepository.save(existingCategory));
     }
     
     private CategoryEntity findEntityById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
     }
+
+
     }

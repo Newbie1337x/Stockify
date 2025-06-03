@@ -2,6 +2,8 @@ package org.stockify.model.service;
 
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.pos.PosAmountRequest;
 import org.stockify.dto.request.pos.PosCreateRequest;
@@ -47,12 +49,18 @@ public class PosService {
 
     public PosResponse save(PosCreateRequest posCreateRequest) {
         PosEntity posEntity = posMapper.toEntity(posCreateRequest);
+        posEntity.setStatus(Status.OFFLINE);
         return posMapper.toDto(posRepository.save(posEntity));
     }
 
     public List<PosResponse> findAll() {
         List<PosEntity> posEntities = posRepository.findAll();
         return posEntities.stream().map(posMapper::toDto).toList();
+    }
+
+    public Page<PosResponse> findAll(Pageable pageable) {
+        Page<PosEntity> posEntities = posRepository.findAll(pageable);
+        return posEntities.map(posMapper::toDto);
     }
 
     public PosResponse findById(Long id) {
@@ -67,6 +75,11 @@ public class PosService {
                 .stream()
                 .map(posMapper::toDto)
                 .toList();
+    }
+
+    public Page<PosResponse> findByStatus(Status statusRequest, Pageable pageable) {
+        Page<PosEntity> posEntities = posRepository.findByStatus(statusRequest, pageable);
+        return posEntities.map(posMapper::toDto);
     }
 
     @Deprecated
@@ -102,8 +115,6 @@ public class PosService {
     @Transactional
     public SessionPosCreateResponse openPos(Long id, SessionPosRequest sessionPosRequest) {
         String employeeDni = sessionPosRequest.getEmployeeDni();
-
-    // crear un dto especifico para cuando se abre al caja
         // Cambiar verificacion por un optional orelse throw
     if (!employeeService.existByDni(employeeDni)) {
       throw new EmployeeNotFoundException("Employee with DNI " + employeeDni + " was not found.");
@@ -138,7 +149,7 @@ public class PosService {
     /**
      * Cierra una POS (punto de venta) si está en estado ONLINE y tiene una sesión abierta.
      * @param idPos identificador de la POS.
-     * @param closeRequest datos de cierre, como el monto final.
+     * @param closeRequest datos de cierre, como el monto final
      *
      * @return {@link SessionPosResponse} DTO con la información de la sesión cerrada.
      * @throws NotFoundException si no se encuentra la POS con el ID proporcionado.

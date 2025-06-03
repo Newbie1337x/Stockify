@@ -5,16 +5,21 @@ import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
+import org.stockify.model.entity.ProviderEntity;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {StockMapper.class})
 public interface ProductMapper {
 
     @Mapping(source = "categories", target = "categories", qualifiedByName = "entitiesToNames")
+    @Mapping(source = "providers", target = "providers", qualifiedByName = "providerEntitiesToIds")
+    @Mapping(source = "stocks", target = "stocks")
     ProductResponse toResponse(ProductEntity entity);
 
+    @Mapping(target = "stocks", ignore = true)
+    @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
     ProductEntity toEntity(ProductRequest request);
@@ -24,12 +29,14 @@ public interface ProductMapper {
      */
     default void updateEntityFromRequest(ProductRequest dto, @MappingTarget ProductEntity entity) {
         updateFromRequest(dto, entity);
-        entity.setCategories(namesToEntities(dto.getCategories()));
+        entity.setCategories(namesToEntities(dto.categories()));
     }
 
     /**
      * Lógica interna del update (excepto categorías)
      */
+    @Mapping(target = "stocks", ignore = true)
+    @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -38,6 +45,8 @@ public interface ProductMapper {
     /**
      * PATCH: ignora campos nulos, actualiza los que vienen con datos
      */
+    @Mapping(target = "stocks", ignore = true)
+    @Mapping(target = "providers", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "categories", target = "categories", qualifiedByName = "namesToEntities")
@@ -60,6 +69,14 @@ public interface ProductMapper {
                     e.setName(name);
                     return e;
                 })
+                .collect(Collectors.toSet());
+    }
+
+    @Named("providerEntitiesToIds")
+    default Set<Long> providerEntitiesToIds(Set<ProviderEntity> providers) {
+        if (providers == null || providers.isEmpty()) return Set.of();
+        return providers.stream()
+                .map(ProviderEntity::getId)
                 .collect(Collectors.toSet());
     }
 }

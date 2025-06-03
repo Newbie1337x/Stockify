@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.stockify.dto.request.ProductFilterRequest;
 import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.BulkItemResponse;
 import org.stockify.dto.response.BulkProductResponse;
@@ -13,15 +15,19 @@ import org.stockify.dto.response.CategoryResponse;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
+import org.stockify.model.entity.ProviderEntity;
 import org.stockify.model.exception.DuplicatedUniqueConstraintException;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.CategoryMapper;
 import org.stockify.model.mapper.ProductMapper;
 import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.repository.ProductRepository;
+import org.stockify.model.repository.ProviderRepository;
+import org.stockify.model.specification.ProductSpecifications;
+import org.stockify.model.specification.SpecificationBuilder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+
 
 
 @Service
@@ -31,20 +37,50 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final Logger logger = LoggerFactory.getLogger(ProductService.class);
     private final CategoryMapper categoryMapper;
+    private final ProviderRepository providerRepository;
 
-    public ProductService(ProductMapper productMapper, ProductRepository productRepository, CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
+    public ProductService(ProductMapper productMapper, ProductRepository productRepository, CategoryRepository categoryRepository, CategoryMapper categoryMapper, ProviderRepository providerRepository) {
         this.productMapper = productMapper;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;
+        this.providerRepository = providerRepository;
     }
 
-    public ProductResponse findById(int id) {
+    public ProductResponse findById(Long id) {
         return productMapper.toResponse(getProductById(id));
     }
 
-    public Page<ProductResponse> findAll(Pageable pageable) {
-        Page<ProductEntity> page = productRepository.findAll(pageable);
+    public Page<ProductResponse> findAll(Pageable pageable, ProductFilterRequest filterRequest) {
+        Specification<ProductEntity> spec = new SpecificationBuilder<ProductEntity>()
+                .add(filterRequest.getPrice() != null ? ProductSpecifications.byPrice(filterRequest.getPrice()) : null)
+                .add(filterRequest.getName() != null && !filterRequest.getName().isEmpty() ? ProductSpecifications.byName(filterRequest.getName()) : null)
+                .add(filterRequest.getDescription() != null && !filterRequest.getDescription().isEmpty() ? ProductSpecifications.byDescription(filterRequest.getDescription()) : null)
+                .add(filterRequest.getBarcode() != null && !filterRequest.getBarcode().isEmpty() ? ProductSpecifications.byBarCode(filterRequest.getBarcode()) : null)
+                .add(filterRequest.getSku() != null && !filterRequest.getSku().isEmpty() ? ProductSpecifications.bySku(filterRequest.getSku()) : null)
+                .add(filterRequest.getBrand() != null && !filterRequest.getBrand().isEmpty() ? ProductSpecifications.byBrand(filterRequest.getBrand()) : null)
+                .add(filterRequest.getCategory() != null && !filterRequest.getCategory().isEmpty() ? ProductSpecifications.byCategory(filterRequest.getCategory()) : null)
+                .add(filterRequest.getProvider() != null && !filterRequest.getProvider().isEmpty() ? ProductSpecifications.byProvider(filterRequest.getProvider()) : null)
+                .add(filterRequest.getProviders() != null && !filterRequest.getProviders().isEmpty() ? ProductSpecifications.byProviders(filterRequest.getProviders()) : null)
+                .add(filterRequest.getCategories() != null && !filterRequest.getCategories().isEmpty() ? ProductSpecifications.byCategories(filterRequest.getCategories()) : null)
+                .add(filterRequest.getPriceGreater() != null ? ProductSpecifications.byPriceGreaterThan(filterRequest.getPriceGreater()) : null)
+                .add(filterRequest.getPriceLess() != null ? ProductSpecifications.byPriceLessThan(filterRequest.getPriceLess()) : null)
+                .add(filterRequest.getPriceBetween() != null && filterRequest.getPriceBetween().size() == 2
+                        ? ProductSpecifications.byPriceBetween(
+                        filterRequest.getPriceBetween().get(0),
+                        filterRequest.getPriceBetween().get(1))
+                        : null)
+                .add(filterRequest.getStock() != null ? ProductSpecifications.byStock(filterRequest.getStock()) : null)
+                .add(filterRequest.getStockLessThan() != null ? ProductSpecifications.byStockLessThan(filterRequest.getStockLessThan()) : null)
+                .add(filterRequest.getStockGreaterThan() != null ? ProductSpecifications.byStockGreaterThan(filterRequest.getStockGreaterThan()) : null)
+                .add(filterRequest.getStockBetween() != null && filterRequest.getStockBetween().size() == 2
+                        ? ProductSpecifications.byStockBetween(
+                        filterRequest.getStockBetween().get(0),
+                        filterRequest.getStockBetween().get(1))
+                        : null)
+                .build();
+
+        Page<ProductEntity> page = productRepository.findAll(spec, pageable);
 
         if (page.isEmpty()) {
             logger.warn("Products list is empty for pageable: {}", pageable);
@@ -54,10 +90,24 @@ public class ProductService {
     }
 
 
+
     public ProductResponse save(ProductRequest request) throws DuplicatedUniqueConstraintException {
-            return productMapper.toResponse(productRepository.save(productMapper.toEntity(request)));
+        ProductEntity product = productMapper.toEntity(request);
+
+        for (String categoryName : request.categories()) {
+            CategoryEntity category = categoryRepository.findByName(categoryName)
+                    .orElseGet(() -> {
+                        CategoryEntity newCategory = new CategoryEntity();
+                        newCategory.setName(categoryName);
+                        return categoryRepository.save(newCategory);
+                    });
+
+            product.getCategories().add(category);
         }
 
+        product = productRepository.save(product);
+        return productMapper.toResponse(product);
+    }
 
     public BulkProductResponse saveAll(List<ProductRequest> requests) {
         List<BulkItemResponse> results = new ArrayList<>();
@@ -67,75 +117,138 @@ public class ProductService {
             try {
                 save(req);
                 created++;
-                results.add(new BulkItemResponse(req.getName(), "CREATED", null));
+                results.add(new BulkItemResponse(req.name(), "CREATED", null));
             } catch (DataIntegrityViolationException ex) {
                 skipped++;
                 results.add(new BulkItemResponse(
-                        req.getName(),
+                        req.name(),
                         "SKIPPED",
                         "Duplicado, se saltó este ítem"
                 ));
-            } catch (Exception ex) {
+            } catch (DuplicatedUniqueConstraintException ex) {
+                skipped++;
+                results.add(new BulkItemResponse(
+                        req.name(),
+                        "SKIPPED",
+                        ex.getMessage()
+                ));
+            } catch (IllegalArgumentException | IllegalStateException ex) {
                 error++;
                 results.add(new BulkItemResponse(
-                        req.getName(),
+                        req.name(),
                         "ERROR",
-                        ex.getMessage()
+                        "Invalid data: " + ex.getMessage()
+                ));
+            } catch (Exception ex) {
+                error++;
+                logger.error("Unexpected error saving product {}: {}", req.name(), ex.getMessage(), ex);
+                results.add(new BulkItemResponse(
+                        req.name(),
+                        "ERROR",
+                        "Unexpected error: " + ex.getMessage()
                 ));
             }
         }
         return new BulkProductResponse(requests.size(),created,skipped,error,results);
     }
 
-    public void deleteById(int id) {
+    public void deleteById(Long id) {
         productRepository.deleteById(id);
     }
 
-    public ProductResponse update(int id, ProductRequest request) {
+    public ProductResponse update(Long id, ProductRequest request) {
         ProductEntity product = getProductById(id);
         productMapper.updateEntityFromRequest(request, product);
         return productMapper.toResponse(productRepository.save(product));
     }
 
-    public ProductResponse patch(int id, ProductRequest request) {
+    public ProductResponse patch(Long id, ProductRequest request) {
         ProductEntity product = getProductById(id);
         productMapper.patchEntityFromRequest(request,product);
         return productMapper.toResponse(productRepository.save(product));
     }
 
-    public Page<ProductResponse> filterByCategories(Set<String> categories, Pageable pageable) {
-        Page<ProductEntity> page = productRepository.findByAllCategoryNames(categories, categories.size(), pageable);
-        return page.map(productMapper::toResponse);
-    }
 
-    public ProductResponse deleteCategoryFromProduct(int categoryId, int productId) {
+    //Categories Logic
+
+    public ProductResponse deleteCategoryFromProduct(int categoryId, Long productId) {
         ProductEntity product = getProductById(productId);
         CategoryEntity category = getCategoryById(categoryId);
         product.getCategories().remove(category);
         return productMapper.toResponse(productRepository.save(product));
     }
 
-    public ProductResponse deleteAllCategoryFromProduct(int productId) {
+    public ProductResponse deleteAllCategoryFromProduct(Long productId) {
         ProductEntity product = getProductById(productId);
         product.getCategories().clear();
         return productMapper.toResponse(productRepository.save(product));
     }
 
-    public Set<CategoryResponse> findCategoriesByProductId(int productId){
-
-        if(productRepository.findById(productId).isEmpty()){
+    public Page<CategoryResponse> findCategoriesByProductId(Long productId, Pageable pageable) {
+        if (productRepository.findById(productId).isEmpty()) {
             throw new NotFoundException("Product with ID " + productId + " not found");
         }
 
-        if(categoryMapper.toResponseSet(productRepository.findCategoriesByProductId(productId)).isEmpty()){
-            throw new NotFoundException("Categories from " + productId + " not found");
+        Page<CategoryEntity> categoryPage = productRepository.findCategoriesByProductId(productId, pageable);
+
+        if (categoryPage.isEmpty()) {
+            logger.info("No categories found for product ID: {}", productId);
         }
 
-        return categoryMapper.toResponseSet(productRepository.findCategoriesByProductId(productId));
-
+        return categoryPage.map(categoryMapper::toResponse);
     }
 
-    private ProductEntity getProductById(int id) {
+    public ProductResponse addCategoryToProduct(int categoryId, Long productId) {
+        ProductEntity product = getProductById(productId);
+        CategoryEntity category = getCategoryById(categoryId);
+        product.getCategories().add(category);
+        return productMapper.toResponse(productRepository.save(product));
+    }
+
+    //Provider logic
+
+    public ProductResponse assignProviderToProduct(Long productID, Long providerID){
+        ProductEntity product = getProductById(productID);
+        ProviderEntity provider = getProviderById(providerID);
+
+        product.getProviders().add(provider);
+        provider.getProductList().add(product);
+
+        productRepository.save(product);
+        providerRepository.save(provider);
+
+        return productMapper.toResponse(product);
+    }
+
+    public ProductResponse unassignProviderFromProduct(Long productID, Long providerID){
+        ProductEntity product = getProductById(productID);
+        ProviderEntity provider = getProviderById(providerID);
+
+        product.getProviders().remove(provider);
+        provider.getProductList().remove(product);
+
+        productRepository.save(product);
+        providerRepository.save(provider);
+
+        return productMapper.toResponse(product);
+    }
+
+    public Page<ProductResponse> findProductsByProviderId(Long providerID, Pageable pageable) {
+
+        Page<ProductResponse> page = productRepository
+                .findAllByProviders_Id(providerID, pageable)
+                .map(productMapper::toResponse);
+
+        if (page.isEmpty()) {
+            logger.warn("No products found for provider ID: {}", providerID);
+        }
+
+        return page;
+    }
+
+
+    //Auxiliar
+    private ProductEntity getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product with ID " + id + " not found"));
     }
@@ -143,6 +256,11 @@ public class ProductService {
     private CategoryEntity getCategoryById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
+    }
+
+    private ProviderEntity getProviderById(Long id) {
+        return providerRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));
     }
 
 }

@@ -7,6 +7,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +23,14 @@ import org.stockify.dto.request.sessionpos.SessionPosRequest;
 import org.stockify.dto.response.PosResponse;
 import org.stockify.dto.response.SessionPosCreateResponse;
 import org.stockify.dto.response.SessionPosResponse;
+import org.stockify.model.assembler.PosModelAssembler;
+import org.stockify.model.assembler.SessionPosCreateModelAssembler;
+import org.stockify.model.assembler.SessionPosModelAssembler;
 import org.stockify.model.enums.Status;
 import org.stockify.model.service.PosService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/pos")
@@ -28,10 +38,19 @@ import java.util.List;
 public class PosController {
 
     private final PosService posService;
+    private final PosModelAssembler posModelAssembler;
+    private final SessionPosModelAssembler sessionPosModelAssembler;
+    private final SessionPosCreateModelAssembler sessionPosCreateModelAssembler;
 
     @Autowired
-    public PosController(PosService posService) {
+    public PosController(PosService posService, 
+                         PosModelAssembler posModelAssembler,
+                         SessionPosModelAssembler sessionPosModelAssembler,
+                         SessionPosCreateModelAssembler sessionPosCreateModelAssembler) {
         this.posService = posService;
+        this.posModelAssembler = posModelAssembler;
+        this.sessionPosModelAssembler = sessionPosModelAssembler;
+        this.sessionPosCreateModelAssembler = sessionPosCreateModelAssembler;
     }
 
     @Operation(summary = "Crear un nuevo POS")
@@ -39,29 +58,36 @@ public class PosController {
 
     })
     @PostMapping
-    public ResponseEntity<PosResponse> postPos(@Valid @RequestBody PosCreateRequest posCreateRequest) {
+    public ResponseEntity<EntityModel<PosResponse>> postPos(@Valid @RequestBody PosCreateRequest posCreateRequest) {
         PosResponse response = posService.save(posCreateRequest);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(posModelAssembler.toModel(response), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Obtener todos los POS")
     @GetMapping
-    public ResponseEntity<List<PosResponse>> getPos() {
-        return ResponseEntity.ok(posService.findAll());
+    public ResponseEntity<PagedModel<EntityModel<PosResponse>>> getPos(
+            @PageableDefault(size = 10) Pageable pageable,
+            PagedResourcesAssembler<PosResponse> assembler) {
+        Page<PosResponse> posResponses = posService.findAll(pageable);
+        return ResponseEntity.ok(assembler.toModel(posResponses, posModelAssembler));
     }
 
     @Operation(summary = "Obtener un POS por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<PosResponse> getById(
+    public ResponseEntity<EntityModel<PosResponse>> getById(
             @Parameter(description = "ID del POS") @PathVariable Long id) {
-        return ResponseEntity.ok(posService.findById(id));
+        PosResponse posResponse = posService.findById(id);
+        return ResponseEntity.ok(posModelAssembler.toModel(posResponse));
     }
 
     @Operation(summary = "Obtener POS por estado")
     @GetMapping("/status")
-    public ResponseEntity<List<PosResponse>> getByStatus(
-            @Parameter(description = "Estado del POS") @RequestParam Status status) {
-        return ResponseEntity.ok(posService.findByStatus(status));
+    public ResponseEntity<PagedModel<EntityModel<PosResponse>>> getByStatus(
+            @Parameter(description = "Estado del POS") @RequestParam Status status,
+            @PageableDefault(size = 10) Pageable pageable,
+            PagedResourcesAssembler<PosResponse> assembler) {
+        Page<PosResponse> posResponses = posService.findByStatus(status, pageable);
+        return ResponseEntity.ok(assembler.toModel(posResponses, posModelAssembler));
     }
 
     @Operation(summary = "Actualizar el monto de un POS")
@@ -75,17 +101,19 @@ public class PosController {
 
     @Operation(summary = "Abrir un POS")
     @PostMapping("/open/{id}")
-    public ResponseEntity<SessionPosCreateResponse> openPos(
+    public ResponseEntity<EntityModel<SessionPosCreateResponse>> openPos(
             @Parameter(description = "ID del POS") @PathVariable Long id,
             @Valid @RequestBody SessionPosRequest sessionPosRequest) {
-        return ResponseEntity.ok(posService.openPos(id, sessionPosRequest));
+        SessionPosCreateResponse response = posService.openPos(id, sessionPosRequest);
+        return ResponseEntity.ok(sessionPosCreateModelAssembler.toModel(response));
     }
 
     @Operation(summary = "Cerrar un POS")
     @PatchMapping("/close/{id}")
-    public ResponseEntity<SessionPosResponse> closePos(
+    public ResponseEntity<EntityModel<SessionPosResponse>> closePos(
             @Parameter(description = "ID del POS") @PathVariable Long id,
             @Valid @RequestBody SessionPosCloseRequest sessionPosRequest) {
-        return ResponseEntity.ok(posService.closePos(id, sessionPosRequest));
+        SessionPosResponse response = posService.closePos(id, sessionPosRequest);
+        return ResponseEntity.ok(sessionPosModelAssembler.toModel(response));
     }
 }
