@@ -1,4 +1,4 @@
-package org.stockify.controllers;
+package org.stockify.controller;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.ClientFilterRequest;
 import org.stockify.dto.request.ClientRequest;
 import org.stockify.dto.response.ClientResponse;
-import org.stockify.model.hateoas.ClientModelAssembler;
-import org.stockify.model.services.ClientService;
+import org.stockify.model.assembler.ClientModelAssembler;
+import org.stockify.model.service.ClientService;
 import java.net.URI;
 
 @RestController

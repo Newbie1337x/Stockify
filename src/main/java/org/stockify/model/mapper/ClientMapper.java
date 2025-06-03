@@ -6,7 +6,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.stockify.dto.request.ClientRequest;
 import org.stockify.dto.response.ClientResponse;
-import org.stockify.model.entities.ClientEntity;
+import org.stockify.model.entity.ClientEntity;
 
 import java.util.List;
 

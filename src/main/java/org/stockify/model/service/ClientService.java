@@ -1,4 +1,4 @@
-package org.stockify.model.services;
+package org.stockify.model.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import org.stockify.dto.request.ClientFilterRequest;
 import org.stockify.dto.request.ClientRequest;
 import org.stockify.dto.response.ClientResponse;
-import org.stockify.model.entities.ClientEntity;
-import org.stockify.model.exceptions.ClientNotFoundException;
+import org.stockify.model.entity.ClientEntity;
+import org.stockify.model.exception.ClientNotFoundException;
 import org.stockify.model.mapper.ClientMapper;
-import org.stockify.model.repositories.ClientRepository;
-import org.stockify.model.specifications.ClientSpecification;
+import org.stockify.model.repository.ClientRepository;
+import org.stockify.model.specification.ClientSpecification;
 
 @Service
 public class ClientService {

@@ -1,7 +1,7 @@
-package org.stockify.model.specifications;
+package org.stockify.model.specification;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.stockify.model.entities.ClientEntity;
+import org.stockify.model.entity.ClientEntity;
 
 public class ClientSpecification {
     public static Specification<ClientEntity> lastNameLike(String lastName) {

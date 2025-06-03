@@ -1,13 +1,12 @@
-package org.stockify.model.repositories;
+package org.stockify.model.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-import org.stockify.model.entities.ClientEntity;
+import org.stockify.model.entity.ClientEntity;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository

@@ -1,4 +1,4 @@
-package org.stockify.model.exceptions;
+package org.stockify.model.exception;
 
 public class ClientNotFoundException extends NotFoundException {
 
