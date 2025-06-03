@@ -18,7 +18,7 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
     
     @Column(name = "name", unique = true ,nullable = false)
     private String name;
@@ -30,16 +30,34 @@ public class ProductEntity {
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
-    @ColumnDefault("0")
-    @Column(name = "stock", precision = 10, scale = 5)
-    private BigDecimal stock;
+    //Check
+    @ColumnDefault("-1")
+    @Column(name = "sku", unique = true)
+    private String sku;
+
+    @Column(name = "barcode" , unique = true)
+    private String barcode;
+
+    @Column(name = "brand")
+    private String brand;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private Set<StockEntity> stocks;
+
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "product_categories",
+    @JoinTable(name = "products_categories",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<CategoryEntity> categories;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "products_providers",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "provider_id")
+    )
+    private Set<ProviderEntity> providers;
 
     public ProductEntity(){
         categories = new HashSet<>();
