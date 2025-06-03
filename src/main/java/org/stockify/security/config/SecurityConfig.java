@@ -46,7 +46,7 @@ public class SecurityConfig {
 //                        .requestMatchers("/api/**").hasRole("USER")
 //                        .requestMatchers(HttpMethod.GET, "/admin/users").hasRole("ADMIN")
 //                        .requestMatchers(HttpMethod.POST, "/admin/users").hasAuthority("ADMIN_CREATE_USER")
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers
