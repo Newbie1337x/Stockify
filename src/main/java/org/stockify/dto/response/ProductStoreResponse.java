@@ -1,21 +1,22 @@
 package org.stockify.dto.response;
+
 import java.util.Set;
 
-public record ProductResponse(
-        Long id,
-        String name,
+public record ProductStoreResponse(
+        long productID,
         double price,
+        double stock,
         String sku,
         String barcode,
-        String description,
         String brand,
+        String description,
+        String name,
         Set<String> categories,
-        Set<Long> providers,
-        Set<StockResponse> stocks
+        Set<Long> providers
 ) {
-    public ProductResponse {
+    public ProductStoreResponse {
         if (categories == null) categories = Set.of();
         if (providers == null) providers = Set.of();
-        if (stocks == null) stocks = Set.of();
     }
+
 }

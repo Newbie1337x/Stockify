@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface SessionPosRepository extends JpaRepository<SessionPosEntity,Long>, JpaSpecificationExecutor<SessionPosEntity> {
 
-   Optional<SessionPosEntity> findByPosEntity_IdAndCloseTime(Long posEntityId, LocalDateTime closeTime);
+    Optional<SessionPosEntity> findByPosEntity_IdAndCloseTime(Long posEntityId, LocalDateTime closeTime);
 
     Boolean existsByPosEntity_IdAndCloseTime(Long posEntityId, LocalDateTime closeTime);
 }

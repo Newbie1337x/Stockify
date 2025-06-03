@@ -2,7 +2,7 @@ package org.stockify.model.mapper;
 
 import org.mapstruct.*;
 import org.stockify.dto.request.ProductRequest;
-import org.stockify.dto.response.ProductResponse;
+import org.stockify.dto.response.ProductStoreResponse;
 import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.ProviderEntity;
@@ -10,42 +10,27 @@ import org.stockify.model.entity.ProviderEntity;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {StockMapper.class})
-public interface ProductMapper {
-
-    @Mapping(source = "categories", target = "categories", qualifiedByName = "entitiesToNames")
-    @Mapping(source = "providers", target = "providers", qualifiedByName = "providerEntitiesToIds")
-    @Mapping(source = "stocks", target = "stocks")
-    ProductResponse toResponse(ProductEntity entity);
+@Mapper(componentModel = "spring")
+public interface ProductStoreMapper {
 
     @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
-    ProductEntity toEntity(ProductRequest request);
+    ProductEntity toEntity(ProductStoreResponse dto);
 
-    /**
-     * PUT: actualiza todo (incluso campos nulos)
-     */
-    default void updateEntityFromRequest(ProductRequest dto, @MappingTarget ProductEntity entity) {
-        updateFromRequest(dto, entity);
-        entity.setCategories(namesToEntities(dto.categories()));
-    }
+    @Mapping(target = "productID", source = "entity.id")
+    @Mapping(source = "entity.categories", target = "categories", qualifiedByName = "entitiesToNames")
+    @Mapping(source = "entity.providers", target = "providers", qualifiedByName = "providerEntitiesToIds")
+    @Mapping(target = "stock", source = "stock")
+    ProductStoreResponse toResponse(ProductEntity entity, Double stock);
 
-    /**
-     * Lógica interna del update (excepto categorías)
-     */
-    @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromRequest(ProductRequest dto, @MappingTarget ProductEntity entity);
 
-    /**
-     * PATCH: ignora campos nulos, actualiza los que vienen con datos
-     */
-    @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
