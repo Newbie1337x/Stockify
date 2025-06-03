@@ -18,7 +18,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/timelogs")
+@RequestMapping("api/timelogs")
 public class TimeLogController {
     private final TimeLogService timeLogService;
 

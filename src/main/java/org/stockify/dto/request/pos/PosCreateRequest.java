@@ -1,11 +1,14 @@
 package org.stockify.dto.request.pos;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.stockify.model.entity.PosEntity;
+import org.stockify.model.enums.Status;
+
 import java.math.BigDecimal;
 /**
  * DTO for {@link org.stockify.model.entity.PosEntity}
@@ -16,11 +19,18 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
+<<<<<<<< HEAD:src/main/java/org/stockify/dto/request/pos/PosRequest.java
+public class PosRequest{
+========
 public class PosCreateRequest {
+>>>>>>>> Security-Implementation:src/main/java/org/stockify/dto/request/pos/PosCreateRequest.java
 
     @NotNull(message = "currentAmount must not be null")
     private BigDecimal currentAmount;
 
-//    @NotNull(message = "status must not be null")
-//    private Status status;
-}
+    @NotNull(message = "status must not be null")
+    private Status status;
+
+    @Pattern(regexp = "^\\d{7,8}$", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
+    private String employeeDni;
+    }

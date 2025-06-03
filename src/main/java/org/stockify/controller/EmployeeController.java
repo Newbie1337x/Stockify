@@ -12,8 +12,6 @@ import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.model.assembler.EmployeeModelAssembler;
 import org.stockify.model.entity.EmployeeEntity;
-import org.stockify.dto.request.employee.EmployeeRequest;
-import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.model.exception.EmployeeNotFoundException;
 import org.stockify.model.service.EmployeeService;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -28,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/employee")
+@RequestMapping("/api/employee")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
