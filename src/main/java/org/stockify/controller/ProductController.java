@@ -1,4 +1,5 @@
 package org.stockify.controller;
+
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -20,11 +21,10 @@ import org.stockify.model.assembler.ProductModelAssembler;
 import org.stockify.model.assembler.ProviderModelAssembler;
 import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
-
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 public class ProductController {
 
     private final ProductService productService;
@@ -96,7 +96,6 @@ public class ProductController {
     public ResponseEntity<EntityModel<ProductResponse>> patchProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest product){
         return ResponseEntity.ok().body(productModelAssembler.toModel(productService.patch(id,product)));
     }
-
 
     //Providers logic
 

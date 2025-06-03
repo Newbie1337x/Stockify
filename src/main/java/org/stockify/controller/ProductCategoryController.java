@@ -1,4 +1,5 @@
 package org.stockify.controller;
+
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +15,8 @@ import org.stockify.model.assembler.CategoryModelAssembler;
 import org.stockify.model.assembler.ProductModelAssembler;
 import org.stockify.model.service.ProductService;
 
-
 @RestController
-@RequestMapping("/api/products/{productId}/categories")
+@RequestMapping("/products/{productId}/categories")
 public class ProductCategoryController {
 
     private final ProductService productService;

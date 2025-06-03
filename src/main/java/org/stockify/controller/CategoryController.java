@@ -1,4 +1,5 @@
 package org.stockify.controller;
+
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -16,7 +17,7 @@ import org.stockify.model.service.CategoryService;
 
 @Validated
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/categories")
 public class CategoryController {
 
 

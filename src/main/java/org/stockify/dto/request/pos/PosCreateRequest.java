@@ -20,13 +20,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class PosCreateRequest {
-
     @NotNull(message = "currentAmount must not be null")
     private BigDecimal currentAmount;
-
-    @NotNull(message = "status must not be null")
-    private Status status;
-
-    @Pattern(regexp = "^\\d{7,8}$", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
-    private String employeeDni;
-    }
+}

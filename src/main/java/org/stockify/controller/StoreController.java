@@ -21,11 +21,10 @@ import org.stockify.model.assembler.StockModelAssembler;
 import org.stockify.model.assembler.StoreModelAssembler;
 import org.stockify.model.service.StockService;
 import org.stockify.model.service.StoreService;
-
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/stores")
+@RequestMapping("/stores")
 public class StoreController {
 
     private final StockService stockService;

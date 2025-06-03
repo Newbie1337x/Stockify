@@ -13,12 +13,8 @@ import org.stockify.dto.response.TimeLogResponse;
 import org.stockify.model.entity.TimeLogEntity;
 import org.stockify.model.service.TimeLogService;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
 @RestController
-@RequestMapping("api/timelogs")
+@RequestMapping("/timelogs")
 public class TimeLogController {
     private final TimeLogService timeLogService;
 
@@ -54,5 +50,4 @@ public class TimeLogController {
     public ResponseEntity<TimeLogResponse> patchTimeLog(@PathVariable Long id, @Validated @RequestBody TimeLogRequest timeLogRequest) {
         return ResponseEntity.status(201).body(timeLogService.updateTimeLog(id, timeLogRequest));
     }
-
 }
