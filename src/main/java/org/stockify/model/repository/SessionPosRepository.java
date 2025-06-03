@@ -8,7 +8,7 @@ import org.stockify.model.entity.SessionPosEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
+//repository
 @Repository
 public interface SessionPosRepository extends JpaRepository<SessionPosEntity,Long>, JpaSpecificationExecutor<SessionPosEntity> {
 
