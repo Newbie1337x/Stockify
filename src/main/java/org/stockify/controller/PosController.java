@@ -2,7 +2,6 @@ package org.stockify.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,9 +27,6 @@ import org.stockify.model.assembler.SessionPosCreateModelAssembler;
 import org.stockify.model.assembler.SessionPosModelAssembler;
 import org.stockify.model.enums.Status;
 import org.stockify.model.service.PosService;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/pos")

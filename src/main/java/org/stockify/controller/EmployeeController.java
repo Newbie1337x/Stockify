@@ -2,9 +2,7 @@ package org.stockify.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -12,21 +10,14 @@ import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.model.assembler.EmployeeModelAssembler;
 import org.stockify.model.entity.EmployeeEntity;
-import org.stockify.model.exception.EmployeeNotFoundException;
 import org.stockify.model.service.EmployeeService;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.data.web.PagedResourcesAssembler;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/employee")
+@RequestMapping("/employee")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -83,5 +74,4 @@ public class EmployeeController {
         EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, id);
         return ResponseEntity.status(200).body(employeeEntity);
     }
-
 }

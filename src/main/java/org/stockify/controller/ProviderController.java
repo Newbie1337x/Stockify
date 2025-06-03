@@ -1,4 +1,5 @@
 package org.stockify.controller;
+
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -20,12 +21,10 @@ import org.stockify.model.assembler.ProductModelAssembler;
 import org.stockify.model.assembler.ProviderModelAssembler;
 import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
-
 import java.util.List;
 
-
 @RestController
-@RequestMapping("/api/providers")
+@RequestMapping("/providers")
 public class ProviderController {
 
     private final ProviderService providerService;
@@ -124,5 +123,4 @@ public class ProviderController {
     {
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.unassignProductToProvider(providerID,productID)));
     }
-
 }

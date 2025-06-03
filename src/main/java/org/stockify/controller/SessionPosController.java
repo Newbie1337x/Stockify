@@ -22,12 +22,11 @@ import org.stockify.model.assembler.SessionPosModelAssembler;
 import org.stockify.model.entity.SessionPosEntity;
 import org.stockify.model.mapper.SessionPosMapper;
 import org.stockify.model.service.SessionPosService;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/pos/sessions")
+@RequestMapping("/sessions")
 @Tag(name = "POS Sessions", description = "API REST para gestionar las sesiones de POS (Point of Sale)")
 public class SessionPosController {
 
