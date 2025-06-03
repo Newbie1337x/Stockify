@@ -19,11 +19,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-<<<<<<<< HEAD:src/main/java/org/stockify/dto/request/pos/PosRequest.java
-public class PosRequest{
-========
 public class PosCreateRequest {
->>>>>>>> Security-Implementation:src/main/java/org/stockify/dto/request/pos/PosCreateRequest.java
 
     @NotNull(message = "currentAmount must not be null")
     private BigDecimal currentAmount;
