@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.response.SessionPosResponse;
 import org.stockify.model.assembler.SessionPosModelAssembler;
 import org.stockify.model.entity.SessionPosEntity;
+import org.stockify.model.mapper.SessionPosMapper;
 import org.stockify.model.service.SessionPosService;
 
 import java.math.BigDecimal;
@@ -32,6 +33,7 @@ public class SessionPosController {
 
     private final SessionPosService sessionPosService;
     private final SessionPosModelAssembler sessionPosModelAssembler;
+    private SessionPosMapper sessionPosMapper;
 
     @Autowired
     public SessionPosController(SessionPosService sessionPosService, 
@@ -66,7 +68,7 @@ public class SessionPosController {
     public ResponseEntity<EntityModel<SessionPosResponse>> getSessionById(
             @Parameter(description = "ID de la sesión de POS") @PathVariable Long id) {
         SessionPosEntity sessionEntity = sessionPosService.findById(id);
-        SessionPosResponse sessionResponse = sessionPosService.entityToDto(sessionEntity);
+        SessionPosResponse sessionResponse = sessionPosMapper.toDto(sessionEntity);
         return ResponseEntity.ok(sessionPosModelAssembler.toModel(sessionResponse));
     }
 

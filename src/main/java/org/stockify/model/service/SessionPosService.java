@@ -188,13 +188,5 @@ public class SessionPosService {
 
         return findAll(spec, pageable);
     }
-
-    /**
-     * Convierte una entidad SessionPosEntity a un DTO SessionPosResponse.
-     * @param sessionPosEntity La entidad a convertir.
-     * @return El DTO resultante.
-     */
-    public SessionPosResponse entityToDto(SessionPosEntity sessionPosEntity) {
-        return sessionPosMapper.toDto(sessionPosEntity);
-    }
+    
 }
