@@ -22,5 +22,5 @@ public class ShiftFilterRequest {
     private LocalDateTime exitTimeFrom;
     private LocalDateTime exitTimeTo;
 
-    private List<Long> employeesId;
+    private List<Long> employeesIds;
 }
