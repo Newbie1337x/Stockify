@@ -23,4 +23,5 @@ import java.math.BigDecimal;
     private Long id;
     private BigDecimal currentAmount;
     private Status status;
+    private Long idStore;
 }
