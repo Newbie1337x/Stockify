@@ -1,7 +1,6 @@
 package org.stockify.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Where;
 import org.stockify.model.enums.Status;
 
 import java.math.BigDecimal;
@@ -35,6 +34,9 @@ public class PosEntity {
     @JoinColumn(name = "employee_id")
     private EmployeeEntity employee;
 
+    @ManyToOne
+    @JoinColumn(name = "store_id")
+    private StoreEntity store;
 
 
 }

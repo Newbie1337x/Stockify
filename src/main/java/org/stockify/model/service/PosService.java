@@ -4,9 +4,9 @@ import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.pos.PosAmountRequest;
-import org.stockify.dto.request.pos.PosCreateRequest;
 import org.stockify.dto.request.sessionpos.SessionPosCloseRequest;
 import org.stockify.dto.request.sessionpos.SessionPosRequest;
 import org.stockify.dto.response.PosResponse;
@@ -19,10 +19,11 @@ import org.stockify.model.enums.Status;
 import org.stockify.model.exception.EmployeeNotFoundException;
 import org.stockify.model.exception.InvalidSessionStatusException;
 import org.stockify.model.exception.NotFoundException;
-import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.mapper.PosMapper;
 import org.stockify.model.mapper.SessionPosMapper;
 import org.stockify.model.repository.PosRepository;
+import org.stockify.model.repository.StoreRepository;
+import org.stockify.model.specification.PosSpecification;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -35,21 +36,27 @@ public class PosService {
     private final PosMapper posMapper;
     private final SessionPosService sessionPosService;
     private final EmployeeService employeeService;
-    private final EmployeeMapper employeeMapper;
     private final SessionPosMapper sessionPosMapper;
+    private final StoreRepository storeRepository;
 
-    public PosService(PosRepository posRepository, PosMapper posMapper, SessionPosService sessionPosService, EmployeeService employeeService, EmployeeMapper employeeMapper, SessionPosMapper sessionPosMapper) {
+    public PosService(PosRepository posRepository, PosMapper posMapper, SessionPosService sessionPosService, 
+                   EmployeeService employeeService, SessionPosMapper sessionPosMapper, StoreRepository storeRepository) {
         this.posRepository = posRepository;
         this.posMapper = posMapper;
         this.sessionPosService = sessionPosService;
         this.employeeService = employeeService;
-        this.employeeMapper = employeeMapper;
         this.sessionPosMapper = sessionPosMapper;
+        this.storeRepository = storeRepository;
     }
 
-    public PosResponse save(PosCreateRequest posCreateRequest) {
-        PosEntity posEntity = posMapper.toEntity(posCreateRequest);
-        posEntity.setStatus(Status.OFFLINE);
+    public PosResponse save(Long idLocal) {
+        PosEntity posEntity = PosEntity.builder()
+                .currentAmount(BigDecimal.ZERO)
+                .store(
+                        storeRepository.findById(idLocal)
+                                .orElseThrow(() -> new NotFoundException("Local with ID " + idLocal + " not found")))
+                .status(Status.OFFLINE)
+                .build();
         return posMapper.toDto(posRepository.save(posEntity));
     }
 
@@ -70,26 +77,59 @@ public class PosService {
         return posMapper.toDto(posEntity);
     }
 
-    public List<PosResponse> findByStatus(Status statusRequest) {
-        return posRepository.findByStatus(statusRequest)
-                .stream()
-                .map(posMapper::toDto)
-                .toList();
-    }
-
     public Page<PosResponse> findByStatus(Status statusRequest, Pageable pageable) {
         Page<PosEntity> posEntities = posRepository.findByStatus(statusRequest, pageable);
         return posEntities.map(posMapper::toDto);
     }
 
-    @Deprecated
-    public Status toggleStatus(Long id) {
-        PosEntity pos = posRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("POS not found: " + id));
-        Status next = (pos.getStatus() == Status.ONLINE) ? Status.OFFLINE : Status.ONLINE;
-        pos.setStatus(next);
-        posRepository.save(pos);
-        return next;
+    /**
+     * Busca POS aplicando filtros individuales.
+     * @param id ID del POS (opcional).
+     * @param storeId ID de la tienda (opcional).
+     * @param status Estado del POS (opcional).
+     * @param employeeId ID del empleado (opcional).
+     * @param currentAmountMin Monto mínimo actual (opcional).
+     * @param currentAmountMax Monto máximo actual (opcional).
+     * @param pageable Información de paginación.
+     * @return Página de POS que cumplen con los filtros.
+     */
+    public Page<PosResponse> findAllWithFilters(
+            Long id,
+            Long storeId,
+            Status status,
+            Long employeeId,
+            BigDecimal currentAmountMin,
+            BigDecimal currentAmountMax,
+            Pageable pageable) {
+
+        Specification<PosEntity> spec = Specification.where(null);
+
+        if (id != null) {
+            spec = spec.and(PosSpecification.byId(id));
+        }
+
+        if (storeId != null) {
+            spec = spec.and(PosSpecification.byStoreId(storeId));
+        }
+
+        if (status != null) {
+            spec = spec.and(PosSpecification.byStatus(status));
+        }
+
+        if (employeeId != null) {
+            spec = spec.and(PosSpecification.byEmployeeId(employeeId));
+        }
+
+        if (currentAmountMin != null) {
+            spec = spec.and(PosSpecification.byCurrentAmountGreaterThan(currentAmountMin));
+        }
+
+        if (currentAmountMax != null) {
+            spec = spec.and(PosSpecification.byCurrentAmountLessThan(currentAmountMax));
+        }
+
+        return posRepository.findAll(spec, pageable)
+                .map(posMapper::toDto);
     }
 
     public void patchAmount(Long id, PosAmountRequest posAmountRequest) {
@@ -115,10 +155,6 @@ public class PosService {
     @Transactional
     public SessionPosCreateResponse openPos(Long id, SessionPosRequest sessionPosRequest) {
         String employeeDni = sessionPosRequest.getEmployeeDni();
-        // Cambiar verificacion por un optional orelse throw
-    if (!employeeService.existByDni(employeeDni)) {
-      throw new EmployeeNotFoundException("Employee with DNI " + employeeDni + " was not found.");
-    }
 
         PosEntity pos = posRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("POS with ID " + id + " was not found."));
@@ -130,8 +166,11 @@ public class PosService {
             throw new InvalidSessionStatusException("The POS is already opened or not in OFFLINE status.");
         }
 
-        EmployeeEntity employee = employeeService.getEmployeeEntityByDni(employeeDni);
-
+        EmployeeEntity employee = employeeService
+                .getEmployeeEntityByDni(employeeDni)
+                .orElseThrow(
+                        () -> new NotFoundException
+                                ("Employee with DNI " + employeeDni + " was not found."));
         pos.setStatus(Status.ONLINE);
         pos.setEmployee(employee);
         pos.setCurrentAmount(sessionPosRequest.getOpeningAmount());
@@ -158,7 +197,7 @@ public class PosService {
     @Transactional
     public SessionPosResponse closePos(@NotNull Long idPos, @NotNull SessionPosCloseRequest closeRequest) {
         PosEntity pos = posRepository.findById(idPos)
-                .orElseThrow(() -> new NotFoundException("This POS is not Found"));
+                .orElseThrow(() -> new NotFoundException("POS with ID " + idPos + " not found"));
 
         if (pos.getStatus() != Status.ONLINE || !sessionPosService.isOpened(idPos, null)) {
             throw new InvalidSessionStatusException("This POS is already closed");
@@ -180,6 +219,4 @@ public class PosService {
 
         return sessionPosService.update(session);
     }
-
-
 }

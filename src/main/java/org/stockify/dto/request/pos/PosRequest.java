@@ -24,6 +24,9 @@ public class PosRequest{
     @NotNull(message = "currentAmount must not be null")
     private BigDecimal currentAmount;
 
+    @NotNull(message = "storeId must not be null")
+    private Long storeId;
+
     @NotNull(message = "status must not be null")
     private Status status;
 

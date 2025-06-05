@@ -17,6 +17,7 @@ import org.stockify.model.specification.EmployeeSpecifications;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EmployeeService {
@@ -109,7 +110,7 @@ public class EmployeeService {
                 .toList();
     }
 
-    public EmployeeEntity getEmployeeEntityByDni(String dni) {
+    public Optional<EmployeeEntity> getEmployeeEntityByDni(String dni) {
         return employeeRepository.getEmployeeEntityByDni(dni);
     }
 

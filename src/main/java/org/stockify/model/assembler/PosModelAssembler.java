@@ -21,8 +21,7 @@ public class PosModelAssembler implements RepresentationModelAssembler<PosRespon
     public EntityModel<PosResponse> toModel(@NotNull PosResponse entity) {
         return EntityModel.of(entity,
                 linkTo(methodOn(PosController.class).getById(entity.getId())).withSelfRel(),
-                linkTo(methodOn(PosController.class).getPos(null, null)).withRel("pos"),
-                linkTo(methodOn(PosController.class).getByStatus(entity.getStatus(), null, null)).withRel("status")
+                linkTo(methodOn(PosController.class).getPos(null, null, null, null, null, null, Pageable.unpaged(), null)).withRel("pos")
         );
     }
 }

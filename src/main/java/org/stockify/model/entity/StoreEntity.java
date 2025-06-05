@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -30,6 +32,10 @@ public class StoreEntity {
     @NotNull
     @Column(name = "city", nullable = false, length = 100)
     private String city;
+
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
+    private Set<PosEntity> posEntities;
+
 
 
 }

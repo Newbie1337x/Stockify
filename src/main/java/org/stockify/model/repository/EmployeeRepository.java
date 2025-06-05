@@ -10,6 +10,7 @@ import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.enums.Status;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long>,
@@ -20,7 +21,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long>,
     EmployeeResponse findByDni(String dni);
     Boolean existsByDni(String dni);
 
-    EmployeeEntity getEmployeeEntityByDni(String dni);
+   Optional<EmployeeEntity> getEmployeeEntityByDni(String dni);
 
     Page<EmployeeEntity> getEmployeeEntitiesByName(String name, Pageable pageable);
     Page<EmployeeEntity> getEmployeeEntitiesByLastName(String lastName, Pageable pageable);
