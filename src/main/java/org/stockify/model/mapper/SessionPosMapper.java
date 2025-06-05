@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public interface SessionPosMapper {
     @Mapping(source = "posEntity.id", target = "idPos")
     SessionPosResponse toDto(SessionPosEntity entity);
+    @Mapping(source = "posEntity.id", target = "idPos")
     SessionPosCreateResponse toDtoCreate(SessionPosEntity entity);
     SessionPosEntity toEntity(SessionPosRequest request);
 }

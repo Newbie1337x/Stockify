@@ -181,7 +181,7 @@ public class PosService {
         session.setPosEntity(pos);
         posRepository.save(pos);
         SessionPosCreateResponse sessionPosCreateResponse = sessionPosService.save(session);
-        sessionPosCreateResponse.setIdPos(id);
+//        sessionPosCreateResponse.setIdPos(id);
         return sessionPosCreateResponse;
     }
 
