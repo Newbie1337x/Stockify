@@ -8,6 +8,7 @@
     import java.sql.Date;
     import java.sql.Timestamp;
     import java.time.LocalDateTime;
+    import java.util.Set;
 
     @Getter
     @Setter
@@ -48,5 +49,6 @@
         @ManyToOne()
         @JoinColumn(name = "pos_id")
         private PosEntity posEntity;
-
+        @OneToMany(mappedBy = "sessionPosEntity", fetch = FetchType.LAZY)
+        private Set<TransactionEntity> transactions;
     }
