@@ -51,9 +51,6 @@ public class ProductController {
     ) {
         Page<ProductResponse> products = productService.findAll(pageable,filter);
 
-        if (products.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
 
         PagedModel<EntityModel<ProductResponse>> pagedModel = assembler.toModel(products, productModelAssembler);
 
