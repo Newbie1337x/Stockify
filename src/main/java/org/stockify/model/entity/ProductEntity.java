@@ -19,7 +19,7 @@ public class ProductEntity {
 
     @Column(name = "id", nullable = false)
     private Long id;
-    
+
     @Column(name = "name", unique = true ,nullable = false)
     private String name;
 
@@ -58,6 +58,9 @@ public class ProductEntity {
             inverseJoinColumns = @JoinColumn(name = "provider_id")
     )
     private Set<ProviderEntity> providers;
+    // Relationship with DetailTransactionEntity
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private Set<DetailTransactionEntity> detailTransactions;
 
     public ProductEntity(){
         categories = new HashSet<>();

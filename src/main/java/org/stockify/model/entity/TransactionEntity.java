@@ -10,6 +10,7 @@ import org.stockify.model.enums.PaymentMethod;
 import org.stockify.model.enums.TransactionType;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -46,6 +47,8 @@ public class TransactionEntity {
     @ManyToOne
     @JoinColumn(name = "store_id")
     private StoreEntity store;
+    @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
+    private Set<DetailTransactionEntity> detailTransactions;
 
 
 
