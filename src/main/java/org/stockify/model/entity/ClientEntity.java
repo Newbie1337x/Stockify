@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDate;
+import java.util.Set;
 
 
 @Entity
@@ -38,4 +39,8 @@ public class ClientEntity {
     @Column(name = "client_date_of_registration")
     @CreationTimestamp
     private LocalDate dateOfRegistration;
+
+    @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
+    private Set<SaleEntity> sales;
+
 }

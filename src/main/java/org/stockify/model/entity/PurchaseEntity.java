@@ -1,0 +1,21 @@
+package org.stockify.model.entity;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@Entity
+@Table(name = "purchases")
+public class PurchaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+    @OneToOne
+    private TransactionEntity transaction;
+    @ManyToOne
+    private ProviderEntity provider;
+
+}
