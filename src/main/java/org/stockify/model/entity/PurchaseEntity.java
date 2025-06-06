@@ -16,6 +16,7 @@ public class PurchaseEntity {
     @OneToOne
     private TransactionEntity transaction;
     @ManyToOne
+    @JoinColumn(name = "provider_id", nullable = false)
     private ProviderEntity provider;
 
 }

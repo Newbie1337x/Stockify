@@ -50,5 +50,5 @@ public class ProviderEntity {
     )
     private Set<ProductEntity> productList;
     @OneToMany(mappedBy = "provider", fetch = FetchType.LAZY)
-    private Set<ProviderEntity> providerList;
+    private Set<PurchaseEntity> purchaseList;
 }
