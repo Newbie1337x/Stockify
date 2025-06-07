@@ -12,12 +12,16 @@ import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
 import org.stockify.security.model.dto.request.CredentialRequest;
 import org.stockify.security.model.entity.CredentialsEntity;
+import org.stockify.security.model.entity.PermitEntity;
 import org.stockify.security.model.entity.RoleEntity;
+import org.stockify.security.model.enums.Permit;
 import org.stockify.security.model.enums.Role;
 import org.stockify.security.repository.CredentialRepository;
 import org.stockify.security.model.dto.request.AuthRequest;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -56,14 +60,25 @@ public class AuthService {
         EmployeeEntity employee = employeeMapper.toEntity(employeeRequest);
         employeeRepository.save(employee);
 
+        List<PermitEntity> permits = permitEmployee();
+
         Set<RoleEntity> roles = new HashSet<>();
-        roles.add(RoleEntity.builder().role(Role.EMPLOYEE).build());
+        roles.add(RoleEntity.builder().role(Role.EMPLOYEE).permits(permits).build());
 
         CredentialsEntity credentials = credentialMapper.toEntity(credentialRequest);
         credentials.setEmployee(employee);
         credentials.setRoles(roles);
         credentials.setPassword(passwordEncoder.encode(credentialRequest.getPassword()));
         credentialsRepository.save(credentials);
+    }
+
+    private List<PermitEntity> permitEmployee(){
+        List<PermitEntity> permits = new ArrayList<>();
+        PermitEntity permit = PermitEntity.builder().permit(Permit.READ).build();
+        PermitEntity permit1 = PermitEntity.builder().permit(Permit.WRITE).build();
+        permits.add(permit);
+        permits.add(permit1);
+        return permits;
     }
 
     public UserDetails authenticate(AuthRequest input) {
