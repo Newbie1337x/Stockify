@@ -32,7 +32,7 @@ public class ProductEntity {
 
     //Check
     @ColumnDefault("-1")
-    @Column(name = "sku", unique = true)
+    @Column(name = "sku", unique = false)
     private String sku;
 
     @Column(name = "barcode" , unique = true)

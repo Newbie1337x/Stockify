@@ -53,10 +53,6 @@ public class StoreController {
             Pageable pageable,
             PagedResourcesAssembler<StoreResponse> assembler) {
         Page<StoreResponse> stores = storeService.findAll(pageable);
-        if (stores.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
         PagedModel<EntityModel<StoreResponse>> pagedModel = assembler.toModel(stores, storeModelAssembler);
 
         return ResponseEntity.ok(pagedModel);

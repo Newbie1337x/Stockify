@@ -1,4 +1,5 @@
 package org.stockify.model.service;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,6 +11,7 @@ import org.stockify.dto.response.StockResponse;
 import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.StockEntity;
 import org.stockify.model.entity.StoreEntity;
+import org.stockify.model.exception.NotEnoughException;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.ProductStoreMapper;
 import org.stockify.model.mapper.StockMapper;
@@ -18,6 +20,7 @@ import org.stockify.model.repository.StockRepository;
 import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.specification.StockSpecifications;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -116,8 +119,36 @@ public class StockService {
         return stockMapper.toResponse(stock);
     }
 
+    @Transactional
+    public List<StockResponse> transferStock(Long storeIdFrom, StockRequest transferRequest) {
+
+        StockEntity stockFrom = findStockByProductAndStore(transferRequest.productId(),storeIdFrom)
+                .orElseThrow(() -> new NotFoundException("Stock not found in origin store"));
+
+        StockEntity stockTo = findStockByProductAndStore(transferRequest.productId(), transferRequest.storeId())
+                .orElseThrow(() -> new NotFoundException("Stock not found in destination store"));
+
+        Double quantityToTransfer = transferRequest.quantity();
+
+        if (stockFrom.getQuantity() < quantityToTransfer) {
+            throw new NotEnoughException("Not enough stock in origin store to transfer.");
+        }
+        if (storeIdFrom.equals(transferRequest.storeId())) {
+            throw new NotEnoughException("Origin and destination store cannot be the same.");
+        }
+
+        stockFrom.setQuantity(stockFrom.getQuantity() - quantityToTransfer);
+        stockTo.setQuantity(stockTo.getQuantity() + quantityToTransfer);
+
+        StockResponse responseFrom = stockMapper.toResponse(stockRepository.save(stockFrom));
+        StockResponse responseTo = stockMapper.toResponse(stockRepository.save(stockTo));
+
+        return List.of(responseFrom, responseTo);
+    }
+
+
     private Optional<StockEntity> findStockByProductAndStore(Long productId, Long storeId) {
-        return stockRepository.findByProductIdAndStoreId(productId, storeId);
+            return stockRepository.findByProductIdAndStoreId(productId, storeId);
     }
 
     private ProductEntity findProduct(Long productId) {

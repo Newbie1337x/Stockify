@@ -7,7 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "stock")
+@Table(name = "stock",uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"product_id", "store_id"
+        })
+})
+
 public class StockEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

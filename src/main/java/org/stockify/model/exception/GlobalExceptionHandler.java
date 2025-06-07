@@ -49,6 +49,17 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
     }
 
+    @ExceptionHandler(NotEnoughException.class)
+    public ResponseEntity<ErrorResponse> handleNotEnough
+            ( NotEnoughException ex,
+              HttpServletRequest request){
+        {
+            return buildErrorResponse(HttpStatus.CONFLICT, ex,request);
+        }
+
+    }
+
+
     private <T extends Throwable> ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status, T ex, HttpServletRequest request) {
 
