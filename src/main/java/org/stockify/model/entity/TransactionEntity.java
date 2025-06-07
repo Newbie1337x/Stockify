@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.stockify.model.enums.PaymentMethod;
 import org.stockify.model.enums.TransactionType;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -26,18 +27,20 @@ public class TransactionEntity {
     private Long id;
 
     @Column(name = "total")
-    private Long total;
+    private BigDecimal total;
 
     @Column(name = "date_time")
     private LocalDateTime dateTime;
 
     @Column(name = "payment_method")
+    @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
     @Column(name = "description")
     private String description;
 
     @Column(name = "type")
+    @Enumerated(EnumType.STRING)
     private TransactionType type;
 
     @ManyToOne
@@ -47,6 +50,7 @@ public class TransactionEntity {
     @ManyToOne
     @JoinColumn(name = "store_id")
     private StoreEntity store;
+
     @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
     private Set<DetailTransactionEntity> detailTransactions;
 

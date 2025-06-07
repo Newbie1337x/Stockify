@@ -14,6 +14,7 @@ public class SaleEntity {
     @Column(name = "id", nullable = false)
     private Long id;
     @OneToOne
+    @JoinColumn(name = "transaction_id", nullable = false)
     private TransactionEntity transaction;
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
