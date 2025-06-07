@@ -42,11 +42,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain (HttpSecurity http) throws
             Exception {
         http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("api/auth/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
 //                        .requestMatchers("/api/**").hasRole("USER")
 //                        .requestMatchers(HttpMethod.GET, "/admin/users").hasRole("ADMIN")
 //                        .requestMatchers(HttpMethod.POST, "/admin/users").hasAuthority("ADMIN_CREATE_USER")
-                        .anyRequest().permitAll())
+                        .anyRequest().permitAll()
+
+                )
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(headers

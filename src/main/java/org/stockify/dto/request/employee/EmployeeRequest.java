@@ -15,16 +15,14 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 public class EmployeeRequest implements Serializable {
-    @NotBlank
+    @NotBlank(message = "An employee required a name")
     private String name;
-    @NotBlank
+    @NotBlank()
     @Size(min = 7,max = 8)
-  @Pattern(regexp = "^\\d{7,8}$", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
+    @Pattern(regexp = "^\\d{7,8}$", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
     private String dni;
-    @NotBlank
+    @NotBlank(message = "An employee required a lastName")
     private String lastName;
-    @NotNull
+    @NotNull(message = "An employee required confirm his status")
     private Status status;
-    @NotNull
-    private Boolean active;
 }
