@@ -120,7 +120,8 @@ public class StockService {
     }
 
     @Transactional
-    public List<StockResponse> transferStock(Long storeIdFrom, StockRequest transferRequest) {
+    public List<StockResponse> transferStock(Long storeIdFrom,
+                                             StockRequest transferRequest) {
 
         StockEntity stockFrom = findStockByProductAndStore(transferRequest.productId(),storeIdFrom)
                 .orElseThrow(() -> new NotFoundException("Stock not found in origin store"));
@@ -145,6 +146,13 @@ public class StockService {
 
         return List.of(responseFrom, responseTo);
     }
+/*
+    public boolean existsByProductIdAndStoreId(Long productId, Long storeId) {
+        return stockRepository.existsByProductIdAndStoreId(productId,storeId);
+    }
+
+
+*/
 
 
     private Optional<StockEntity> findStockByProductAndStore(Long productId, Long storeId) {

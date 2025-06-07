@@ -134,4 +134,14 @@ public class StoreController {
         stockService.removeStock(productId, storeId);
         return ResponseEntity.noContent().build();
     }
+
+    /* implement
+    @Operation(summary = "Comprobate stock for a specific product and store")
+    @GetMapping("{store_id}/stock/{product_id}/check")
+    public ResponseEntity<Double> checkStock(Long store_id,Long product_id){
+
+
+    }
+    */
+
 }
