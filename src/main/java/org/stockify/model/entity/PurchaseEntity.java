@@ -11,10 +11,12 @@ import lombok.Setter;
 public class PurchaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
+
     @OneToOne
+    @JoinColumn(name = "transaction_id", nullable = false)
     private TransactionEntity transaction;
+
     @ManyToOne
     @JoinColumn(name = "provider_id", nullable = false)
     private ProviderEntity provider;

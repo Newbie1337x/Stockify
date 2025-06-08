@@ -1,4 +1,4 @@
-package org.stockify.dto.request;
+package org.stockify.dto.request.provider;
 
 import lombok.Getter;
 import lombok.Setter;
