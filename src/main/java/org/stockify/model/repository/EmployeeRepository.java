@@ -18,7 +18,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long>,
     List<EmployeeEntity> getEmployeeEntitiesByName(String name);
     List<EmployeeEntity> getEmployeeEntitiesByLastName(String lastName);
     List<EmployeeEntity> findByStatus(Status status);
-    Optional<EmployeeResponse> findByDni(String dni);
+    Optional<EmployeeEntity> findByDni(String dni);
     Boolean existsByDni(String dni);
 
    Optional<EmployeeEntity> getEmployeeEntityByDni(String dni);

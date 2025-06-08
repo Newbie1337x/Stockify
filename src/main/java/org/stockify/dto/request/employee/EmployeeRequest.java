@@ -25,4 +25,5 @@ public class EmployeeRequest implements Serializable {
     private String lastName;
     @NotNull(message = "An employee required confirm his status")
     private Status status;
+    private Boolean active = true;
 }

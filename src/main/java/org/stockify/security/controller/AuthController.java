@@ -6,13 +6,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.security.model.dto.request.AuthRequest;
+import org.stockify.security.model.dto.request.CredentialRequest;
+import org.stockify.security.model.dto.request.RegisterEmployeeRequest;
 import org.stockify.security.model.dto.response.AuthResponse;
 import org.stockify.security.service.AuthService;
 import org.stockify.security.service.JwtService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -22,6 +25,13 @@ public class AuthController {
             jwtService) {
         this.authService = authService;
         this.jwtService = jwtService;
+    }
+
+    @PostMapping("/register/employee")
+    public ResponseEntity<AuthResponse> registerEmployee(
+            @RequestBody RegisterEmployeeRequest registerEmployeeRequest) {
+        AuthResponse response = authService.registerEmployee(registerEmployeeRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
