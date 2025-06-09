@@ -146,6 +146,28 @@ public class StockService {
 
         return List.of(responseFrom, responseTo);
     }
+
+
+    public StockResponse increaseStock(Long productId, Long storeId, Long quantity) {
+        findProduct(productId);
+        findStore(storeId);
+        StockEntity stock = findStockByProductAndStore(productId, storeId)
+                .orElseThrow(() -> generateNotFoundException(productId, storeId));
+        stock.setQuantity(stock.getQuantity() + quantity);
+        return stockMapper.toResponse(stockRepository.save(stock));
+    }
+
+    public StockResponse decreaseStock(Long productId, Long storeId, Long quantity){
+        findProduct(productId);
+        findStore(storeId);
+        StockEntity stock = findStockByProductAndStore(productId, storeId)
+                .orElseThrow(() -> generateNotFoundException(productId, storeId));
+        if(stock.getQuantity() < quantity){
+            throw new NotFoundException("Stock not enough to decrease");
+        }
+        stock.setQuantity(stock.getQuantity() - quantity);
+        return stockMapper.toResponse(stockRepository.save(stock));
+    }
 /*
     public boolean existsByProductIdAndStoreId(Long productId, Long storeId) {
         return stockRepository.existsByProductIdAndStoreId(productId,storeId);
