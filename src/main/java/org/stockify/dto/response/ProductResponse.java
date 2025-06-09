@@ -5,6 +5,7 @@ public record ProductResponse(
         Long id,
         String name,
         double price,
+        double unitPrice,
         String sku,
         String barcode,
         String description,
@@ -12,6 +13,7 @@ public record ProductResponse(
         Set<String> categories,
         Set<Long> providers,
         Set<StockResponse> stocks
+
 ) {
     public ProductResponse {
         if (categories == null) categories = Set.of();

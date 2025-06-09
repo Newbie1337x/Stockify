@@ -13,6 +13,7 @@ public record ProductRequest(
         String name,
         String description,
         BigDecimal price,
+        BigDecimal unitPrice,
         BigDecimal stock,
         String sku,
         String barcode,
