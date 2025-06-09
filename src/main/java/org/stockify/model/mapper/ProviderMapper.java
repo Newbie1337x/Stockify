@@ -2,7 +2,7 @@ package org.stockify.model.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.stockify.dto.request.ProviderRequest;
+import org.stockify.dto.request.provider.ProviderRequest;
 import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.entity.ProviderEntity;
 

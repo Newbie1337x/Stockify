@@ -23,7 +23,6 @@ import java.util.Set;
 public class TransactionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(name = "total")
@@ -54,6 +53,12 @@ public class TransactionEntity {
     @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
     private Set<DetailTransactionEntity> detailTransactions;
 
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
+    private PurchaseEntity purchase;
 
+    @PrePersist                 //Metodo que se aplica automaticamente antes que la entidad se persista en la BDD
+    public void prePersist(){
+        this.dateTime = LocalDateTime.now();
+    }
 
 }
