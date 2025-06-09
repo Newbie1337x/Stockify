@@ -9,7 +9,8 @@ import org.stockify.model.entity.PurchaseEntity;
 @Mapper(componentModel = "spring")
 public interface PurchaseMapper {
 
-    @Mapping(source = "transactionId", target = "transaction.id")
+    @Mapping(target = "transaction", ignore = true)
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "providerId", target = "provider.id")
     PurchaseEntity toEntity(PurchaseRequest dto);
 

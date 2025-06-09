@@ -17,15 +17,20 @@ public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
     private final PurchaseMapper purchaseMapper;
+    private final StockService stockService;
+    private final TransactionService transactionService;
 
-    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper) {
+    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper, StockService stockService, TransactionService transactionService) {
         this.purchaseRepository = purchaseRepository;
         this.purchaseMapper = purchaseMapper;
+        this.stockService = stockService;
+        this.transactionService = transactionService;
     }
 
     //-- CRUD operations --
 
     public PurchaseResponse createPurchase(PurchaseRequest request) {
+        //transactionService.createTransaction(request)
         return purchaseMapper.toResponseDTO(purchaseRepository.save(purchaseMapper.toEntity(request)));
     }
 

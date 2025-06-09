@@ -8,7 +8,7 @@ import lombok.Setter;
 public class PurchaseResponse {
 
     private Long id;
-   // private TransactionResponse transaction; TODO: Uncomment when TransactionResponse is available
+    private TransactionResponse transaction;
     private ProviderResponse provider;
 
 }
