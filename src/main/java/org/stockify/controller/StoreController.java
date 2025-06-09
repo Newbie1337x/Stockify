@@ -53,10 +53,6 @@ public class StoreController {
             Pageable pageable,
             PagedResourcesAssembler<StoreResponse> assembler) {
         Page<StoreResponse> stores = storeService.findAll(pageable);
-        if (stores.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
         PagedModel<EntityModel<StoreResponse>> pagedModel = assembler.toModel(stores, storeModelAssembler);
 
         return ResponseEntity.ok(pagedModel);
@@ -138,4 +134,14 @@ public class StoreController {
         stockService.removeStock(productId, storeId);
         return ResponseEntity.noContent().build();
     }
+
+    /* implement
+    @Operation(summary = "Comprobate stock for a specific product and store")
+    @GetMapping("{store_id}/stock/{product_id}/check")
+    public ResponseEntity<Double> checkStock(Long store_id,Long product_id){
+
+
+    }
+    */
+
 }
