@@ -5,7 +5,7 @@ import org.stockify.dto.request.transaction.TransactionRequest;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.TransactionEntity;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {ProviderMapper.class})
 public interface TransactionMapper {
     TransactionEntity toEntity(TransactionRequest transactionRequest);
 

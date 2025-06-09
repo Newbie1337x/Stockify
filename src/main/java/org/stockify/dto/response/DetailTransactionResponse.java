@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Getter
 public class DetailTransactionResponse {
     Long id;
-    ProductResponse product;
     Long quantity;
     BigDecimal subtotal;
+    ProductResponseTransaction product;
 }
