@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.Value;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * DTO for {@link org.stockify.model.entity.DetailTransactionEntity}
@@ -14,5 +15,5 @@ import java.io.Serializable;
 @Setter
 public class DetailTransactionRequest{
     String productBarcode;
-    Long quantity;
+    BigDecimal quantity;
 }

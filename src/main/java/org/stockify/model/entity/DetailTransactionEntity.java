@@ -27,7 +27,7 @@ public class DetailTransactionEntity {
     private ProductEntity product;
 
     @Column(name = "quantity", nullable = false)
-    private Long quantity;
+        private BigDecimal quantity;
 
     @Column(name = "subtotal", precision = 20, scale = 2)
     private BigDecimal subtotal;

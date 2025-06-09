@@ -62,7 +62,7 @@ public class PosController {
             @Parameter(description = "ID del empleado") @RequestParam(required = false) Long employeeId,
             @Parameter(description = "Monto mínimo actual") @RequestParam(required = false) BigDecimal currentAmountMin,
             @Parameter(description = "Monto máximo actual") @RequestParam(required = false) BigDecimal currentAmountMax,
-            @PageableDefault(size = 10) Pageable pageable,
+            @PageableDefault() Pageable pageable,
             PagedResourcesAssembler<PosResponse> assembler) {
         Page<PosResponse> posResponses = posService.findAllWithFilters(
                 id, storeId, status, employeeId, currentAmountMin, currentAmountMax, pageable);
