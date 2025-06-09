@@ -29,8 +29,8 @@ public class PurchaseService {
 
     //-- CRUD operations --
 
-    public PurchaseResponse createPurchase(PurchaseRequest request) {
-        //transactionService.createTransaction(request)
+    public PurchaseResponse createPurchase(PurchaseRequest request,Long storeID, Long posID) {
+        transactionService.createTransaction(request.getTransaction(),storeID,posID);
         return purchaseMapper.toResponseDTO(purchaseRepository.save(purchaseMapper.toEntity(request)));
     }
 
