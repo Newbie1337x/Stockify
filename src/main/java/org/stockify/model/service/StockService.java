@@ -11,7 +11,7 @@ import org.stockify.dto.response.StockResponse;
 import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.StockEntity;
 import org.stockify.model.entity.StoreEntity;
-import org.stockify.model.exception.NotEnoughException;
+import org.stockify.model.exception.InsufficientStockException;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.ProductStoreMapper;
 import org.stockify.model.mapper.StockMapper;
@@ -21,7 +21,6 @@ import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.specification.StockSpecifications;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StockService {
@@ -87,55 +86,39 @@ public class StockService {
     }
 
     public StockResponse getStock(Long productId, Long storeId) {
-        return findStockByProductAndStore(productId, storeId)
-                .map(stockMapper::toResponse)
-                .orElseThrow(() -> generateNotFoundException(productId, storeId));
+        StockEntity stock = findStockByProductAndStore(productId, storeId);
+        return stockMapper.toResponse(stock);
     }
 
     public StockResponse addStock(StockRequest request) {
         ProductEntity product = findProduct(request.productId());
         StoreEntity store = findStore(request.storeId());
-
-        Optional<StockEntity> existingStock = findStockByProductAndStore(request.productId(), request.storeId());
-
-        if (existingStock.isPresent()) {
-            throw new IllegalStateException("Stock already exists for product id: " + request.productId() + " and store id: " + request.storeId());
-        }
-
         StockEntity stock = stockMapper.toEntity(request, product, store);
-        stock = stockRepository.save(stock);
-        return stockMapper.toResponse(stock);
+
+        return stockMapper.toResponse(stockRepository.save(stock));
     }
 
     public StockResponse updateStock(StockRequest request) {
-        findProduct(request.productId());
-        findStore(request.storeId());
-
-        StockEntity stock = findStockByProductAndStore(request.productId(), request.storeId())
-                .orElseThrow(() -> generateNotFoundException(request.productId(), request.storeId()));
-
+        StockEntity stock = findStockByProductAndStore(request.productId(), request.storeId());
         stock.setQuantity(request.quantity());
-        stock = stockRepository.save(stock);
-        return stockMapper.toResponse(stock);
+
+        return stockMapper.toResponse(stockRepository.save(stock));
     }
 
     @Transactional
     public List<StockResponse> transferStock(Long storeIdFrom,
                                              StockRequest transferRequest) {
 
-        StockEntity stockFrom = findStockByProductAndStore(transferRequest.productId(),storeIdFrom)
-                .orElseThrow(() -> new NotFoundException("Stock not found in origin store"));
-
-        StockEntity stockTo = findStockByProductAndStore(transferRequest.productId(), transferRequest.storeId())
-                .orElseThrow(() -> new NotFoundException("Stock not found in destination store"));
+        StockEntity stockFrom = findStockByProductAndStore(transferRequest.productId(),storeIdFrom);
+        StockEntity stockTo = findStockByProductAndStore(transferRequest.productId(), transferRequest.storeId());
 
         Double quantityToTransfer = transferRequest.quantity();
 
         if (stockFrom.getQuantity() < quantityToTransfer) {
-            throw new NotEnoughException("Not enough stock in origin store to transfer.");
+            throw new InsufficientStockException("Not enough stock in origin store to transfer.");
         }
         if (storeIdFrom.equals(transferRequest.storeId())) {
-            throw new NotEnoughException("Origin and destination store cannot be the same.");
+            throw new InsufficientStockException("Origin and destination store cannot be the same.");
         }
 
         stockFrom.setQuantity(stockFrom.getQuantity() - quantityToTransfer);
@@ -147,38 +130,31 @@ public class StockService {
         return List.of(responseFrom, responseTo);
     }
 
-
-    public StockResponse increaseStock(Long productId, Long storeId, Long quantity) {
-        findProduct(productId);
-        findStore(storeId);
-        StockEntity stock = findStockByProductAndStore(productId, storeId)
-                .orElseThrow(() -> generateNotFoundException(productId, storeId));
+    public StockResponse increaseStock(Long productId, Long storeId, Double quantity) {
+        StockEntity stock = findStockByProductAndStore(productId, storeId);
         stock.setQuantity(stock.getQuantity() + quantity);
         return stockMapper.toResponse(stockRepository.save(stock));
     }
 
-    public StockResponse decreaseStock(Long productId, Long storeId, Long quantity){
-        findProduct(productId);
-        findStore(storeId);
-        StockEntity stock = findStockByProductAndStore(productId, storeId)
-                .orElseThrow(() -> generateNotFoundException(productId, storeId));
+        public StockResponse decreaseStock(Long productId, Long storeId, Double quantity){
+            StockEntity stock = findStockByProductAndStore(productId, storeId);
         if(stock.getQuantity() < quantity){
-            throw new NotFoundException("Stock not enough to decrease");
+            throw new InsufficientStockException("Stock not enough to decrease");
         }
         stock.setQuantity(stock.getQuantity() - quantity);
         return stockMapper.toResponse(stockRepository.save(stock));
     }
-/*
-    public boolean existsByProductIdAndStoreId(Long productId, Long storeId) {
-        return stockRepository.existsByProductIdAndStoreId(productId,storeId);
-    }
+
+    private StockEntity findStockByProductAndStore(Long productId, Long storeId) {
+        productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
+
+        storeRepository.findById(storeId)
+                .orElseThrow(() -> new NotFoundException("Store not found with id: " + storeId));
 
 
-*/
-
-
-    private Optional<StockEntity> findStockByProductAndStore(Long productId, Long storeId) {
-            return stockRepository.findByProductIdAndStoreId(productId, storeId);
+            return stockRepository.findByProductIdAndStoreId(productId, storeId).orElseThrow(()->
+                    new NotFoundException("Stock not found for product id: " + productId + " and store id: " + storeId));
     }
 
     private ProductEntity findProduct(Long productId) {
@@ -187,11 +163,7 @@ public class StockService {
     }
 
     private StoreEntity findStore(Long storeId) {
-        return storeRepository.findById(storeId)
+       return  storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException("Store not found with id: " + storeId));
-    }
-
-    private NotFoundException generateNotFoundException(Long productId, Long storeId) {
-        return new NotFoundException("Stock not found for product id: " + productId + " and store id: " + storeId);
     }
 }

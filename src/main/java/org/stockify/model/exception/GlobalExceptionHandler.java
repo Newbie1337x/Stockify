@@ -49,9 +49,9 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
     }
 
-    @ExceptionHandler(NotEnoughException.class)
+    @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ErrorResponse> handleNotEnough
-            ( NotEnoughException ex,
+            ( InsufficientStockException ex,
               HttpServletRequest request){
         {
             return buildErrorResponse(HttpStatus.CONFLICT, ex,request);

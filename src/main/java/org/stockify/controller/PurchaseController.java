@@ -13,7 +13,7 @@ import org.stockify.dto.response.PurchaseResponse;
 import org.stockify.model.service.PurchaseService;
 
 @RestController
-@RequestMapping("/api/purchases")
+@RequestMapping("/purchases")
 @RequiredArgsConstructor
 public class PurchaseController {
 

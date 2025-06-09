@@ -25,6 +25,6 @@ public class TransactionResponse{
     String employeeDni;
     Long idPos;
     Long storeId;
-    String storeStoreName;
+    String storeName;
     Set<DetailTransactionResponse> detailTransactions;
 }

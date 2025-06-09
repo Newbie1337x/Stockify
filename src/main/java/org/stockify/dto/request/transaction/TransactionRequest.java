@@ -20,5 +20,7 @@ public class TransactionRequest{
     @NotNull
     PaymentMethod paymentMethod;
     List<DetailTransactionRequest> detailTransactions;
+    String description;
+
 
 }

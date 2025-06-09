@@ -50,7 +50,7 @@ public class TransactionEntity {
     @JoinColumn(name = "store_id")
     private StoreEntity store;
 
-    @OneToMany(mappedBy = "transaction", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<DetailTransactionEntity> detailTransactions;
 
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)

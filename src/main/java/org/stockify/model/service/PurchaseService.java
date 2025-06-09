@@ -1,5 +1,5 @@
 package org.stockify.model.service;
-
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -7,9 +7,14 @@ import org.springframework.stereotype.Service;
 import org.stockify.dto.request.purchase.PurchaseFilterRequest;
 import org.stockify.dto.request.purchase.PurchaseRequest;
 import org.stockify.dto.response.PurchaseResponse;
+import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.PurchaseEntity;
+import org.stockify.model.enums.TransactionType;
+import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.PurchaseMapper;
+import org.stockify.model.repository.ProviderRepository;
 import org.stockify.model.repository.PurchaseRepository;
+import org.stockify.model.repository.TransactionRepository;
 import org.stockify.model.specification.PurchaseSpecification;
 
 @Service
@@ -19,19 +24,45 @@ public class PurchaseService {
     private final PurchaseMapper purchaseMapper;
     private final StockService stockService;
     private final TransactionService transactionService;
+    private final TransactionRepository transactionRepository;
+    private final ProviderRepository providerRepository;
+    private final ProviderService providerService;
 
-    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper, StockService stockService, TransactionService transactionService) {
+    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper, StockService stockService, TransactionService transactionService, TransactionRepository transactionRepository, ProviderRepository providerRepository, ProviderService providerService) {
         this.purchaseRepository = purchaseRepository;
         this.purchaseMapper = purchaseMapper;
         this.stockService = stockService;
         this.transactionService = transactionService;
+        this.transactionRepository = transactionRepository;
+        this.providerRepository = providerRepository;
+        this.providerService = providerService;
     }
 
     //-- CRUD operations --
 
-    public PurchaseResponse createPurchase(PurchaseRequest request,Long storeID, Long posID) {
-        transactionService.createTransaction(request.getTransaction(),storeID,posID);
-        return purchaseMapper.toResponseDTO(purchaseRepository.save(purchaseMapper.toEntity(request)));
+    @Transactional
+    public PurchaseResponse createPurchase(PurchaseRequest request, Long storeID, Long posID) {
+
+        request.getTransaction().getDetailTransactions()
+                .forEach(detail -> stockService.increaseStock(detail.getProductID(), storeID, detail.getQuantity()));
+
+        TransactionResponse transaction = transactionService.createTransaction(request.getTransaction(), storeID, posID, TransactionType.PURCHASE);
+        PurchaseEntity purchase = purchaseMapper.toEntity(request);
+        purchase.setTransaction(transactionRepository.findById(transaction.getId())
+                .orElseThrow(() -> new NotFoundException("Transaction not found")));
+        purchase.setProvider(providerRepository.findById(request.getProviderId()).orElseThrow(() -> new NotFoundException("Provider not found")));
+
+        return purchaseMapper.toResponseDTO(purchaseRepository.save(purchase));
+    }
+
+    public PurchaseResponse getPurchaseById(Long id) {
+        return purchaseMapper.toResponseDTO(purchaseRepository.findById(id).get());
+    }
+
+    public PurchaseResponse updatePurchase(Long id, PurchaseRequest request) {
+        PurchaseEntity purchaseEntity = purchaseMapper.toEntity(request);
+        purchaseEntity.setId(id);
+        return purchaseMapper.toResponseDTO(purchaseRepository.save(purchaseEntity));
     }
 
     public void deletePurchase(Long id) {

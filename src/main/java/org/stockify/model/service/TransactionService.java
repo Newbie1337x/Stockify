@@ -7,7 +7,10 @@ import org.stockify.dto.request.transaction.TransactionRequest;
 import org.stockify.dto.response.DetailTransactionResponse;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.DetailTransactionEntity;
+import org.stockify.model.entity.ProductEntity;
+import org.stockify.model.entity.StoreEntity;
 import org.stockify.model.entity.TransactionEntity;
+import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.DetailTransactionMapper;
 import org.stockify.model.mapper.TransactionMapper;
@@ -26,18 +29,14 @@ import java.util.stream.Collectors;
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
-    private final DetailTransactionMapper detailTransactionMapper;
     private final StoreRepository storeRepository;
-    private final PosRepository posRepository;
     private final SessionPosService sessionPosService;
     private final ProductRepository productRepository;
 
     public TransactionService(TransactionRepository transactionRepository, TransactionMapper transactionMapper, DetailTransactionMapper detailTransactionMapper, StoreRepository storeRepository, PosRepository posRepository, SessionPosService sessionPosService, ProductRepository productRepository) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
-        this.detailTransactionMapper = detailTransactionMapper;
         this.storeRepository = storeRepository;
-        this.posRepository = posRepository;
         this.sessionPosService = sessionPosService;
         this.productRepository = productRepository;
     }
@@ -49,33 +48,45 @@ public class TransactionService {
                                         .toEntity(request)));
     }
 
-    public TransactionResponse createTransaction(TransactionRequest request,Long idLocal,Long idPos)
+    public TransactionResponse createTransaction(TransactionRequest request, Long idLocal, Long idPos, TransactionType type)
     {
+//        Set<DetailTransactionEntity> detailTransactions = request
+//                .getDetailTransactions()
+//                .stream()
+//                .map(detailTransactionMapper::toEntity)
+//                .collect(Collectors.toSet());
+
+
+        //Hice esto porque si no daba null pointer porque estaba intentando hacer un toEntity con productos sin mapear
+
         Set<DetailTransactionEntity> detailTransactions = request
                 .getDetailTransactions()
                 .stream()
-                .map(detailTransactionMapper::toEntity)
+                .map(detailRequest -> {
+                    ProductEntity product = productRepository.findById(detailRequest.getProductID())
+                            .orElseThrow(() -> new NotFoundException("Product with ID " + detailRequest.getProductID() + " not found."));
+
+                    DetailTransactionEntity entity = new DetailTransactionEntity();
+                    entity.setProduct(product);
+
+                    BigDecimal quantity = BigDecimal.valueOf(detailRequest.getQuantity());
+                    entity.setQuantity(quantity);
+
+                    entity.setSubtotal(product.getPrice().multiply(quantity));
+
+                    return entity;
+                })
                 .collect(Collectors.toSet());
 
-        detailTransactions
-                .forEach
-                        (detailTransaction
-                                -> detailTransaction.setSubtotal(
-                                        productRepository
-                                                .findById(detailTransaction
-                                                        .getProduct()
-                                                        .getId())
-                                                .orElseThrow(
-                                                        () -> new NotFoundException("Product with ID " + detailTransaction.getProduct().getId() + " not found."))
-                                                .getPrice().multiply(detailTransaction.getQuantity()))
-                        );
 
         TransactionEntity transactionEntity = transactionMapper.toEntity(request);
         transactionEntity.setDetailTransactions(detailTransactions);
         transactionEntity.setSessionPosEntity
                 (sessionPosService.findByIdPosAndCloseTime(idPos,null));
 
-        transactionEntity.setStore(storeRepository.findById(idLocal).orElseThrow());
+        StoreEntity store = storeRepository.findById(idLocal).orElseThrow(() -> new NotFoundException("Store with ID " + idLocal + " not found."));
+        transactionEntity.setStore(store);
+
 
         transactionEntity.setTotal(
                 detailTransactions
@@ -84,6 +95,9 @@ public class TransactionService {
                         .reduce(BigDecimal::add)
                         .orElse(BigDecimal.ZERO)
         );
+        transactionEntity.setDescription(request.getDescription());
+        transactionEntity.setType(type);
+
 
         return transactionMapper.toDto(transactionRepository.save(transactionEntity));
     }

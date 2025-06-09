@@ -16,7 +16,7 @@ public class PurchaseRequest {
     @NotNull(message = "Provider ID is required")
     private Long providerId;
 
-    @NotEmpty(message = "Transaction is required")
+    @NotNull(message = "Transaction is required")
     private TransactionRequest transaction;
 }
 
