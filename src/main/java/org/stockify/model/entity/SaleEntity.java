@@ -17,7 +17,7 @@ public class SaleEntity {
     @JoinColumn(name = "transaction_id", nullable = false)
     private TransactionEntity transaction;
     @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false)
+    @JoinColumn(name = "client_id")
     private ClientEntity client;
 
 }

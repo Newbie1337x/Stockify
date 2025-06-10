@@ -26,16 +26,15 @@ public class PurchaseService {
     private final TransactionService transactionService;
     private final TransactionRepository transactionRepository;
     private final ProviderRepository providerRepository;
-    private final ProviderService providerService;
 
-    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper, StockService stockService, TransactionService transactionService, TransactionRepository transactionRepository, ProviderRepository providerRepository, ProviderService providerService) {
+    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper, StockService stockService, TransactionService transactionService, TransactionRepository transactionRepository, ProviderRepository providerRepository) {
         this.purchaseRepository = purchaseRepository;
         this.purchaseMapper = purchaseMapper;
         this.stockService = stockService;
         this.transactionService = transactionService;
         this.transactionRepository = transactionRepository;
         this.providerRepository = providerRepository;
-        this.providerService = providerService;
+
     }
 
     //-- CRUD operations --
@@ -53,10 +52,6 @@ public class PurchaseService {
         purchase.setProvider(providerRepository.findById(request.getProviderId()).orElseThrow(() -> new NotFoundException("Provider not found")));
 
         return purchaseMapper.toResponseDTO(purchaseRepository.save(purchase));
-    }
-
-    public PurchaseResponse getPurchaseById(Long id) {
-        return purchaseMapper.toResponseDTO(purchaseRepository.findById(id).get());
     }
 
     public PurchaseResponse updatePurchase(Long id, PurchaseRequest request) {

@@ -48,17 +48,9 @@ public class TransactionService {
                                         .toEntity(request)));
     }
 
-    public TransactionResponse createTransaction(TransactionRequest request, Long idLocal, Long idPos, TransactionType type)
-    {
-//        Set<DetailTransactionEntity> detailTransactions = request
-//                .getDetailTransactions()
-//                .stream()
-//                .map(detailTransactionMapper::toEntity)
-//                .collect(Collectors.toSet());
+    public TransactionResponse createTransaction(TransactionRequest request, Long idLocal, Long idPos, TransactionType type) {
 
-
-        //Hice esto porque si no daba null pointer porque estaba intentando hacer un toEntity con productos sin mapear
-
+        // Convertir cada detalle a entidad, seteando producto, cantidad, subtotal
         Set<DetailTransactionEntity> detailTransactions = request
                 .getDetailTransactions()
                 .stream()
@@ -78,16 +70,24 @@ public class TransactionService {
                 })
                 .collect(Collectors.toSet());
 
-
+        // Crear la transacción base
         TransactionEntity transactionEntity = transactionMapper.toEntity(request);
         transactionEntity.setDetailTransactions(detailTransactions);
-        transactionEntity.setSessionPosEntity
-                (sessionPosService.findByIdPosAndCloseTime(idPos,null));
 
-        StoreEntity store = storeRepository.findById(idLocal).orElseThrow(() -> new NotFoundException("Store with ID " + idLocal + " not found."));
+        // 🔥 FIX: asignar la transacción a cada detalle
+        detailTransactions.forEach(detail -> detail.setTransaction(transactionEntity));
+
+        // Setear la sesión del POS
+        transactionEntity.setSessionPosEntity(
+                sessionPosService.findByIdPosAndCloseTime(idPos, null)
+        );
+
+        // Buscar y setear el local
+        StoreEntity store = storeRepository.findById(idLocal)
+                .orElseThrow(() -> new NotFoundException("Store with ID " + idLocal + " not found."));
         transactionEntity.setStore(store);
 
-
+        // Calcular el total
         transactionEntity.setTotal(
                 detailTransactions
                         .stream()
@@ -95,12 +95,14 @@ public class TransactionService {
                         .reduce(BigDecimal::add)
                         .orElse(BigDecimal.ZERO)
         );
+
         transactionEntity.setDescription(request.getDescription());
         transactionEntity.setType(type);
 
-
+        // Guardar y devolver el response
         return transactionMapper.toDto(transactionRepository.save(transactionEntity));
     }
+
 
     public List<TransactionResponse> findAll()
     {
