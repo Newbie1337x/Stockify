@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 import org.stockify.model.enums.PaymentMethod;
 import org.stockify.model.enums.TransactionType;
 
@@ -20,6 +22,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "transactions")
+@Audited
 public class TransactionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,19 +47,22 @@ public class TransactionEntity {
 
     @ManyToOne
     @JoinColumn(name = "session_pos_id")
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private SessionPosEntity sessionPosEntity;
 
     @ManyToOne
     @JoinColumn(name = "store_id")
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private StoreEntity store;
 
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<DetailTransactionEntity> detailTransactions;
 
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private PurchaseEntity purchase;
 
-    @PrePersist                 //Metodo que se aplica automaticamente antes que la entidad se persista en la BDD
+    @PrePersist
     public void prePersist(){
         this.dateTime = LocalDateTime.now();
     }

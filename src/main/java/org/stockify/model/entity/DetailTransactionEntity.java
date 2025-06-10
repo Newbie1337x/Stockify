@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import java.math.BigDecimal;
 
@@ -24,6 +26,7 @@ public class DetailTransactionEntity {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private ProductEntity product;
 
     @Column(name = "quantity", nullable = false)

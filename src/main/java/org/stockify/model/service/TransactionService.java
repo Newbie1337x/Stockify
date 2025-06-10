@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
