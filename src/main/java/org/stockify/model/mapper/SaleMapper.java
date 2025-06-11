@@ -1,7 +1,6 @@
 package org.stockify.model.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
 import org.stockify.model.entity.SaleEntity;
@@ -17,4 +16,9 @@ public interface SaleMapper {
     @Mapping(target = "dniClient", source = "client.dni")
     @Mapping(target = "transaction", source = "transaction", qualifiedByName = "toTransactionResponse")
     SaleResponse toResponseDTO (SaleEntity entity);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void partialUpdateSaleEntity(SaleRequest saleRequest, @MappingTarget SaleEntity saleEntity);
+
+    void updateShiftEntity(SaleRequest saleRequest, @MappingTarget SaleEntity saleEntity);
 }

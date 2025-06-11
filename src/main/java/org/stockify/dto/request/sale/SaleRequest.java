@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.stockify.dto.request.transaction.TransactionRequest;
 
-
 @Getter
 @Setter
 public class SaleRequest {

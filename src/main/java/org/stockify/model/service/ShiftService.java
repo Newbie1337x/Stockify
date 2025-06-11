@@ -67,7 +67,7 @@ public class ShiftService {
                 .and(ShiftSpecification.exitTimeBetween(filterRequest.getExitTimeFrom(), filterRequest.getExitTimeTo()))
                 .and(ShiftSpecification.hasAnyEmployeeId(filterRequest.getEmployeesIds()));
 
-        Page<ShiftEntity> shiftEntities = shiftRepository.findAll(pageable);
+        Page<ShiftEntity> shiftEntities = shiftRepository.findAll(specification, pageable);
         return shiftEntities.map(shiftMapper::toDto);
     }
 

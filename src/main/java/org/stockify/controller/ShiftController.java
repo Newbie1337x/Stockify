@@ -1,6 +1,6 @@
 package org.stockify.controller;
 
-import jakarta.validation.Valid;
+import  jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/shift")
+@RequestMapping("/shifts")
 public class ShiftController {
     private final ShiftService shiftService;
     private final ShiftModelAssembler shiftModelAssembler;

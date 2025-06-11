@@ -18,7 +18,7 @@ import org.stockify.model.service.ClientService;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/client")
+@RequestMapping("/clients")
 public class ClientController {
     private final ClientService clientService;
     private final ClientModelAssembler clientModelAssembler;
