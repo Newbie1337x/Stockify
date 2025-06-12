@@ -14,11 +14,17 @@ public class TransactionController {
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
+
     @PostMapping("/{idPos}")
     public void createTransaction(@PathVariable Long idLocal,
                                   @PathVariable Long idPos,@RequestBody @Valid TransactionRequest request)
     {
         transactionService.createTransaction(request, idLocal, idPos, TransactionType.OTHER);
+    }
+
+    @GetMapping("/pdf/{idTransaction}")
+    public void generatePdf(@PathVariable Long idTransaction) throws Exception {
+        transactionService.generatePdf(idTransaction);
     }
 
 }
