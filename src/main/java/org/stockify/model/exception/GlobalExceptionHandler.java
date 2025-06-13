@@ -27,9 +27,41 @@ public class GlobalExceptionHandler implements ProblemHandling {
         return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
     }
 
-    // Catch bad request on Sorts
+    @ExceptionHandler(PropertyReferenceException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSort(PropertyReferenceException ex, HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex, request);
+    }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(
+            EntityNotFoundException ex,
+            HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex, request);
+    }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex,
+                                                             HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
+    }
+
+    @ExceptionHandler(InvalidSessionStatusException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidSessionStatus(
+            InvalidSessionStatusException ex,
+            HttpServletRequest request
+    ) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ErrorResponse> handleNotEnough
+            ( InsufficientStockException ex,
+              HttpServletRequest request){
+        {
+            return buildErrorResponse(HttpStatus.CONFLICT, ex,request);
+        }
+
+    }
 
 
 
