@@ -4,7 +4,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 import org.stockify.controller.ClientController;
-import org.stockify.dto.request.ClientFilterRequest;
+import org.stockify.dto.request.client.ClientFilterRequest;
 import org.stockify.dto.response.ClientResponse;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
