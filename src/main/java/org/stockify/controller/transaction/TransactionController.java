@@ -20,7 +20,11 @@ public class TransactionController {
     {
         transactionService.createTransaction(request, storeID, posID, TransactionType.OTHER);
     }
-
+    
+    @GetMapping("/pdf/{idTransaction}")
+    public void generatePdf(@PathVariable Long idTransaction) throws Exception {
+        transactionService.generatePdf(idTransaction);
+    }
 
 
 }
