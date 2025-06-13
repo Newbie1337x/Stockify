@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.employee.EmployeeRequest;
@@ -43,6 +44,7 @@ public class EmployeeController {
             }
     )
     @GetMapping
+    @PreAuthorize("hasAuthority('EMPLOYEE')")
     public ResponseEntity<PagedModel<EntityModel<EmployeeResponse>>> getAllEmployees(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String lastName,
