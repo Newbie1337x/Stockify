@@ -1,4 +1,4 @@
-package org.stockify.controller;
+package org.stockify.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Page;

@@ -19,10 +19,6 @@ public class PurchaseController {
 
     private final PurchaseService purchaseService;
 
-    @PostMapping(("/{storeID}/{posID}" ) )
-    public ResponseEntity<PurchaseResponse> create(@Valid @RequestBody PurchaseRequest request, @PathVariable Long storeID, @PathVariable Long posID) {
-        return new ResponseEntity<>(purchaseService.createPurchase(request,storeID,posID), HttpStatus.CREATED);
-    }
 
     @GetMapping
     public ResponseEntity<Page<PurchaseResponse>> list(Pageable pageable, PurchaseFilterRequest filter) {

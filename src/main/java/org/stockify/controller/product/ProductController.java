@@ -1,4 +1,4 @@
-package org.stockify.controller;
+package org.stockify.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -16,7 +16,6 @@ import org.stockify.dto.request.ProductFilterRequest;
 import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.BulkProductResponse;
 import org.stockify.dto.response.ProductResponse;
-import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.assembler.ProductModelAssembler;
 import org.stockify.model.assembler.ProviderModelAssembler;
 import org.stockify.model.service.ProductService;
@@ -96,38 +95,5 @@ public class ProductController {
 
     //Providers logic
 
-    @Operation(summary = "Assign a provider to a product")
-    @PutMapping("/{productID}/providers/{providerID}")
-    public ResponseEntity<EntityModel<ProductResponse>> assignProvider(
-            @PathVariable Long productID,
-            @PathVariable Long providerID
-    ){
-        return ResponseEntity.ok(productModelAssembler
-                .toModel(productService
-                        .assignProviderToProduct(productID,providerID)));
-    }
 
-
-    @Operation(summary = "Unassign a provider from a product")
-    @DeleteMapping("/{productID}/providers/{providerID}")
-    public ResponseEntity<EntityModel<ProductResponse>> unassignProvider(
-            @PathVariable Long productID,
-            @PathVariable Long providerID
-    ){
-        return ResponseEntity.ok(productModelAssembler
-                .toModel(productService
-                        .unassignProviderFromProduct(productID,providerID)));
-    }
-
-    @Operation(summary = "List all providers associated with a specific product")
-    @GetMapping("/{id}/providers")
-    public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
-            @PathVariable Long id,
-            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
-            PagedResourcesAssembler<ProviderResponse> assembler
-    ){
-        Page<ProviderResponse> providersPage = providerService.findAllProvidersByProductID(id, pageable);
-        PagedModel<EntityModel<ProviderResponse>> pagedModel = assembler.toModel(providersPage, providerModelAssembler);
-        return ResponseEntity.ok(pagedModel);
-    }
 }

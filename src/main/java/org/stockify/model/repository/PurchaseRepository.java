@@ -9,4 +9,5 @@ import org.stockify.model.entity.PurchaseEntity;
 
 @Repository
 public interface PurchaseRepository extends JpaRepository<PurchaseEntity, Long>, JpaSpecificationExecutor<PurchaseEntity> {
+
 }

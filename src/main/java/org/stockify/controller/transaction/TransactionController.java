@@ -1,4 +1,4 @@
-package org.stockify.controller;
+package org.stockify.controller.transaction;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -7,18 +7,20 @@ import org.stockify.model.enums.TransactionType;
 import org.stockify.model.service.TransactionService;
 
 @RestController
-@RequestMapping("/store/{idLocal}/transactions")
+@RequestMapping("/stores/{storeID}/pos/{posID}/transactions")
 public class TransactionController {
     private final TransactionService transactionService;
 
     public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
-    @PostMapping("/{idPos}")
-    public void createTransaction(@PathVariable Long idLocal,
-                                  @PathVariable Long idPos,@RequestBody @Valid TransactionRequest request)
+    @PostMapping
+    public void createTransaction(@PathVariable Long storeID,
+                                  @PathVariable Long posID,@RequestBody @Valid TransactionRequest request)
     {
-        transactionService.createTransaction(request, idLocal, idPos, TransactionType.OTHER);
+        transactionService.createTransaction(request, storeID, posID, TransactionType.OTHER);
     }
+
+
 
 }

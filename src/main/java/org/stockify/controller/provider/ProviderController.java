@@ -1,10 +1,9 @@
-package org.stockify.controller;
+package org.stockify.controller.provider;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.provider.ProviderFilterRequest;
 import org.stockify.dto.request.provider.ProviderRequest;
 import org.stockify.dto.response.BulkProviderResponse;
-import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.assembler.ProductModelAssembler;
 import org.stockify.model.assembler.ProviderModelAssembler;
@@ -93,34 +91,5 @@ public class ProviderController {
 
     //Products Logic
 
-    @Operation(summary = "List products associated with a provider")
-    @GetMapping("/{id}/products")
-    public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
-            @PathVariable Long id,
-            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
-            PagedResourcesAssembler<ProductResponse> assembler
-    ) {
-        Page<ProductResponse> productPage = productService.findProductsByProviderId(id, pageable);
-        return ResponseEntity.ok(assembler.toModel(productPage, productModelAssembler));
-    }
 
-    @Operation(summary = "Assign a specific product to a provider")
-    @PutMapping("/{providerID}/products/{productID}")
-    public ResponseEntity<EntityModel<ProviderResponse>> assignProduct(
-            @PathVariable Long providerID,
-            @PathVariable Long productID
-    ){
-        return ResponseEntity.ok(providerModelAssembler
-                .toModel(providerService.assignProductToProvider(providerID,productID)));
-    }
-
-    @Operation(summary = "Unassign a specific product from a provider")
-    @PatchMapping("/{providerID}/products/{productID}")
-    public ResponseEntity<EntityModel<ProviderResponse>> unassignProducts(
-            @PathVariable Long providerID,
-            @PathVariable Long productID
-    )
-    {
-        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.unassignProductToProvider(providerID,productID)));
-    }
 }

@@ -6,6 +6,7 @@ public record ProductStoreResponse(
         long productID,
         double price,
         double stock,
+        long storeID,
         String sku,
         String barcode,
         String brand,

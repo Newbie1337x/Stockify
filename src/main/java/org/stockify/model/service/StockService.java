@@ -5,7 +5,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.ProductFilterRequest;
-import org.stockify.dto.request.StockRequest;
+import org.stockify.dto.request.stock.StockRequest;
+import org.stockify.dto.request.stock.StockTransferRequest;
+import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProductStoreResponse;
 import org.stockify.dto.response.StockResponse;
 import org.stockify.model.entity.ProductEntity;
@@ -90,34 +92,34 @@ public class StockService {
         return stockMapper.toResponse(stock);
     }
 
-    public StockResponse addStock(StockRequest request) {
-        ProductEntity product = findProduct(request.productId());
-        StoreEntity store = findStore(request.storeId());
+    public StockResponse addStock(Long productID, Long storeID ,StockRequest request) {
+        ProductEntity product = findProduct(productID);
+        StoreEntity store = findStore(storeID);
         StockEntity stock = stockMapper.toEntity(request, product, store);
 
         return stockMapper.toResponse(stockRepository.save(stock));
     }
 
-    public StockResponse updateStock(StockRequest request) {
-        StockEntity stock = findStockByProductAndStore(request.productId(), request.storeId());
+    public StockResponse updateStock(Long productID, Long storeID, StockRequest request) {
+        StockEntity stock = findStockByProductAndStore(productID,storeID);
         stock.setQuantity(request.quantity());
 
         return stockMapper.toResponse(stockRepository.save(stock));
     }
 
     @Transactional
-    public List<StockResponse> transferStock(Long storeIdFrom,
-                                             StockRequest transferRequest) {
+    public List<StockResponse> transferStock(Long originStoreID,
+                                             StockTransferRequest transferRequest) {
 
-        StockEntity stockFrom = findStockByProductAndStore(transferRequest.productId(),storeIdFrom);
-        StockEntity stockTo = findStockByProductAndStore(transferRequest.productId(), transferRequest.storeId());
+        StockEntity stockFrom = findStockByProductAndStore(transferRequest.productId(),originStoreID);
+        StockEntity stockTo = findStockByProductAndStore(transferRequest.productId(), transferRequest.destinationStoreId());
 
         Double quantityToTransfer = transferRequest.quantity();
 
         if (stockFrom.getQuantity() < quantityToTransfer) {
             throw new InsufficientStockException("Not enough stock in origin store to transfer.");
         }
-        if (storeIdFrom.equals(transferRequest.storeId())) {
+        if (originStoreID.equals(transferRequest.destinationStoreId())) {
             throw new InsufficientStockException("Origin and destination store cannot be the same.");
         }
 

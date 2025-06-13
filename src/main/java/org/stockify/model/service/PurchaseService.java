@@ -72,5 +72,6 @@ public class PurchaseService {
         return purchaseRepository.findAll(spec, pageable)
                 .map(purchaseMapper::toResponseDTO);
     }
+    
 
 }
