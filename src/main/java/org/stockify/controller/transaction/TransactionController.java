@@ -1,8 +1,13 @@
 package org.stockify.controller.transaction;
 
 import jakarta.validation.Valid;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.transaction.TransactionRequest;
+import org.stockify.dto.response.TransactionPDFResponse;
+import org.stockify.dto.response.TransactionResponse;
+import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.service.TransactionService;
 
@@ -15,15 +20,15 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
     @PostMapping
-    public void createTransaction(@PathVariable Long storeID,
-                                  @PathVariable Long posID,@RequestBody @Valid TransactionRequest request)
+    public ResponseEntity<TransactionResponse> createTransaction(@PathVariable Long storeID,
+                                            @PathVariable Long posID, @RequestBody @Valid TransactionRequest request)
     {
-        transactionService.createTransaction(request, storeID, posID, TransactionType.OTHER);
+        return ResponseEntity.ok(transactionService.createTransaction(request, storeID, posID, TransactionType.OTHER));
     }
     
     @GetMapping("/pdf/{idTransaction}")
-    public void generatePdf(@PathVariable Long idTransaction) throws Exception {
-        transactionService.generatePdf(idTransaction);
+    public ResponseEntity<EntityModel<TransactionPDFResponse>> generatePdf(@PathVariable Long idTransaction) throws Exception {
+        return transactionService.generatePdf(idTransaction);
     }
 
 

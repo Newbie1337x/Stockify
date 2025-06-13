@@ -48,6 +48,7 @@ public class SaleService {
                 .forEach(detail -> stockService.decreaseStock(detail.getProductID(), storeID, detail.getQuantity()));
 
         TransactionResponse transaction = transactionService.createTransaction(request.getTransaction(), storeID, posID, TransactionType.SALE);
+
         SaleEntity sale = saleMapper.toEntity(request);
         if (request.getClientId() != null) {
             sale.setClient(clientRepository.findById(request.getClientId()).orElseThrow(() -> new NotFoundException("Client not found with ID"+ request.getClientId())));

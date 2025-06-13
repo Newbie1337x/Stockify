@@ -7,11 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.stockify.dto.request.transaction.TransactionRequest;
-
-@NoArgsConstructor
 @Getter
 @Setter
-public class SaleRequest {
+@NoArgsConstructor
+public class SaleRequestnig {
     @Schema(description = "ID of the client", example = "10")
     Long clientId;
 

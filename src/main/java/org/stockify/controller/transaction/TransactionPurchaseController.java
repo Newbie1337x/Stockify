@@ -1,5 +1,6 @@
 package org.stockify.controller.transaction;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,7 @@ import org.stockify.model.service.PurchaseService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/stores/{storeID}/pos/{posID}/transactions/purchase")
+@RequestMapping("/stores/{storeID}/pos/{posID}/transactions/purchases")
 public class TransactionPurchaseController {
 
     private final PurchaseService purchaseService;
@@ -22,6 +23,7 @@ public class TransactionPurchaseController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<PurchaseResponse> create(
             @Valid @RequestBody PurchaseRequest request,
             @PathVariable Long storeID,

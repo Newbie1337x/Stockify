@@ -5,6 +5,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.transaction.TransactionRequest;
+import org.stockify.dto.response.TransactionPDFResponse;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.DetailTransactionEntity;
 import org.stockify.model.entity.ProductEntity;
@@ -122,12 +123,14 @@ public class TransactionService {
     }
 
 
-    public ResponseEntity<EntityModel<TransactionEntity>> generatePdf(Long id) throws Exception {
+    public ResponseEntity<EntityModel<TransactionPDFResponse>> generatePdf(Long id) throws Exception {
         TransactionEntity transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Transaction with ID " + id + " not found."));
 
         // Convertir a DTO
         TransactionResponse dto = transactionMapper.toDto(transaction);
+
+
 
         // Generar PDF en el siguiente directorio
         String fileName = "transaction_" + id + ".pdf";
@@ -141,11 +144,14 @@ public class TransactionService {
         }
 
         // Retornar la respuesta con el PDF generado
-        return ResponseEntity.ok(EntityModel.of(transaction));
+        return ResponseEntity.ok(EntityModel.of(
+                TransactionPDFResponse.builder()
+                        .path(outputPath)
+                        .transaction(dto).build()));
     }
 
 
-    public void generateHtmlToPdf(TransactionResponse dto, String outputPath, TransactionEntity transaction) throws Exception {
+    private void generateHtmlToPdf(TransactionResponse dto, String outputPath, TransactionEntity transaction) throws Exception {
         // Configurar Thymeleaf
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
         resolver.setTemplateMode("HTML");

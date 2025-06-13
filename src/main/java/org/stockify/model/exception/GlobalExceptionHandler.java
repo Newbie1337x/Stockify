@@ -6,15 +6,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.NoHandlerFoundException;
 import org.stockify.dto.response.ErrorResponse;
 import org.zalando.problem.spring.web.advice.ProblemHandling;
-
 import java.time.LocalDateTime;
-import java.util.Map;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler implements ProblemHandling {
@@ -29,7 +26,7 @@ public class GlobalExceptionHandler implements ProblemHandling {
 
     @ExceptionHandler(PropertyReferenceException.class)
     public ResponseEntity<ErrorResponse> handleInvalidSort(PropertyReferenceException ex, HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex, request);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, new InvalidSortParameterException("'Sort' value is invalid.  " + ex.getMessage()), request);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -60,8 +57,8 @@ public class GlobalExceptionHandler implements ProblemHandling {
         {
             return buildErrorResponse(HttpStatus.CONFLICT, ex,request);
         }
-
     }
+
 
 
 

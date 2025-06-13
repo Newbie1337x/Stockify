@@ -5,13 +5,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
-import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.assembler.SaleModelAssembler;
 import org.stockify.model.service.SaleService;
 
@@ -20,42 +21,26 @@ import org.stockify.model.service.SaleService;
 public class TransactionSaleController {
 
     private final SaleService saleService;
-    private final SaleModelAssembler saleModelAssembler;
+
 
     public TransactionSaleController(SaleService saleService, SaleModelAssembler saleModelAssembler) {
         this.saleService = saleService;
-        this.saleModelAssembler = saleModelAssembler;
+
     }
 
-    @Operation(
-            summary = "Create a new sale",
-            description = "Creates a sale for a given store and POS",
-            requestBody = @RequestBody(
-                    description = "Sale creation request",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = SaleRequest.class))
-            ),
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Sale created successfully", content = @Content(schema = @Schema(implementation = SaleResponse.class))),
-                    @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content)
-            }
-    )
     @PostMapping
-    public ResponseEntity<EntityModel<SaleResponse>> create(
-            @Parameter(description = "Sale request body", required = true)
+    @Transactional
+    public ResponseEntity<SaleResponse> create(
+
             @Valid @RequestBody SaleRequest request,
-
-            @Parameter(description = "Store ID", required = true, example = "1")
             @PathVariable Long storeID,
-
-            @Parameter(description = "POS ID", required = true, example = "10")
             @PathVariable Long posID) {
+        System.out.println("Request: " + request);
         SaleResponse saleResponse = saleService.createSale(request, storeID, posID);
-        EntityModel<SaleResponse> entityModel = saleModelAssembler.toModel(saleResponse);
-        return ResponseEntity
-                .created(entityModel.getRequiredLink("self").toUri())
-                .body(entityModel);
+        return new ResponseEntity<>(saleResponse,HttpStatus.CREATED);
     }
+
+
 
 
 }

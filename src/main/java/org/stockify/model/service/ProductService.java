@@ -6,7 +6,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.stockify.dto.request.ProductFilterRequest;
 import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.BulkItemResponse;
@@ -210,12 +213,18 @@ public class ProductService {
     public ProductResponse assignProviderToProduct(Long productID, Long providerID){
         ProductEntity product = getProductById(productID);
         ProviderEntity provider = getProviderById(providerID);
-
         product.getProviders().add(provider);
         provider.getProductList().add(product);
 
-        productRepository.save(product);
-        providerRepository.save(provider);
+        try{
+            productRepository.save(product);
+            providerRepository.save(provider);
+
+        }catch (DataIntegrityViolationException ex){
+            logger.error("Error saving product {} and provider {}: {}", productID, providerID, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Provider "+ providerID+ " already assigned to product "+ productID + " or the other way around");
+        }
+
 
         return productMapper.toResponse(product);
     }
