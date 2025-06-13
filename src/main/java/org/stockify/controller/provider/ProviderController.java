@@ -26,9 +26,8 @@ import java.util.List;
 public class ProviderController {
 
     private final ProviderService providerService;
-    private final ProductService productService;
     private final ProviderModelAssembler providerModelAssembler;
-    private final ProductModelAssembler productModelAssembler;
+
 
     public ProviderController(ProviderService providerService,
                               ProductService productService,
@@ -36,9 +35,8 @@ public class ProviderController {
                               ProductModelAssembler productModelAssembler) {
 
         this.providerService = providerService;
-        this.productService = productService;
         this.providerModelAssembler = providerModelAssembler;
-        this.productModelAssembler = productModelAssembler;
+
     }
 
     //---Crud operations---
@@ -57,9 +55,9 @@ public class ProviderController {
     }
 
     @Operation(summary = "Get provider by ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<ProviderResponse>> getProviderById(@PathVariable Long id) {
-        ProviderResponse providerResponse = providerService.findById(id);
+    @GetMapping("/{providerID}")
+    public ResponseEntity<EntityModel<ProviderResponse>> getProviderById(@PathVariable Long providerID) {
+        ProviderResponse providerResponse = providerService.findById(providerID);
         EntityModel<ProviderResponse> entityModel = providerModelAssembler.toModel(providerResponse);
         return ResponseEntity.ok(entityModel);
     }
@@ -77,15 +75,15 @@ public class ProviderController {
     }
 
     @Operation(summary = "Logically delete a provider")
-    @PatchMapping("/{id}/disable")
-    public ResponseEntity<EntityModel<ProviderResponse>> logicalDeleteProvider(@PathVariable Long id) {
-        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(id)));
+    @PatchMapping("/{providerID}/disable")
+    public ResponseEntity<EntityModel<ProviderResponse>> logicalDeleteProvider(@PathVariable Long providerID) {
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(providerID)));
     }
 
     @Operation(summary = "Delete a provider from the system")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<EntityModel<ProviderResponse>> deleteProvider(@PathVariable Long id) {
-        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(id)));
+    @DeleteMapping("/{providerID}")
+    public ResponseEntity<EntityModel<ProviderResponse>> deleteProvider(@PathVariable Long providerID) {
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(providerID)));
     }
 
 

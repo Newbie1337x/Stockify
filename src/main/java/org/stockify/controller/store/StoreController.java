@@ -52,9 +52,9 @@ public class StoreController {
     }
 
     @Operation(summary = "Get store by ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<StoreResponse>> getStoreById(@PathVariable Long id) {
-        StoreResponse store = storeService.findById(id);
+    @GetMapping("/{storeID}")
+    public ResponseEntity<EntityModel<StoreResponse>> getStoreById(@PathVariable Long storeID) {
+        StoreResponse store = storeService.findById(storeID);
         return ResponseEntity.ok(storeModelAssembler.toModel(store));
     }
 
@@ -67,33 +67,18 @@ public class StoreController {
     }
 
     @Operation(summary = "Update store by ID")
-    @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<StoreResponse>> updateStore(@PathVariable Long id, @Valid @RequestBody StoreRequest request) {
-        StoreResponse store = storeService.update(id, request);
+    @PutMapping("/{storeID}")
+    public ResponseEntity<EntityModel<StoreResponse>> updateStore(@PathVariable Long storeID, @Valid @RequestBody StoreRequest request) {
+        StoreResponse store = storeService.update(storeID, request);
         return ResponseEntity.ok(storeModelAssembler.toModel(store));
     }
 
     @Operation(summary = "Delete store by ID")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStore(@PathVariable Long id) {
-        storeService.deleteById(id);
+    @DeleteMapping("/{storeID}")
+    public ResponseEntity<Void> deleteStore(@PathVariable Long storeID) {
+        storeService.deleteById(storeID);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "List all products from a specific store which match the filter criteria")
-    @GetMapping("/{id}/products")
-    public ResponseEntity<PagedModel<EntityModel<ProductStoreResponse>>> getProductsFromStore(
-            @PathVariable Long id, 
-            Pageable pageable,
-            PagedResourcesAssembler<ProductStoreResponse> assembler,
-            ProductFilterRequest filter) {
-        Page<ProductStoreResponse> products = stockService.listProductsByStore(id, pageable, filter);
-        if (products.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
 
-        PagedModel<EntityModel<ProductStoreResponse>> pagedModel = assembler.toModel(products, productStoreModelAssembler);
-
-        return ResponseEntity.ok(pagedModel);
-    }
 }

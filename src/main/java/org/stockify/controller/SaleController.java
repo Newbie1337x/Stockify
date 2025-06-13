@@ -75,11 +75,11 @@ public class SaleController {
                     @ApiResponse(responseCode = "404", description = "Sale not found", content = @Content)
             }
     )
-    @GetMapping("/{id}")
+    @GetMapping("/{saleID}")
     public ResponseEntity<EntityModel<SaleResponse>> getSaleById(
             @Parameter(description = "Sale ID", required = true, example = "1")
-            @PathVariable Long id) {
-        SaleResponse saleResponse = saleService.findbyId(id);
+            @PathVariable Long saleID) {
+        SaleResponse saleResponse = saleService.findbyId(saleID);
         return ResponseEntity.ok(saleModelAssembler.toModel(saleResponse));
     }
 
@@ -91,11 +91,14 @@ public class SaleController {
                     @ApiResponse(responseCode = "404", description = "Sale or transaction not found", content = @Content)
             }
     )
-    @GetMapping("/{id}/transaction")
+
+    //Sale ya devuelve la transaccion por defecto.
+    @Deprecated
+    @GetMapping("{saleID}/transactions")
     public ResponseEntity<TransactionResponse> getSaleTransactionById(
             @Parameter(description = "Sale ID", required = true, example = "1")
-            @PathVariable Long id) {
-        TransactionResponse transactionResponse = saleService.findTransactionBySaleId(id);
+            @PathVariable Long saleID) {
+        TransactionResponse transactionResponse = saleService.findTransactionBySaleId(saleID);
         return ResponseEntity.ok(transactionResponse);
     }
 
@@ -107,11 +110,11 @@ public class SaleController {
                     @ApiResponse(responseCode = "404", description = "Sale not found", content = @Content)
             }
     )
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{saleID}")
     public ResponseEntity<Void> deleteSaleById(
             @Parameter(description = "Sale ID", required = true, example = "1")
-            @PathVariable Long id) {
-        saleService.delete(id);
+            @PathVariable Long saleID) {
+        saleService.delete(saleID);
         return ResponseEntity.noContent().build();
     }
 
@@ -128,14 +131,14 @@ public class SaleController {
                     @ApiResponse(responseCode = "404", description = "Sale not found", content = @Content)
             }
     )
-    @PutMapping("/{id}")
+    @PutMapping("/{saleID}")
     public ResponseEntity<EntityModel<SaleResponse>> putSale(
             @Parameter(description = "Sale ID", required = true, example = "1")
-            @PathVariable Long id,
+            @PathVariable Long saleID,
 
             @Parameter(description = "Sale request body", required = true)
             @Valid @RequestBody SaleRequest saleRequest) {
-        SaleResponse updatedSale = saleService.updateSaleFull(id, saleRequest);
+        SaleResponse updatedSale = saleService.updateSaleFull(saleID, saleRequest);
         EntityModel<SaleResponse> entityModel = saleModelAssembler.toModel(updatedSale);
         return ResponseEntity.ok(entityModel);
     }
@@ -153,14 +156,14 @@ public class SaleController {
                     @ApiResponse(responseCode = "404", description = "Sale not found", content = @Content)
             }
     )
-    @PatchMapping("/{id}")
+    @PatchMapping("/{saleID}")
     public ResponseEntity<EntityModel<SaleResponse>> patchSale(
             @Parameter(description = "Sale ID", required = true, example = "1")
-            @PathVariable Long id,
+            @PathVariable Long saleID,
 
             @Parameter(description = "Sale request body", required = true)
             @Valid @RequestBody SaleRequest saleRequest) {
-        SaleResponse updatedSale = saleService.updateShiftPartial(id, saleRequest);
+        SaleResponse updatedSale = saleService.updateShiftPartial(saleID, saleRequest);
         EntityModel<SaleResponse> entityModel = saleModelAssembler.toModel(updatedSale);
         return ResponseEntity.ok(entityModel);
     }

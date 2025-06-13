@@ -17,9 +17,7 @@ import org.stockify.dto.request.ProductRequest;
 import org.stockify.dto.response.BulkProductResponse;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.assembler.ProductModelAssembler;
-import org.stockify.model.assembler.ProviderModelAssembler;
 import org.stockify.model.service.ProductService;
-import org.stockify.model.service.ProviderService;
 import java.util.List;
 
 @RestController
@@ -28,17 +26,12 @@ public class ProductController {
 
     private final ProductService productService;
     private final ProductModelAssembler productModelAssembler;
-    private final ProviderModelAssembler providerModelAssembler;
-    private final ProviderService providerService;
+
 
     public ProductController(ProductService productService,
-                             ProductModelAssembler productModelAssembler,
-                             ProviderModelAssembler providerModelAssembler,
-                             ProviderService providerService) {
+                             ProductModelAssembler productModelAssembler) {
         this.productService = productService;
         this.productModelAssembler = productModelAssembler;
-        this.providerModelAssembler = providerModelAssembler;
-        this.providerService = providerService;
     }
 
     @Operation(summary = "List all products with optional filters")
@@ -63,9 +56,9 @@ public class ProductController {
     }
 
     @Operation(summary = "Get a product by ID")
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<ProductResponse>> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productModelAssembler.toModel(productService.findById(id)));
+    @GetMapping("/{productID}")
+    public ResponseEntity<EntityModel<ProductResponse>> getProductById(@PathVariable Long productID) {
+        return ResponseEntity.ok(productModelAssembler.toModel(productService.findById(productID)));
     }
 
     @Operation(summary = "Create a new product")
@@ -75,25 +68,22 @@ public class ProductController {
     }
 
     @Operation(summary = "Delete a product by ID")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteById(id);
+    @DeleteMapping("/{productID}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long productID) {
+        productService.deleteById(productID);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Update an existing product by ID")
-    @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<ProductResponse>> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest product){
-        return ResponseEntity.ok().body(productModelAssembler.toModel(productService.update(id, product)));
+    @PutMapping("/{productID}")
+    public ResponseEntity<EntityModel<ProductResponse>> updateProduct(@PathVariable Long productID, @Valid @RequestBody ProductRequest product){
+        return ResponseEntity.ok().body(productModelAssembler.toModel(productService.update(productID, product)));
     }
 
     @Operation(summary = "Patch an existing product by ID")
-    @PatchMapping("/{id}")
-    public ResponseEntity<EntityModel<ProductResponse>> patchProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest product){
-        return ResponseEntity.ok().body(productModelAssembler.toModel(productService.patch(id,product)));
+    @PatchMapping("/{productID}")
+    public ResponseEntity<EntityModel<ProductResponse>> patchProduct(@PathVariable Long productID, @Valid @RequestBody ProductRequest product){
+        return ResponseEntity.ok().body(productModelAssembler.toModel(productService.patch(productID,product)));
     }
-
-    //Providers logic
-
 
 }

@@ -43,16 +43,16 @@ public class CategoryController {
         return ResponseEntity.ok(pagedModel);
     }
 
-    @Operation(summary = "Get a categorie by id")
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<CategoryResponse>> getCategoryById(@PathVariable int id) {
-        return ResponseEntity.ok(categoryModelAssembler.toModel(categoryService.findById(id)));
+    @Operation(summary = "Get a category by id")
+    @GetMapping("/{categoryID}")
+    public ResponseEntity<EntityModel<CategoryResponse>> getCategoryById(@PathVariable int categoryID) {
+        return ResponseEntity.ok(categoryModelAssembler.toModel(categoryService.findById(categoryID)));
     }
 
     @Operation(summary = "Delete a category by id")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable int id) {
-        categoryService.deleteById(id);
+    @DeleteMapping("/{categoryID}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable int categoryID) {
+        categoryService.deleteById(categoryID);
 
         return ResponseEntity.noContent().build();
     }
@@ -65,16 +65,16 @@ public class CategoryController {
     }
 
     @Operation(summary = "Update category name by id")
-    @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<CategoryResponse>> updateCategory(@PathVariable int id, @Valid @RequestBody CategoryRequest categoryRequestDTO) {
+    @PutMapping("/{categoryID}")
+    public ResponseEntity<EntityModel<CategoryResponse>> updateCategory(@PathVariable int categoryID, @Valid @RequestBody CategoryRequest categoryRequestDTO) {
         return ResponseEntity.ok(categoryModelAssembler
-                .toModel(categoryService.update(id, categoryRequestDTO)));
+                .toModel(categoryService.update(categoryID, categoryRequestDTO)));
     }
 
     @Operation(summary = "Patch category name by id")
-    @PatchMapping("/{id}")
-    public ResponseEntity<EntityModel<CategoryResponse>> patchCategory(@PathVariable int id,@Valid @RequestBody CategoryRequest categoryRequestDTO) {
+    @PatchMapping("/{categoryID}")
+    public ResponseEntity<EntityModel<CategoryResponse>> patchCategory(@PathVariable int categoryID,@Valid @RequestBody CategoryRequest categoryRequestDTO) {
         return ResponseEntity.ok().body(categoryModelAssembler
-                .toModel(categoryService.patch(id, categoryRequestDTO)));
+                .toModel(categoryService.patch(categoryID, categoryRequestDTO)));
     }
 }

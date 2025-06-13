@@ -8,12 +8,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
+import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.assembler.SaleModelAssembler;
 import org.stockify.model.service.SaleService;
 
@@ -58,4 +56,6 @@ public class TransactionSaleController {
                 .created(entityModel.getRequiredLink("self").toUri())
                 .body(entityModel);
     }
+
+
 }

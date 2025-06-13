@@ -12,7 +12,6 @@ import org.stockify.model.assembler.EmployeeModelAssembler;
 import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.service.EmployeeService;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.data.web.PagedResourcesAssembler;
 
@@ -35,7 +34,7 @@ public class EmployeeController {
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) String dni,
-            @PageableDefault(size = 10) Pageable pageable,
+            Pageable pageable,
             PagedResourcesAssembler<EmployeeResponse> pagedAssembler
     ) {
         Page<EmployeeResponse> employeePage = employeeService.getEmployees(id, name, lastName, dni, pageable);
@@ -44,9 +43,9 @@ public class EmployeeController {
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<EmployeeResponse>> getEmployeeById(@PathVariable Long id) {
-        EmployeeResponse employee = employeeService.getEmployeeById(id);
+    @GetMapping("/{employeeID}")
+    public ResponseEntity<EntityModel<EmployeeResponse>> getEmployeeById(@PathVariable Long employeeID) {
+        EmployeeResponse employee = employeeService.getEmployeeById(employeeID);
         return ResponseEntity.ok(employeeModelAssembler.toModel(employee));
     }
 
@@ -57,21 +56,21 @@ public class EmployeeController {
         return ResponseEntity.status(201).body(employeeService.createEmployee(employeeRequest));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<EmployeeResponse> deleteEmployee(@PathVariable Long id) {
-        employeeService.delete(id);
+    @DeleteMapping("/{employeeID}")
+    public ResponseEntity<EmployeeResponse> deleteEmployee(@PathVariable Long employeeID) {
+        employeeService.delete(employeeID);
         return ResponseEntity.status(200).body(null);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<EmployeeEntity> putEmployee(@PathVariable Long id, @RequestBody EmployeeRequest employeeRequest) {
-        EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, id);
+    @PutMapping("/{employeeID}")
+    public ResponseEntity<EmployeeEntity> putEmployee(@PathVariable Long employeeID, @RequestBody EmployeeRequest employeeRequest) {
+        EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, employeeID);
         return ResponseEntity.status(200).body(employeeEntity);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<EmployeeEntity> patchEmployee(@PathVariable Long id, @RequestBody EmployeeRequest employeeRequest) {
-        EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, id);
+    @PatchMapping("/{employeeID}")
+    public ResponseEntity<EmployeeEntity> patchEmployee(@PathVariable Long employeeID, @RequestBody EmployeeRequest employeeRequest) {
+        EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, employeeID);
         return ResponseEntity.status(200).body(employeeEntity);
     }
 }

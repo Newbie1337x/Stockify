@@ -52,38 +52,38 @@ public class ShiftController {
         return ResponseEntity.ok(assembler.toModel(shiftResponsePage, shiftModelAssembler));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<ShiftResponse>> getShiftById(@PathVariable Long id) {
-        ShiftResponse shiftResponse = shiftService.findById(id);
+    @GetMapping("/{shiftID}")
+    public ResponseEntity<EntityModel<ShiftResponse>> getShiftById(@PathVariable Long shiftID) {
+        ShiftResponse shiftResponse = shiftService.findById(shiftID);
 
         return ResponseEntity.ok(shiftModelAssembler.toModel(shiftResponse));
     }
 
-    @GetMapping("/{id}/employee")
-    public ResponseEntity<List<EmployeeResponse>> getEmployeesByShiftId(@PathVariable Long id) {
-        List<EmployeeResponse> employeeResponses = shiftService.findEmployeesByShiftId(id);
+    @GetMapping("/{shiftID}/employee")
+    public ResponseEntity<List<EmployeeResponse>> getEmployeesByShiftId(@PathVariable Long shiftID) {
+        List<EmployeeResponse> employeeResponses = shiftService.findEmployeesByShiftId(shiftID);
 
         return ResponseEntity.ok(employeeResponses);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteShiftById(@PathVariable Long id) {
-        shiftService.delete(id);
+    @DeleteMapping("/{shiftID}")
+    public ResponseEntity<Void> deleteShiftById(@PathVariable Long shiftID) {
+        shiftService.delete(shiftID);
 
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<ShiftResponse>> putShift(@PathVariable Long id, @Valid @RequestBody ShiftRequest shiftRequest) {
-        ShiftResponse updatedShift = shiftService.updateShiftFull(id, shiftRequest);
+    @PutMapping("/{shiftID}")
+    public ResponseEntity<EntityModel<ShiftResponse>> putShift(@PathVariable Long shiftID, @Valid @RequestBody ShiftRequest shiftRequest) {
+        ShiftResponse updatedShift = shiftService.updateShiftFull(shiftID, shiftRequest);
         EntityModel<ShiftResponse> entityModel = shiftModelAssembler.toModel(updatedShift);
 
         return ResponseEntity.ok(entityModel);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<EntityModel<ShiftResponse>> patchShift(@PathVariable Long id, @Valid @RequestBody ShiftRequest shiftRequest) {
-        ShiftResponse updatedShift = shiftService.updateShiftPartial(id, shiftRequest);
+    @PatchMapping("/{shiftID}")
+    public ResponseEntity<EntityModel<ShiftResponse>> patchShift(@PathVariable Long shiftID, @Valid @RequestBody ShiftRequest shiftRequest) {
+        ShiftResponse updatedShift = shiftService.updateShiftPartial(shiftID, shiftRequest);
         EntityModel<ShiftResponse> entityModel = shiftModelAssembler.toModel(updatedShift);
 
         return ResponseEntity.ok(entityModel);

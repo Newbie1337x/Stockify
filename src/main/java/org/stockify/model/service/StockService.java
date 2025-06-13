@@ -83,6 +83,12 @@ public class StockService {
                 productStoreMapper.toResponse(stockEntity.getProduct(), stockEntity.getQuantity()));
     }
 
+    public ProductStoreResponse getProductByStoreAndProductID(Long storeID, Long productID) {
+        StockEntity stock = stockRepository.findByProductIdAndStoreId(productID, storeID).orElseThrow(()->
+                new NotFoundException("Stock not found for product id: " + productID + " and store id: " + storeID));
+        return productStoreMapper.toResponse(stock.getProduct(), stock.getQuantity());
+    }
+
     public void removeStock(Long productId, Long storeId) {
         stockRepository.deleteByProductIdAndStoreId(productId, storeId);
     }

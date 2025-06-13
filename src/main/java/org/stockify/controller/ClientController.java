@@ -50,29 +50,29 @@ public class ClientController {
         return ResponseEntity.ok(pagedAssembler.toModel(clientResponsePage, clientModelAssembler));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<ClientResponse>> getClientById(@PathVariable Long id){
-        ClientResponse clientResponse = clientService.findById(id);
+    @GetMapping("/{clientID}")
+    public ResponseEntity<EntityModel<ClientResponse>> getClientById(@PathVariable Long clientID){
+        ClientResponse clientResponse = clientService.findById(clientID);
 
         return ResponseEntity.ok(clientModelAssembler.toModel(clientResponse));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteClientById(@PathVariable Long id){
-        clientService.delete(id);
+    @DeleteMapping("/{clientID}")
+    public ResponseEntity<Void> deleteClientById(@PathVariable Long clientID){
+        clientService.delete(clientID);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<EntityModel<ClientResponse>> patchClient(@PathVariable Long id,@RequestBody ClientRequest client) {
-        ClientResponse updatedClient = clientService.updateClientPartial(id, client);
+    @PatchMapping("/{clientID}")
+    public ResponseEntity<EntityModel<ClientResponse>> patchClient(@PathVariable Long clientID,@RequestBody ClientRequest client) {
+        ClientResponse updatedClient = clientService.updateClientPartial(clientID, client);
         EntityModel<ClientResponse> entityModel = clientModelAssembler.toModel(updatedClient);
         return ResponseEntity.ok(entityModel);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<ClientResponse>> putClient(@PathVariable Long id,@Valid @RequestBody ClientRequest client) {
-        ClientResponse updatedClient = clientService.updateClientFull(id, client);
+    @PutMapping("/{clientID}")
+    public ResponseEntity<EntityModel<ClientResponse>> putClient(@PathVariable Long clientID,@Valid @RequestBody ClientRequest client) {
+        ClientResponse updatedClient = clientService.updateClientFull(clientID, client);
         EntityModel<ClientResponse> entityModel = clientModelAssembler.toModel(updatedClient);
         return ResponseEntity.ok(entityModel);
     }

@@ -26,7 +26,6 @@ public class StoreStockController {
         this.stockModelAssembler = stockModelAssembler;
     }
 
- 
 
     @Operation(summary = "Add a stock for a specific product and store")
     @PostMapping("{productID}")
