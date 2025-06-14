@@ -56,6 +56,7 @@ public class TransactionEntity {
     private StoreEntity store;
 
     @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL,orphanRemoval = true)
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private Set<DetailTransactionEntity> detailTransactions;
 
     @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)

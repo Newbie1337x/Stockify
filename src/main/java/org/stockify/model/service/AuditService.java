@@ -1,16 +1,23 @@
 package org.stockify.model.service;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.dto.PurchaseAuditDTO;
 import org.stockify.model.dto.SaleAuditDTO;
 import org.stockify.model.dto.TransactionAuditDTO;
+import org.stockify.model.entity.DetailTransactionEntity;
 import org.stockify.model.entity.PurchaseEntity;
 import org.stockify.model.entity.SaleEntity;
 import org.stockify.model.entity.TransactionEntity;
+import org.stockify.model.mapper.TransactionMapper;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -19,7 +26,9 @@ public class AuditService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // Obtener todas las auditorías de compras
+    @Autowired
+    private TransactionMapper transactionMapper;
+
     public List<PurchaseAuditDTO> getAllPurchaseAudits() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
         List<PurchaseEntity> purchases = entityManager.createQuery("SELECT p FROM PurchaseEntity p", PurchaseEntity.class).getResultList();
@@ -30,20 +39,34 @@ public class AuditService {
             for (Number rev : revisions) {
                 PurchaseEntity auditedPurchase = auditReader.find(PurchaseEntity.class, purchase.getId(), rev);
                 String revisionTypeStr = rev.equals(revisions.getFirst()) ? "ADD" : "MOD";
+
+                TransactionEntity transaction = auditedPurchase.getTransaction();
+
+                // 🟡 Cargar detalles de la transacción manualmente si existe
+                if (transaction != null) {
+                    List<DetailTransactionEntity> details = entityManager.createQuery("""
+                    SELECT d FROM DetailTransactionEntity d
+                    WHERE d.transaction.id = :txId
+                """, DetailTransactionEntity.class)
+                            .setParameter("txId", transaction.getId())
+                            .getResultList();
+
+                    transaction.setDetailTransactions(new HashSet<>(details));
+                }
+
                 PurchaseAuditDTO auditDTO = PurchaseAuditDTO.builder()
                         .revision(rev.longValue())
                         .revisionType(revisionTypeStr)
                         .id(auditedPurchase.getId())
-                        .transactionId(auditedPurchase.getTransaction() != null ? auditedPurchase.getTransaction().getId() : null)
-                        .providerId(auditedPurchase.getProvider() != null ? auditedPurchase.getProvider().getId() : null)
+                        .transaction(transactionMapper.toDto(transaction))
                         .build();
+
                 auditList.add(auditDTO);
             }
         }
         return auditList;
     }
 
-    // Obtener todas las auditorías de ventas
     public List<SaleAuditDTO> getAllSaleAudits() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
         List<SaleEntity> sales = entityManager.createQuery("SELECT s FROM SaleEntity s", SaleEntity.class).getResultList();
@@ -54,20 +77,34 @@ public class AuditService {
             for (Number rev : revisions) {
                 SaleEntity auditedSale = auditReader.find(SaleEntity.class, sale.getId(), rev);
                 String revisionTypeStr = rev.equals(revisions.getFirst()) ? "ADD" : "MOD";
+
+                TransactionEntity transaction = auditedSale.getTransaction();
+
+                if (transaction != null) {
+                    List<DetailTransactionEntity> details = entityManager.createQuery("""
+                    SELECT d FROM DetailTransactionEntity d
+                    WHERE d.transaction.id = :txId
+                """, DetailTransactionEntity.class)
+                            .setParameter("txId", transaction.getId())
+                            .getResultList();
+
+                    transaction.setDetailTransactions(new HashSet<>(details));
+                }
+
                 SaleAuditDTO auditDTO = SaleAuditDTO.builder()
                         .revision(rev.longValue())
                         .revisionType(revisionTypeStr)
                         .id(auditedSale.getId())
-                        .transactionId(auditedSale.getTransaction() != null ? auditedSale.getTransaction().getId() : null)
+                        .transaction(transactionMapper.toDto(transaction))
                         .clientId(auditedSale.getClient() != null ? auditedSale.getClient().getId() : null)
                         .build();
+
                 auditList.add(auditDTO);
             }
         }
         return auditList;
     }
 
-    // Obtener todas las auditorías de transacciones
     public List<TransactionAuditDTO> getAllTransactionAudits() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
         List<TransactionEntity> transactions = entityManager.createQuery("SELECT t FROM TransactionEntity t", TransactionEntity.class).getResultList();
@@ -78,6 +115,7 @@ public class AuditService {
             for (Number rev : revisions) {
                 TransactionEntity auditedTransaction = auditReader.find(TransactionEntity.class, transaction.getId(), rev);
                 String revisionTypeStr = rev.equals(revisions.getFirst()) ? "ADD" : "MOD";
+
                 TransactionAuditDTO auditDTO = TransactionAuditDTO.builder()
                         .revision(rev.longValue())
                         .revisionType(revisionTypeStr)
@@ -90,6 +128,7 @@ public class AuditService {
                         .storeId(auditedTransaction.getStore() != null ? auditedTransaction.getStore().getId() : null)
                         .sessionPosId(auditedTransaction.getSessionPosEntity() != null ? auditedTransaction.getSessionPosEntity().getId() : null)
                         .build();
+
                 auditList.add(auditDTO);
             }
         }
