@@ -1,7 +1,10 @@
 package org.stockify.controller.provider;
 
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +22,10 @@ import org.stockify.model.assembler.ProviderModelAssembler;
 import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
 
-
 @RestController
 @RequestMapping("/providers/{providerID}/products")
 @RequiredArgsConstructor
+@Tag(name = "ProviderProduct", description = "Operations for managing product-provider relationships")
 public class ProviderProductController {
 
     private final ProductService productService;
@@ -30,11 +33,15 @@ public class ProviderProductController {
     private final ProviderModelAssembler providerModelAssembler;
     private final ProviderService providerService;
 
-
     @Operation(summary = "List products associated with a provider")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paged list of products retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Provider not found")
+    })
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
-            @PathVariable Long providerID,
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID,
+            @Parameter(hidden = true)
             @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
             PagedResourcesAssembler<ProductResponse> assembler
     ) {
@@ -43,22 +50,34 @@ public class ProviderProductController {
     }
 
     @Operation(summary = "Assign a specific product to a provider")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product assigned to provider successfully"),
+            @ApiResponse(responseCode = "404", description = "Product or Provider not found"),
+            @ApiResponse(responseCode = "409", description = "Product already assigned to provider")
+    })
     @PutMapping("/{productID}")
     public ResponseEntity<EntityModel<ProviderResponse>> assignProduct(
-            @PathVariable Long providerID,
-            @PathVariable Long productID
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID,
+            @Parameter(description = "ID of the product") @PathVariable Long productID
     ){
         return ResponseEntity.ok(providerModelAssembler
-                .toModel(providerService.assignProductToProvider(providerID,productID)));
+                .toModel(providerService.assignProductToProvider(providerID, productID)));
     }
 
     @Operation(summary = "Unassign a specific product from a provider")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product unassigned from provider successfully"),
+            @ApiResponse(responseCode = "404", description = "Product or Provider not found")
+    })
     @PatchMapping("/{productID}")
     public ResponseEntity<EntityModel<ProviderResponse>> unassignProducts(
-            @PathVariable Long providerID,
-            @PathVariable Long productID
-    )
-    {
-        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.unassignProductToProvider(providerID,productID)));
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID,
+            @Parameter(description = "ID of the product") @PathVariable Long productID
+    ){
+        return ResponseEntity.ok(
+                providerModelAssembler.toModel(
+                        providerService.unassignProductToProvider(providerID, productID)
+                )
+        );
     }
 }

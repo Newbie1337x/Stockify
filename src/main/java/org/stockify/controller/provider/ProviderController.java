@@ -1,9 +1,13 @@
 package org.stockify.controller.provider;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -19,63 +23,90 @@ import org.stockify.dto.response.BulkProviderResponse;
 import org.stockify.dto.response.ProviderResponse;
 import org.stockify.model.assembler.ProviderModelAssembler;
 import org.stockify.model.service.ProviderService;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/providers")
 @RequiredArgsConstructor
+@Tag(name = "Providers", description = "Operations related to managing providers")
 public class ProviderController {
 
     private final ProviderService providerService;
     private final ProviderModelAssembler providerModelAssembler;
 
-
-    //---Crud operations---
     @Operation(summary = "List all providers with optional filters")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paged list of providers returned successfully")
+    })
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
-            @Valid ProviderFilterRequest filters,
+            @ParameterObject @Valid ProviderFilterRequest filters,
+            @Parameter(hidden = true)
             @PageableDefault(sort = "name") Pageable pageable,
             PagedResourcesAssembler<ProviderResponse> assembler) {
 
         Page<ProviderResponse> providerPage = providerService.findAll(pageable, filters);
-        PagedModel<EntityModel<ProviderResponse>> pagedModel =
-                assembler.toModel(providerPage, providerModelAssembler);
-
-        return ResponseEntity.ok(pagedModel);
+        return ResponseEntity.ok(assembler.toModel(providerPage, providerModelAssembler));
     }
 
     @Operation(summary = "Get provider by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provider found"),
+            @ApiResponse(responseCode = "404", description = "Provider not found")
+    })
     @GetMapping("/{providerID}")
-    public ResponseEntity<EntityModel<ProviderResponse>> getProviderById(@PathVariable Long providerID) {
+    public ResponseEntity<EntityModel<ProviderResponse>> getProviderById(
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID) {
+
         ProviderResponse providerResponse = providerService.findById(providerID);
-        EntityModel<ProviderResponse> entityModel = providerModelAssembler.toModel(providerResponse);
-        return ResponseEntity.ok(entityModel);
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerResponse));
     }
 
     @Operation(summary = "Create a new provider")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provider created successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation failed")
+    })
     @PostMapping
-        public ResponseEntity<EntityModel<ProviderResponse>> createProvider(@Valid @RequestBody ProviderRequest request) {
+    public ResponseEntity<EntityModel<ProviderResponse>> createProvider(
+            @Valid @RequestBody ProviderRequest request) {
+
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.save(request)));
     }
 
     @Operation(summary = "Create multiple providers")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Bulk provider creation completed")
+    })
     @PostMapping("/bulk")
-    public ResponseEntity<BulkProviderResponse> bulkSaveProviders(@Valid @RequestBody List<@Valid ProviderRequest> providers) {
+    public ResponseEntity<BulkProviderResponse> bulkSaveProviders(
+            @Valid @RequestBody List<@Valid ProviderRequest> providers) {
+
         return ResponseEntity.status(HttpStatus.CREATED).body(providerService.saveAll(providers));
     }
 
     @Operation(summary = "Logically delete a provider")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provider logically deleted"),
+            @ApiResponse(responseCode = "404", description = "Provider not found")
+    })
     @PatchMapping("/{providerID}/disable")
-    public ResponseEntity<EntityModel<ProviderResponse>> logicalDeleteProvider(@PathVariable Long providerID) {
+    public ResponseEntity<EntityModel<ProviderResponse>> logicalDeleteProvider(
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID) {
+
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(providerID)));
     }
 
     @Operation(summary = "Delete a provider from the system")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provider deleted permanently"),
+            @ApiResponse(responseCode = "404", description = "Provider not found")
+    })
     @DeleteMapping("/{providerID}")
-    public ResponseEntity<EntityModel<ProviderResponse>> deleteProvider(@PathVariable Long providerID) {
+    public ResponseEntity<EntityModel<ProviderResponse>> deleteProvider(
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID) {
+
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(providerID)));
     }
-
-
 }

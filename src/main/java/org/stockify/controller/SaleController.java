@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -47,7 +48,7 @@ public class SaleController {
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<SaleResponse>>> getAll(
             @Parameter(description = "Filter request object")
-            @ModelAttribute SaleFilterRequest filterRequest,
+            @ParameterObject SaleFilterRequest filterRequest,
 
             @Parameter(description = "Page number (0..N)", example = "0")
             @RequestParam(required = false, defaultValue = "0") int page,

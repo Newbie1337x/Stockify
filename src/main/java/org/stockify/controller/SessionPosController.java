@@ -40,6 +40,7 @@ public class SessionPosController {
 //    @Operation(summary = "Obtener todas las sesiones de POS")
 //    @GetMapping
 //    public ResponseEntity<PagedModel<EntityModel<SessionPosResponse>>> getAllSessions(
+
 //            @PageableDefault(size = 10) Pageable pageable,
 //            PagedResourcesAssembler<SessionPosResponse> assembler) {
 //        Page<SessionPosResponse> sessionResponses = sessionPosService.findAll(pageable);

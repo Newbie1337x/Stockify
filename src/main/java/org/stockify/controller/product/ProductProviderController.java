@@ -1,7 +1,10 @@
 package org.stockify.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +25,7 @@ import org.stockify.model.service.ProviderService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/products/{productID}/providers")
+@Tag(name = "ProductProvider", description = "Operations for managing product-provider relationships")
 public class ProductProviderController {
 
     private final ProductModelAssembler productModelAssembler;
@@ -29,39 +33,50 @@ public class ProductProviderController {
     private final ProviderService providerService;
     private final ProviderModelAssembler providerModelAssembler;
 
-
     @Operation(summary = "Assign a provider to a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provider assigned successfully"),
+            @ApiResponse(responseCode = "404", description = "Product or Provider not found"),
+            @ApiResponse(responseCode = "409", description = "Provider already assigned to product")
+    })
     @PutMapping("{providerID}")
     public ResponseEntity<EntityModel<ProductResponse>> assignProvider(
-            @PathVariable Long providerID,
-            @PathVariable Long productID
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID,
+            @Parameter(description = "ID of the product") @PathVariable Long productID
     ){
         return ResponseEntity.ok(productModelAssembler
                 .toModel(productService
-                        .assignProviderToProduct(productID,providerID)));
+                        .assignProviderToProduct(productID, providerID)));
     }
 
-
     @Operation(summary = "Unassign a provider from a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provider unassigned successfully"),
+            @ApiResponse(responseCode = "404", description = "Product or Provider not found")
+    })
     @DeleteMapping("{providerID}")
     public ResponseEntity<EntityModel<ProductResponse>> unassignProvider(
-            @PathVariable Long productID,
-            @PathVariable Long providerID
+            @Parameter(description = "ID of the product") @PathVariable Long productID,
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID
     ){
         return ResponseEntity.ok(productModelAssembler
                 .toModel(productService
-                        .unassignProviderFromProduct(productID,providerID)));
+                        .unassignProviderFromProduct(productID, providerID)));
     }
 
     @Operation(summary = "List all providers associated with a specific product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paged list of providers returned successfully"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
-            @PathVariable Long productID,
+            @Parameter(description = "ID of the product") @PathVariable Long productID,
+            @Parameter(hidden = true)
             @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable,
             PagedResourcesAssembler<ProviderResponse> assembler
     ){
         Page<ProviderResponse> providersPage = providerService.findAllProvidersByProductID(productID, pageable);
-        PagedModel<EntityModel<ProviderResponse>> pagedModel = assembler.toModel(providersPage, providerModelAssembler);
-        return ResponseEntity.ok(pagedModel);
+        return ResponseEntity.ok(assembler.toModel(providersPage, providerModelAssembler));
     }
 }

@@ -1,7 +1,10 @@
 package org.stockify.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,43 +23,74 @@ import org.stockify.model.service.ProductService;
 @RestController
 @RequestMapping("/products/{productId}/categories")
 @RequiredArgsConstructor
+@Tag(name = "ProductCategory", description = "Operations related to product-category relationships")
 public class ProductCategoryController {
 
     private final ProductService productService;
     private final CategoryModelAssembler categoryModelAssembler;
     private final ProductModelAssembler productModelAssembler;
 
-
     @Operation(summary = "Remove a category from a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Category removed from product successfully"),
+            @ApiResponse(responseCode = "404", description = "Product or Category not found")
+    })
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<EntityModel<ProductResponse>> removeCategoryFromProduct(
-            @PathVariable Long productId,
-            @PathVariable int categoryId) {
-        return ResponseEntity.ok(productModelAssembler.toModel(productService.deleteCategoryFromProduct(categoryId, productId)));
+            @Parameter(description = "ID of the product") @PathVariable Long productId,
+            @Parameter(description = "ID of the category") @PathVariable int categoryId) {
+
+        return ResponseEntity.ok(
+                productModelAssembler.toModel(
+                        productService.deleteCategoryFromProduct(categoryId, productId)
+                )
+        );
     }
 
     @Operation(summary = "Add a category to a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Category added to product successfully"),
+            @ApiResponse(responseCode = "404", description = "Product or Category not found")
+    })
     @PutMapping("/{categoryId}")
     public ResponseEntity<EntityModel<ProductResponse>> addCategoryToProduct(
-            @PathVariable Long productId,
-            @PathVariable int categoryId
-    ){
-        return ResponseEntity.ok(productModelAssembler.toModel(productService.addCategoryToProduct(categoryId, productId)));
+            @Parameter(description = "ID of the product") @PathVariable Long productId,
+            @Parameter(description = "ID of the category") @PathVariable int categoryId) {
+
+        return ResponseEntity.ok(
+                productModelAssembler.toModel(
+                        productService.addCategoryToProduct(categoryId, productId)
+                )
+        );
     }
 
-    @Operation(summary = "Remove all categories from all products")
+    @Operation(summary = "Remove all categories from a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All categories removed from product successfully"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     @DeleteMapping
     public ResponseEntity<EntityModel<ProductResponse>> removeAllCategoriesFromProduct(
-            @PathVariable Long productId) {
-        return ResponseEntity.ok(productModelAssembler.toModel(productService.deleteAllCategoryFromProduct(productId)));
+            @Parameter(description = "ID of the product") @PathVariable Long productId) {
+
+        return ResponseEntity.ok(
+                productModelAssembler.toModel(
+                        productService.deleteAllCategoryFromProduct(productId)
+                )
+        );
     }
 
     @Operation(summary = "Get all categories from a specific product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paged list of categories retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<CategoryResponse>>> getCategoriesFromProduct(
-            @PathVariable Long productId,
-            @PageableDefault(sort = "name") Pageable pageable,
+            @Parameter(description = "ID of the product") @PathVariable Long productId,
+            @Parameter(hidden = true) @PageableDefault(sort = "name") Pageable pageable,
             PagedResourcesAssembler<CategoryResponse> assembler) {
+
         Page<CategoryResponse> categoryPage = productService.findCategoriesByProductId(productId, pageable);
         return ResponseEntity.ok(assembler.toModel(categoryPage, categoryModelAssembler));
     }
