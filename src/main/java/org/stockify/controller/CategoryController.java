@@ -32,15 +32,17 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<CategoryResponse>>> listCategories(
             Pageable pageable,
+            @RequestParam(required = false) String name,
             PagedResourcesAssembler<CategoryResponse> assembler
     ) {
-        Page<CategoryResponse> page = categoryService.findAll(pageable);
+        Page<CategoryResponse> page = categoryService.findAll(pageable, name);
         if (page.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         PagedModel<EntityModel<CategoryResponse>> pagedModel = assembler.toModel(page, categoryModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
+
 
     @Operation(summary = "Get a category by id")
     @GetMapping("/{categoryID}")

@@ -2,13 +2,16 @@ package org.stockify.controller.store;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stockify.dto.request.ProductFilterRequest;
 import org.stockify.dto.request.stock.StockRequest;
 import org.stockify.dto.request.stock.StockTransferRequest;
+import org.stockify.dto.response.ProductStoreResponse;
 import org.stockify.dto.response.StockResponse;
 import org.stockify.model.assembler.StockModelAssembler;
 import org.stockify.model.service.StockService;
@@ -63,7 +66,7 @@ public class StoreStockController {
             @PathVariable Long productID
     ) {
         stockService.removeStock(productID, storeID);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Transfer quantity to other store")

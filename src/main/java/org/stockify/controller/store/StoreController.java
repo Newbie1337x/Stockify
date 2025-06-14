@@ -1,6 +1,7 @@
 package org.stockify.controller.store;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.mail.Store;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +68,11 @@ public class StoreController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Patch store by ID")
+    @PatchMapping("/{storeID}")
+    public ResponseEntity<EntityModel<StoreResponse>> patchStore(@PathVariable Long storeID, @RequestBody StoreRequest request){
+        StoreResponse store = storeService.patch(storeID,request);
+        return ResponseEntity.ok(storeModelAssembler.toModel(store));
+    }
 
 }

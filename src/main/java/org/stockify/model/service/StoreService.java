@@ -42,6 +42,12 @@ public class StoreService {
         return storeMapper.toResponse(store);
     }
 
+    public StoreResponse patch(Long id, StoreRequest request) {
+        StoreEntity store = getStoreById(id);
+        storeMapper.patchEntityFromRequest(request, store);
+    return storeMapper.toResponse(storeRepository.save(store));
+    }
+
     public void deleteById(Long id) {
         storeRepository.deleteById(id);
     }
