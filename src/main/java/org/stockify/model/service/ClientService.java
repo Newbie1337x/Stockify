@@ -1,5 +1,6 @@
 package org.stockify.model.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,15 +16,11 @@ import org.stockify.model.repository.ClientRepository;
 import org.stockify.model.specification.ClientSpecification;
 
 @Service
+@RequiredArgsConstructor
+
 public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
-
-    @Autowired
-    public ClientService(ClientRepository clientRepository, ClientMapper clientMapper) {
-        this.clientRepository = clientRepository;
-        this.clientMapper = clientMapper;
-    }
 
     public ClientResponse findById(Long id) {
         ClientEntity clientEntity = clientRepository.findById(id)

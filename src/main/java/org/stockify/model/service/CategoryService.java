@@ -1,4 +1,5 @@
 package org.stockify.model.service;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -12,15 +13,12 @@ import org.stockify.model.mapper.CategoryMapper;
 import org.stockify.model.repository.CategoryRepository;
 
 @Service
+@RequiredArgsConstructor
+
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final Logger logger = LoggerFactory.getLogger(CategoryService.class);
-
-    public CategoryService(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
-        this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
-    }
 
     public Page<CategoryResponse> findAll(Pageable pageable) {
         Page<CategoryEntity> page = categoryRepository.findAll(pageable);

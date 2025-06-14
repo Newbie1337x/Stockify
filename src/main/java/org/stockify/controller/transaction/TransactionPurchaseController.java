@@ -1,7 +1,6 @@
 package org.stockify.controller.transaction;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

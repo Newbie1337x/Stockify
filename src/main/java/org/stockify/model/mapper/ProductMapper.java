@@ -18,6 +18,7 @@ public interface ProductMapper {
     @Mapping(source = "stocks", target = "stocks")
     ProductResponse toResponse(ProductEntity entity);
 
+    @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -35,6 +36,7 @@ public interface ProductMapper {
     /**
      * Lógica interna del update (excepto categorías)
      */
+    @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -45,6 +47,7 @@ public interface ProductMapper {
     /**
      * PATCH: ignora campos nulos, actualiza los que vienen con datos
      */
+    @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

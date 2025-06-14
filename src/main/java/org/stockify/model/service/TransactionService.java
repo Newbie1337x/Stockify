@@ -1,6 +1,7 @@
 package org.stockify.model.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,20 +37,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
+
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
     private final StoreRepository storeRepository;
     private final SessionPosService sessionPosService;
     private final ProductRepository productRepository;
-
-    public TransactionService(TransactionRepository transactionRepository, TransactionMapper transactionMapper, DetailTransactionMapper detailTransactionMapper, StoreRepository storeRepository, PosRepository posRepository, SessionPosService sessionPosService, ProductRepository productRepository) {
-        this.transactionRepository = transactionRepository;
-        this.transactionMapper = transactionMapper;
-        this.storeRepository = storeRepository;
-        this.sessionPosService = sessionPosService;
-        this.productRepository = productRepository;
-    }
 
     public TransactionResponse saveTransaction(TransactionRequest request) {
         return transactionMapper
@@ -84,7 +79,7 @@ public class TransactionService {
         TransactionEntity transactionEntity = transactionMapper.toEntity(request);
         transactionEntity.setDetailTransactions(detailTransactions);
 
-        // 🔥 FIX: asignar la transacción a cada detalle
+        //FIX: asignar la transacción a cada detalle
         detailTransactions.forEach(detail -> detail.setTransaction(transactionEntity));
 
         // Setear la sesión del POS

@@ -1,6 +1,7 @@
 package org.stockify.model.service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,7 +26,8 @@ import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.specification.StockSpecifications;
 
 import java.util.List;
-@AllArgsConstructor
+@RequiredArgsConstructor
+
 @Service
 public class StockService {
     private final StockRepository stockRepository;

@@ -1,6 +1,7 @@
 package org.stockify.model.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+
 public class PosService {
 
     private final PosRepository posRepository;
@@ -39,15 +42,6 @@ public class PosService {
     private final SessionPosMapper sessionPosMapper;
     private final StoreRepository storeRepository;
 
-    public PosService(PosRepository posRepository, PosMapper posMapper, SessionPosService sessionPosService, 
-                   EmployeeService employeeService, SessionPosMapper sessionPosMapper, StoreRepository storeRepository) {
-        this.posRepository = posRepository;
-        this.posMapper = posMapper;
-        this.sessionPosService = sessionPosService;
-        this.employeeService = employeeService;
-        this.sessionPosMapper = sessionPosMapper;
-        this.storeRepository = storeRepository;
-    }
 
     public PosResponse save(Long idLocal) {
         PosEntity posEntity = PosEntity.builder()

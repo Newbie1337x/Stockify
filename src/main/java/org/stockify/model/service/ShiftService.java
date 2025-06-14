@@ -1,5 +1,6 @@
 package org.stockify.model.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,6 +19,7 @@ import org.stockify.model.repository.ShiftRepository;
 import org.stockify.model.specification.ShiftSpecification;
 import java.util.List;
 import java.util.stream.Collectors;
+@RequiredArgsConstructor
 
 @Service
 public class ShiftService {
@@ -25,13 +27,6 @@ public class ShiftService {
     private final ShiftMapper shiftMapper;
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper employeeMapper;
-
-    public ShiftService(ShiftRepository shiftRepository, ShiftMapper shiftMapper, EmployeeRepository employeeRepository, EmployeeMapper employeeMapper) {
-        this.shiftRepository = shiftRepository;
-        this.shiftMapper = shiftMapper;
-        this.employeeRepository = employeeRepository;
-        this.employeeMapper = employeeMapper;
-    }
 
     public ShiftResponse save(ShiftRequest shiftRequest) {
         ShiftEntity shiftEntity = shiftMapper.toEntity(shiftRequest);

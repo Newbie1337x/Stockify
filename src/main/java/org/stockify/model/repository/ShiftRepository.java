@@ -11,8 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface ShiftRepository extends JpaRepository<ShiftEntity, Long>, JpaSpecificationExecutor<ShiftEntity> {
-    ShiftEntity findByDay(LocalDate day);
     Page<ShiftEntity> findAll(Pageable pageable);
-    Page<ShiftEntity> findByDay(LocalDate day, Pageable pageable);
     Optional<ShiftEntity> findById(Long id);
 }

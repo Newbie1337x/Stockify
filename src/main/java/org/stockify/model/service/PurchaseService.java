@@ -1,5 +1,6 @@
 package org.stockify.model.service;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,6 +19,8 @@ import org.stockify.model.repository.TransactionRepository;
 import org.stockify.model.specification.PurchaseSpecification;
 
 @Service
+@RequiredArgsConstructor
+
 public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
@@ -27,15 +30,6 @@ public class PurchaseService {
     private final TransactionRepository transactionRepository;
     private final ProviderRepository providerRepository;
 
-    public PurchaseService(PurchaseRepository purchaseRepository, PurchaseMapper purchaseMapper, StockService stockService, TransactionService transactionService, TransactionRepository transactionRepository, ProviderRepository providerRepository) {
-        this.purchaseRepository = purchaseRepository;
-        this.purchaseMapper = purchaseMapper;
-        this.stockService = stockService;
-        this.transactionService = transactionService;
-        this.transactionRepository = transactionRepository;
-        this.providerRepository = providerRepository;
-
-    }
 
     //-- CRUD operations --
 

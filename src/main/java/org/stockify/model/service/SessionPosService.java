@@ -1,5 +1,6 @@
 package org.stockify.model.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,15 +20,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+
 public class SessionPosService {
 
     private final SessionPosRepository repository;
     private final SessionPosMapper sessionPosMapper;
 
-    public SessionPosService(SessionPosRepository repository, SessionPosMapper sessionPosMapper) {
-        this.repository = repository;
-        this.sessionPosMapper = sessionPosMapper;
-    }
 
     /**
      * Guarda una nueva sesión POS en la base de datos a partir de un objeto de solicitud (DTO).

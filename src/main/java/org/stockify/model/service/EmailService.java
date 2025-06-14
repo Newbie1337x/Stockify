@@ -1,6 +1,7 @@
 package org.stockify.model.service;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,8 @@ import org.stockify.config.GlobalPreferencesConfig;
 import org.stockify.model.entity.StockEntity;
 import org.stockify.model.entity.TransactionEntity;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
+
 @Service
 public class EmailService {
     private final JavaMailSender mailSender;

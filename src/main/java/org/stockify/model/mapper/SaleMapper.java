@@ -17,8 +17,12 @@ public interface SaleMapper {
     @Mapping(target = "transaction", source = "transaction", qualifiedByName = "toTransactionResponse")
     SaleResponse toResponseDTO (SaleEntity entity);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "client", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void partialUpdateSaleEntity(SaleRequest saleRequest, @MappingTarget SaleEntity saleEntity);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "client", ignore = true)
     void updateShiftEntity(SaleRequest saleRequest, @MappingTarget SaleEntity saleEntity);
 }

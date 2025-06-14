@@ -1,5 +1,6 @@
 package org.stockify.model.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,14 +12,12 @@ import org.stockify.model.mapper.StoreMapper;
 import org.stockify.model.repository.StoreRepository;
 
 @Service
+@RequiredArgsConstructor
+
 public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreMapper storeMapper;
 
-    public StoreService(StoreRepository storeRepository, StoreMapper storeMapper) {
-        this.storeRepository = storeRepository;
-        this.storeMapper = storeMapper;
-    }
 
     public Page<StoreResponse> findAll(Pageable pageable) {
         Page<StoreEntity> stores = storeRepository.findAll(pageable);

@@ -1,5 +1,6 @@
 package org.stockify.model.service;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -34,6 +35,8 @@ import java.util.List;
 
 
 @Service
+@RequiredArgsConstructor
+
 public class ProductService {
     private final ProductMapper productMapper;
     private final ProductRepository productRepository;
@@ -41,14 +44,6 @@ public class ProductService {
     private final Logger logger = LoggerFactory.getLogger(ProductService.class);
     private final CategoryMapper categoryMapper;
     private final ProviderRepository providerRepository;
-
-    public ProductService(ProductMapper productMapper, ProductRepository productRepository, CategoryRepository categoryRepository, CategoryMapper categoryMapper, ProviderRepository providerRepository) {
-        this.productMapper = productMapper;
-        this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
-        this.providerRepository = providerRepository;
-    }
 
     public ProductResponse findById(Long id) {
         return productMapper.toResponse(getProductById(id));

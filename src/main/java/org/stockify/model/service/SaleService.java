@@ -1,6 +1,7 @@
 package org.stockify.model.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,6 +23,8 @@ import org.stockify.model.repository.TransactionRepository;
 import org.stockify.model.specification.SaleSpecification;
 
 @Service
+@RequiredArgsConstructor
+
 public class SaleService {
 
     private final StockService stockService;
@@ -32,15 +35,6 @@ public class SaleService {
     private final SaleRepository saleRepository;
     private final TransactionMapper transactionMapper;
 
-    public SaleService(StockService stockService, TransactionService transactionService, SaleMapper saleMapper, TransactionRepository transactionRepository, ClientRepository clientRepository, SaleRepository saleRepository, ShiftMapper shiftMapper, TransactionMapper transactionMapper) {
-        this.stockService = stockService;
-        this.transactionService = transactionService;
-        this.saleMapper = saleMapper;
-        this.transactionRepository = transactionRepository;
-        this.clientRepository = clientRepository;
-        this.saleRepository = saleRepository;
-        this.transactionMapper = transactionMapper;
-    }
 
     @Transactional
     public SaleResponse createSale(SaleRequest request, long storeID, long posID){

@@ -1,4 +1,5 @@
 package org.stockify.model.service;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,17 +20,13 @@ import java.util.List;
 
 
 @Service
+@RequiredArgsConstructor
+
 public class ProviderService {
 
     private final ProviderRepository providerRepository;
     private final ProductRepository productRepository;
     private final ProviderMapper providerMapper;
-
-    public ProviderService(ProviderRepository providerRepository, ProductRepository productRepository, ProviderMapper providerMapper) {
-        this.providerRepository = providerRepository;
-        this.productRepository = productRepository;
-        this.providerMapper = providerMapper;
-    }
 
     //---Crud operations---
 

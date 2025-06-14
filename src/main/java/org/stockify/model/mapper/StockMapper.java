@@ -10,6 +10,7 @@ import org.stockify.model.entity.StoreEntity;
 @Mapper(componentModel = "spring")
 public interface StockMapper {
 
+    @Mapping(target = "lowStockAlertSent", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "product", source = "product")
     @Mapping(target = "store", source = "store")

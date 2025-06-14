@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface ProductStoreMapper {
 
+    @Mapping(target = "unitPrice", ignore = true)
+    @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -25,12 +27,16 @@ public interface ProductStoreMapper {
     @Mapping(target = "stock", source = "stock")
     ProductStoreResponse toResponse(ProductEntity entity, Double stock);
 
+    @Mapping(target = "stocks", ignore = true)
+    @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromRequest(ProductRequest dto, @MappingTarget ProductEntity entity);
 
+    @Mapping(target = "stocks", ignore = true)
+    @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)

@@ -17,6 +17,11 @@ public interface PosMapper {
      * @param PosOpenRequest el DTO que se desea mapear.
      * @return la entidad resultante de tipo {@link PosEntity}.
      */
+    @Mapping(target = "store", ignore = true)
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "sessionPosEntities", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "employee", ignore = true)
     PosEntity toEntity(PosOpenRequest PosOpenRequest);
 
 
@@ -30,7 +35,7 @@ public interface PosMapper {
     PosResponse toDto(PosEntity posEntity);
 
 
-    //Que hace bean mapping?
+    @Mapping(target = "idStore", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     PosResponse partialUpdate(PosEntity posEntity, @MappingTarget PosResponse posResponse);
 }

@@ -1,5 +1,6 @@
 package org.stockify.model.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,20 +15,13 @@ import org.stockify.model.specification.TimeLogSpecifications;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+@RequiredArgsConstructor
 
 @Service
 public class TimeLogService {
 
     private final TimeLogRepository timeLogRepository;
     private final TimeLogMapper timeLogMapper;
-
-    @Autowired
-    public TimeLogService(TimeLogRepository timeLogRepository, TimeLogMapper timeLogMapper) {
-        this.timeLogRepository = timeLogRepository;
-        this.timeLogMapper = timeLogMapper;
-    }
 
     public TimeLogEntity createTimeLog(TimeLogRequest timeLogRequest) {
         System.out.println("---------------------------------------------------");

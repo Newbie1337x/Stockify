@@ -19,7 +19,6 @@ import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.assembler.SaleModelAssembler;
-import org.stockify.model.service.EmailService;
 import org.stockify.model.service.SaleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
