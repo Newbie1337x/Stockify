@@ -11,11 +11,11 @@ import lombok.*;
 @Setter
 public class ClientRequest {
     @NotBlank
-    @Size(min = 5, message = "")
+    @Size(max = 20, message = "Max length for first name is 20 characters")
     private String firstName;
 
     @NotBlank
-    @Size(min = 5, message = "")
+    @Size(max = 20, message = "Max length for last name is 20 characters")
     private String lastName;
 
     @NotBlank
@@ -23,10 +23,10 @@ public class ClientRequest {
     private String dni;
 
     @NotBlank
-    @Email(message = "el formato de mail no es valido", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
+    @Email(message = "Email format not valid", regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
     private String email;
 
     @NotBlank
-    @Size(min = 5, message = "")
+    @Size (message = "Phone number must be between 7 and 20 characters", min = 7, max = 20)
     private String phone;
 }
