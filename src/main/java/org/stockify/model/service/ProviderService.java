@@ -30,12 +30,24 @@ public class ProviderService {
 
     //---Crud operations---
 
+    /**
+     * Guarda un nuevo proveedor en el sistema.
+     * 
+     * @param providerRequest DTO con los datos del proveedor a crear
+     * @return DTO con los datos del proveedor creado
+     */
     public ProviderResponse save(ProviderRequest providerRequest) {
         return providerMapper
                 .toResponseDTO(providerRepository.save
                         (providerMapper.toEntity(providerRequest)));
     }
 
+    /**
+     * Guarda múltiples proveedores en el sistema en una sola operación.
+     * 
+     * @param providers Lista de DTOs con los datos de los proveedores a crear
+     * @return Respuesta con los proveedores creados y posibles errores
+     */
     public BulkProviderResponse saveAll(List<ProviderRequest> providers) {
         List<String> errors = new java.util.ArrayList<>();
         List<ProviderResponse> responses = new java.util.ArrayList<>();
@@ -58,6 +70,13 @@ public class ProviderService {
         return new BulkProviderResponse(responses, errors);
     }
 
+    /**
+     * Busca proveedores aplicando filtros y paginación.
+     * 
+     * @param pageable Información de paginación
+     * @param filterRequest DTO con los filtros a aplicar (nombre, razón social, identificación fiscal, etc.)
+     * @return Página de proveedores que cumplen con los filtros
+     */
     public Page<ProviderResponse> findAll(Pageable pageable, ProviderFilterRequest filterRequest) {
         Specification<ProviderEntity> specification = Specification
                 .where(ProviderSpecification.byName(filterRequest.getName()))
@@ -73,11 +92,25 @@ public class ProviderService {
                 .map(providerMapper::toResponseDTO);
     }
 
+    /**
+     * Busca un proveedor por su ID.
+     * 
+     * @param id ID del proveedor a buscar
+     * @return DTO con los datos del proveedor encontrado
+     * @throws NotFoundException si no se encuentra ningún proveedor con el ID especificado
+     */
     public ProviderResponse findById(long id) {
         ProviderEntity provider = getProviderById(id);
         return providerMapper.toResponseDTO(provider);
     }
 
+    /**
+     * Elimina logicamente un proveedor (lo marca como inactivo).
+     * 
+     * @param id ID del proveedor a eliminar lógicamente
+     * @return DTO con los datos del proveedor actualizado
+     * @throws NotFoundException si no se encuentra ningún proveedor con el ID especificado
+     */
     public ProviderResponse logicalDelete(Long id) {
         ProviderEntity provider = getProviderById(id);
         provider.setActive(false);
@@ -92,12 +125,27 @@ public class ProviderService {
 */
     //Product Logic
 
+    /**
+     * Busca proveedores asociados a un producto con paginación.
+     * 
+     * @param productID ID del producto del que se buscarán los proveedores
+     * @param pageable Información de paginación
+     * @return Página de proveedores asociados al producto
+     */
     public Page<ProviderResponse> findAllProvidersByProductID(Long productID, Pageable pageable) {
         return providerRepository
                 .findAllByProductList_Id(pageable, productID)
                 .map(providerMapper::toResponseDTO);
     }
 
+    /**
+     * Asigna un producto a un proveedor.
+     * 
+     * @param providerID ID del proveedor al que se asignará el producto
+     * @param productID ID del producto a asignar al proveedor
+     * @return DTO con los datos del proveedor actualizado
+     * @throws NotFoundException si no se encuentra el proveedor o el producto con los IDs especificados
+     */
     public ProviderResponse assignProductToProvider(Long providerID, Long productID){
         ProviderEntity provider = getProviderById(providerID);
         ProductEntity product = getProductById(productID);
@@ -110,6 +158,14 @@ public class ProviderService {
         return providerMapper.toResponseDTO(provider);
     }
 
+    /**
+     * Desasigna un producto de un proveedor.
+     * 
+     * @param providerID ID del proveedor del que se desasignará el producto
+     * @param productID ID del producto a desasignar del proveedor
+     * @return DTO con los datos del proveedor actualizado
+     * @throws NotFoundException si no se encuentra el proveedor o el producto con los IDs especificados
+     */
     public ProviderResponse unassignProductToProvider(Long providerID, Long productID){
         ProviderEntity provider = getProviderById(providerID);
         ProductEntity product = getProductById(productID);
@@ -123,11 +179,25 @@ public class ProviderService {
     }
 
     //Auxiliar
+    /**
+     * Metodo auxiliar para buscar una entidad de producto por su ID.
+     * 
+     * @param id ID del producto a buscar
+     * @return La entidad del producto encontrado
+     * @throws NotFoundException si no se encuentra ningún producto con el ID especificado
+     */
     private ProductEntity getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product with ID " + id + " not found"));
     }
 
+    /**
+     * Mtodo auxiliar para buscar una entidad de proveedor por su ID.
+     * 
+     * @param id ID del proveedor a buscar
+     * @return La entidad del proveedor encontrado
+     * @throws NotFoundException si no se encuentra ningún proveedor con el ID especificado
+     */
     private ProviderEntity getProviderById(Long id) {
         return providerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));

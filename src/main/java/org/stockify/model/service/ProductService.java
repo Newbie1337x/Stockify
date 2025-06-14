@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.stockify.dto.request.ProductFilterRequest;
@@ -45,10 +44,24 @@ public class ProductService {
     private final CategoryMapper categoryMapper;
     private final ProviderRepository providerRepository;
 
+    /**
+     * Busca un producto por su ID.
+     * 
+     * @param id ID del producto a buscar
+     * @return DTO con los datos del producto encontrado
+     * @throws NotFoundException si no se encuentra ningún producto con el ID especificado
+     */
     public ProductResponse findById(Long id) {
         return productMapper.toResponse(getProductById(id));
     }
 
+    /**
+     * Busca productos aplicando filtros y paginación.
+     * 
+     * @param pageable Información de paginación
+     * @param filterRequest DTO con los filtros a aplicar (precio, nombre, descripción, etc.)
+     * @return Página de productos que cumplen con los filtros
+     */
     public Page<ProductResponse> findAll(Pageable pageable, ProductFilterRequest filterRequest) {
         Specification<ProductEntity> spec = new SpecificationBuilder<ProductEntity>()
                 .add(filterRequest.getPrice() != null ? ProductSpecifications.byPrice(filterRequest.getPrice()) : null)
@@ -89,6 +102,14 @@ public class ProductService {
 
 
 
+    /**
+     * Guarda un nuevo producto en el sistema.
+     * Si se especifican categorías que no existen, se crean automáticamente.
+     * 
+     * @param request DTO con los datos del producto a crear
+     * @return DTO con los datos del producto creado
+     * @throws DuplicatedUniqueConstraintException si ya existe un producto con el mismo código de barras o SKU
+     */
     public ProductResponse save(ProductRequest request) throws DuplicatedUniqueConstraintException {
         ProductEntity product = productMapper.toEntity(request);
 
@@ -107,6 +128,12 @@ public class ProductService {
         return productMapper.toResponse(product);
     }
 
+    /**
+     * Guarda múltiples productos en el sistema en una sola operación.
+     * 
+     * @param requests Lista de DTOs con los datos de los productos a crear
+     * @return Respuesta con estadísticas de la operación (creados, omitidos, errores) y detalles de cada elemento
+     */
     public BulkProductResponse saveAll(List<ProductRequest> requests) {
         List<BulkItemResponse> results = new ArrayList<>();
         int created = 0, skipped = 0, error = 0;
@@ -121,7 +148,7 @@ public class ProductService {
                 results.add(new BulkItemResponse(
                         req.name(),
                         "SKIPPED",
-                        "Duplicado, se saltó este ítem"
+                        "Duplicated, ítem skipped"
                 ));
             } catch (DuplicatedUniqueConstraintException ex) {
                 skipped++;
@@ -150,16 +177,37 @@ public class ProductService {
         return new BulkProductResponse(requests.size(),created,skipped,error,results);
     }
 
+    /**
+     * Elimina un producto por su ID.
+     * 
+     * @param id ID del producto a eliminar
+     */
     public void deleteById(Long id) {
         productRepository.deleteById(id);
     }
 
+    /**
+     * Actualiza completamente un producto existente.
+     * 
+     * @param id ID del producto a actualizar
+     * @param request DTO con los nuevos datos del producto
+     * @return DTO con los datos del producto actualizado
+     * @throws NotFoundException si no se encuentra ningún producto con el ID especificado
+     */
     public ProductResponse update(Long id, ProductRequest request) {
         ProductEntity product = getProductById(id);
         productMapper.updateEntityFromRequest(request, product);
         return productMapper.toResponse(productRepository.save(product));
     }
 
+    /**
+     * Actualiza parcialmente un producto existente.
+     * 
+     * @param id ID del producto a actualizar parcialmente
+     * @param request DTO con los datos a actualizar del producto
+     * @return DTO con los datos del producto actualizado
+     * @throws NotFoundException si no se encuentra ningún producto con el ID especificado
+     */
     public ProductResponse patch(Long id, ProductRequest request) {
         ProductEntity product = getProductById(id);
         productMapper.patchEntityFromRequest(request,product);
@@ -169,6 +217,14 @@ public class ProductService {
 
     //Categories Logic
 
+    /**
+     * Elimina una categoría de un producto.
+     * 
+     * @param categoryId ID de la categoría a eliminar del producto
+     * @param productId ID del producto del que se eliminará la categoría
+     * @return DTO con los datos del producto actualizado
+     * @throws NotFoundException si no se encuentra el producto o la categoría con los IDs especificados
+     */
     public ProductResponse deleteCategoryFromProduct(int categoryId, Long productId) {
         ProductEntity product = getProductById(productId);
         CategoryEntity category = getCategoryById(categoryId);
@@ -176,12 +232,27 @@ public class ProductService {
         return productMapper.toResponse(productRepository.save(product));
     }
 
+    /**
+     * Elimina todas las categorías de un producto.
+     * 
+     * @param productId ID del producto del que se eliminarán todas las categorías
+     * @return DTO con los datos del producto actualizado
+     * @throws NotFoundException si no se encuentra el producto con el ID especificado
+     */
     public ProductResponse deleteAllCategoryFromProduct(Long productId) {
         ProductEntity product = getProductById(productId);
         product.getCategories().clear();
         return productMapper.toResponse(productRepository.save(product));
     }
 
+    /**
+     * Busca las categorías asociadas a un producto con paginación.
+     * 
+     * @param productId ID del producto del que se buscarán las categorías
+     * @param pageable Informacion de paginación
+     * @return Pagina de categorias asociadas al producto
+     * @throws NotFoundException si no se encuentra el producto con el ID especificado
+     */
     public Page<CategoryResponse> findCategoriesByProductId(Long productId, Pageable pageable) {
         if (productRepository.findById(productId).isEmpty()) {
             throw new NotFoundException("Product with ID " + productId + " not found");
@@ -196,6 +267,14 @@ public class ProductService {
         return categoryPage.map(categoryMapper::toResponse);
     }
 
+    /**
+     * Agrega una categoría a un producto.
+     * 
+     * @param categoryId ID de la categoría a agregar al producto
+     * @param productId ID del producto al que se agregará la categoría
+     * @return DTO con los datos del producto actualizado
+     * @throws NotFoundException si no se encuentra el producto o la categoría con los IDs especificados
+     */
     public ProductResponse addCategoryToProduct(int categoryId, Long productId) {
         ProductEntity product = getProductById(productId);
         CategoryEntity category = getCategoryById(categoryId);
@@ -205,6 +284,15 @@ public class ProductService {
 
     //Provider logic
 
+    /**
+     * Asigna un proveedor a un producto.
+     * 
+     * @param productID ID del producto al que se asignará el proveedor
+     * @param providerID ID del proveedor a asignar al producto
+     * @return DTO con los datos del producto actualizado
+     * @throws NotFoundException si no se encuentra el producto o el proveedor con los IDs especificados
+     * @throws ResponseStatusException si el proveedor ya está asignado al producto
+     */
     public ProductResponse assignProviderToProduct(Long productID, Long providerID){
         ProductEntity product = getProductById(productID);
         ProviderEntity provider = getProviderById(providerID);
@@ -224,6 +312,14 @@ public class ProductService {
         return productMapper.toResponse(product);
     }
 
+    /**
+     * Desasigna un proveedor de un producto.
+     * 
+     * @param productID ID del producto del que se desasignará el proveedor
+     * @param providerID ID del proveedor a desasignar del producto
+     * @return DTO con los datos del producto actualizado
+     * @throws NotFoundException si no se encuentra el producto o el proveedor con los IDs especificados
+     */
     public ProductResponse unassignProviderFromProduct(Long productID, Long providerID){
         ProductEntity product = getProductById(productID);
         ProviderEntity provider = getProviderById(providerID);
@@ -237,6 +333,13 @@ public class ProductService {
         return productMapper.toResponse(product);
     }
 
+    /**
+     * Busca productos asociados a un proveedor con paginación.
+     * 
+     * @param providerID ID del proveedor del que se buscarán los productos
+     * @param pageable Informacion de paginación
+     * @return Página de productos asociados al proveedor
+     */
     public Page<ProductResponse> findProductsByProviderId(Long providerID, Pageable pageable) {
 
         Page<ProductResponse> page = productRepository
@@ -252,16 +355,37 @@ public class ProductService {
 
 
     //Auxiliar
+    /**
+     * Metodo auxiliar para buscar una entidad de producto por su ID.
+     * 
+     * @param id ID del producto a buscar
+     * @return La entidad del producto encontrado
+     * @throws NotFoundException si no se encuentra ningún producto con el ID especificado
+     */
     private ProductEntity getProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Product with ID " + id + " not found"));
     }
 
+    /**
+     * Meodo auxiliar para buscar una entidad de categoría por su ID.
+     * 
+     * @param id ID de la categoría a buscar
+     * @return La entidad de la categoría encontrada
+     * @throws NotFoundException si no se encuentra ninguna categoría con el ID especificado
+     */
     private CategoryEntity getCategoryById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
     }
 
+    /**
+     * Metodo auxiliar para buscar una entidad de proveedor por su ID.
+     * 
+     * @param id ID del proveedor a buscar
+     * @return La entidad del proveedor encontrado
+     * @throws NotFoundException si no se encuentra ningún proveedor con el ID especificado
+     */
     private ProviderEntity getProviderById(Long id) {
         return providerRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));

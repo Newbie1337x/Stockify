@@ -15,7 +15,6 @@ import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.SaleMapper;
-import org.stockify.model.mapper.ShiftMapper;
 import org.stockify.model.mapper.TransactionMapper;
 import org.stockify.model.repository.ClientRepository;
 import org.stockify.model.repository.SaleRepository;
@@ -36,6 +35,15 @@ public class SaleService {
     private final TransactionMapper transactionMapper;
 
 
+    /**
+     * Crea una nueva venta en el sistema y actualiza el stock de los productos.
+     * 
+     * @param request DTO con los datos de la venta a crear
+     * @param storeID ID de la tienda donde se realiza la venta
+     * @param posID ID del punto de venta donde se realiza la venta
+     * @return DTO con los datos de la venta creada
+     * @throws NotFoundException si no se encuentra el cliente o la transacción
+     */
     @Transactional
     public SaleResponse createSale(SaleRequest request, long storeID, long posID){
         request.getTransaction().getDetailTransactions()
@@ -54,6 +62,12 @@ public class SaleService {
         return saleMapper.toResponseDTO(saleRepository.save(sale));
     }
 
+    /**
+     * Elimina una venta por su ID.
+     * 
+     * @param id ID de la venta a eliminar
+     * @throws NotFoundException si no se encuentra ninguna venta con el ID especificado
+     */
     public void delete (Long id) {
         if(!saleRepository.existsById(id)){
             throw new NotFoundException("Sale with ID " + id + " not found");
@@ -61,6 +75,13 @@ public class SaleService {
         saleRepository.deleteById(id);
     }
 
+    /**
+     * Busca ventas aplicando filtros y paginación.
+     * 
+     * @param filterRequest DTO con los filtros a aplicar (ID de cliente, ID de venta, ID de transacción)
+     * @param pageable Información de paginación
+     * @return Página de ventas que cumplen con los filtros
+     */
     public Page<SaleResponse> findAll(SaleFilterRequest filterRequest, Pageable pageable){
         Specification<SaleEntity> specification = Specification
                 .where(SaleSpecification.byClientId(filterRequest.getClientId()))
@@ -71,12 +92,26 @@ public class SaleService {
         return saleEntities.map(saleMapper::toResponseDTO);
     }
 
+    /**
+     * Busca una venta por su ID.
+     * 
+     * @param id ID de la venta a buscar
+     * @return DTO con los datos de la venta encontrada
+     * @throws NotFoundException si no se encuentra ninguna venta con el ID especificado
+     */
     public SaleResponse findbyId(Long id) {
         SaleEntity saleEntity = saleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Sale with ID " + id + " not found"));
         return saleMapper.toResponseDTO(saleEntity);
     }
 
+    /**
+     * Busca la transacción asociada a una venta.
+     * 
+     * @param saleId ID de la venta de la que se busca la transacción
+     * @return DTO con los datos de la transacción asociada a la venta
+     * @throws NotFoundException si no se encuentra ninguna venta con el ID especificado
+     */
     public TransactionResponse findTransactionBySaleId(Long saleId) {
         SaleEntity saleEntity = saleRepository.findById(saleId)
                 .orElseThrow(() -> new NotFoundException("Sale with ID " + saleId + " not found"));
@@ -85,6 +120,14 @@ public class SaleService {
         return transactionMapper.toDto(transactionEntity);
     }
 
+    /**
+     * Actualiza parcialmente una venta existente.
+     * 
+     * @param id ID de la venta a actualizar parcialmente
+     * @param saleRequest DTO con los datos a actualizar de la venta
+     * @return DTO con los datos de la venta actualizada
+     * @throws NotFoundException si no se encuentra ninguna venta con el ID especificado
+     */
     public SaleResponse updateShiftPartial(Long id, SaleRequest saleRequest){
         SaleEntity existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Sale with ID " + id + " not found"));
@@ -94,6 +137,14 @@ public class SaleService {
         return saleMapper.toResponseDTO(updatedSale);
     }
 
+    /**
+     * Actualiza completamente una venta existente.
+     * 
+     * @param id ID de la venta a actualizar
+     * @param saleRequest DTO con los nuevos datos de la venta
+     * @return DTO con los datos de la venta actualizada
+     * @throws NotFoundException si no se encuentra ninguna venta con el ID especificado
+     */
     public SaleResponse updateSaleFull(Long id, SaleRequest saleRequest){
         SaleEntity existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Sale with ID " + id + " not found"));

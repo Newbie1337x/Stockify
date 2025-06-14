@@ -37,12 +37,11 @@ public class EmployeeController {
     public ResponseEntity<PagedModel<EntityModel<EmployeeResponse>>> getAllEmployees(
             @Parameter(description = "Filter by employee name") @RequestParam(required = false) String name,
             @Parameter(description = "Filter by employee last name") @RequestParam(required = false) String lastName,
-            @Parameter(description = "Filter by employee ID") @RequestParam(required = false) Long id,
             @Parameter(description = "Filter by employee DNI") @RequestParam(required = false) String dni,
             @Parameter(hidden = true) Pageable pageable,
             PagedResourcesAssembler<EmployeeResponse> pagedAssembler
     ) {
-        Page<EmployeeResponse> employeePage = employeeService.getEmployees(id, name, lastName, dni, pageable);
+        Page<EmployeeResponse> employeePage = employeeService.getEmployees(name, lastName, dni, pageable);
         PagedModel<EntityModel<EmployeeResponse>> model = pagedAssembler.toModel(employeePage, employeeModelAssembler);
         return ResponseEntity.ok(model);
     }

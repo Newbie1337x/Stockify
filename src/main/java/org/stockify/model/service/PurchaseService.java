@@ -33,6 +33,15 @@ public class PurchaseService {
 
     //-- CRUD operations --
 
+    /**
+     * Crea una nueva compra en el sistema y actualiza el stock de los productos.
+     * 
+     * @param request DTO con los datos de la compra a crear
+     * @param storeID ID de la tienda donde se realiza la compra
+     * @param posID ID del punto de venta donde se realiza la compra
+     * @return DTO con los datos de la compra creada
+     * @throws NotFoundException si no se encuentra la transacción o el proveedor
+     */
     @Transactional
     public PurchaseResponse createPurchase(PurchaseRequest request, Long storeID, Long posID) {
 
@@ -48,16 +57,35 @@ public class PurchaseService {
         return purchaseMapper.toResponseDTO(purchaseRepository.save(purchase));
     }
 
+    /**
+     * Actualiza una compra existente.
+     * 
+     * @param id ID de la compra a actualizar
+     * @param request DTO con los nuevos datos de la compra
+     * @return DTO con los datos de la compra actualizada
+     */
     public PurchaseResponse updatePurchase(Long id, PurchaseRequest request) {
         PurchaseEntity purchaseEntity = purchaseMapper.toEntity(request);
         purchaseEntity.setId(id);
         return purchaseMapper.toResponseDTO(purchaseRepository.save(purchaseEntity));
     }
 
+    /**
+     * Elimina una compra por su ID.
+     * 
+     * @param id ID de la compra a eliminar
+     */
     public void deletePurchase(Long id) {
         purchaseRepository.deleteById(id);
     }
 
+    /**
+     * Busca compras aplicando filtros y paginación.
+     * 
+     * @param pageable Información de paginación
+     * @param request DTO con los filtros a aplicar (ID de transacción, ID de proveedor, ID de compra)
+     * @return Página de compras que cumplen con los filtros
+     */
     public Page<PurchaseResponse> getAllPurchases(Pageable pageable, PurchaseFilterRequest request) {
         Specification<PurchaseEntity> spec = Specification
                 .where(PurchaseSpecification.ByTransactionId(request.getTransactionId()))
@@ -66,6 +94,6 @@ public class PurchaseService {
         return purchaseRepository.findAll(spec, pageable)
                 .map(purchaseMapper::toResponseDTO);
     }
-    
+
 
 }
