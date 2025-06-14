@@ -37,9 +37,11 @@ public class GlobalExceptionHandler implements ProblemHandling {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex,
-                                                             HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(HttpServletRequest request,
+    DataIntegrityViolationException ex) {
+        String msg = ex.getMostSpecificCause().getMessage();
+
+        return buildErrorResponse(HttpStatus.CONFLICT,new DuplicatedUniqueConstraintException(msg) , request);
     }
 
     @ExceptionHandler(InvalidSessionStatusException.class)

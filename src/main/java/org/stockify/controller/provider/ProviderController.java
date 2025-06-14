@@ -30,13 +30,9 @@ public class ProviderController {
 
 
     public ProviderController(ProviderService providerService,
-                              ProductService productService,
-                              ProviderModelAssembler providerModelAssembler,
-                              ProductModelAssembler productModelAssembler) {
-
+                              ProviderModelAssembler providerModelAssembler) {
         this.providerService = providerService;
         this.providerModelAssembler = providerModelAssembler;
-
     }
 
     //---Crud operations---
@@ -85,9 +81,6 @@ public class ProviderController {
     public ResponseEntity<EntityModel<ProviderResponse>> deleteProvider(@PathVariable Long providerID) {
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(providerID)));
     }
-
-
-    //Products Logic
 
 
 }
