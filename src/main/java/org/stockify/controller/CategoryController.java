@@ -2,6 +2,8 @@ package org.stockify.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -18,16 +20,13 @@ import org.stockify.model.service.CategoryService;
 @Validated
 @RestController
 @RequestMapping("/categories")
+@RequiredArgsConstructor
 public class CategoryController {
 
 
     private final CategoryService categoryService;
     private final CategoryModelAssembler categoryModelAssembler;
 
-    public CategoryController(CategoryService categoryService, CategoryModelAssembler categoryModelAssembler) {
-        this.categoryService = categoryService;
-        this.categoryModelAssembler = categoryModelAssembler;
-    }
 
     @Operation(summary = "List all categories")
     @GetMapping

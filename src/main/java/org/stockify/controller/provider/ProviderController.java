@@ -2,6 +2,8 @@ package org.stockify.controller.provider;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -15,25 +17,18 @@ import org.stockify.dto.request.provider.ProviderFilterRequest;
 import org.stockify.dto.request.provider.ProviderRequest;
 import org.stockify.dto.response.BulkProviderResponse;
 import org.stockify.dto.response.ProviderResponse;
-import org.stockify.model.assembler.ProductModelAssembler;
 import org.stockify.model.assembler.ProviderModelAssembler;
-import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
 import java.util.List;
 
 @RestController
 @RequestMapping("/providers")
+@RequiredArgsConstructor
 public class ProviderController {
 
     private final ProviderService providerService;
     private final ProviderModelAssembler providerModelAssembler;
 
-
-    public ProviderController(ProviderService providerService,
-                              ProviderModelAssembler providerModelAssembler) {
-        this.providerService = providerService;
-        this.providerModelAssembler = providerModelAssembler;
-    }
 
     //---Crud operations---
     @Operation(summary = "List all providers with optional filters")

@@ -1,6 +1,8 @@
 package org.stockify.controller.store;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -16,15 +18,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/stores/{storeID}/stock")
+@RequiredArgsConstructor
 public class StoreStockController {
 
     private final StockService stockService;
     private final StockModelAssembler stockModelAssembler;
-
-    public StoreStockController(StockService stockService, StockModelAssembler stockModelAssembler) {
-        this.stockService = stockService;
-        this.stockModelAssembler = stockModelAssembler;
-    }
 
 
     @Operation(summary = "Add a stock for a specific product and store")

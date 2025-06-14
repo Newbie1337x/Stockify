@@ -1,9 +1,11 @@
 package org.stockify.model.service;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.stockify.config.GlobalPreferencesConfig;
 import org.stockify.dto.request.ProductFilterRequest;
 import org.stockify.dto.request.stock.StockRequest;
 import org.stockify.dto.request.stock.StockTransferRequest;
@@ -23,7 +25,7 @@ import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.specification.StockSpecifications;
 
 import java.util.List;
-
+@AllArgsConstructor
 @Service
 public class StockService {
     private final StockRepository stockRepository;
@@ -31,19 +33,8 @@ public class StockService {
     private final StockMapper stockMapper;
     private final ProductRepository productRepository;
     private final StoreRepository storeRepository;
-
-    public StockService(
-            StockRepository stockRepository,
-            ProductStoreMapper productStoreMapper,
-            StockMapper stockMapper,
-            ProductRepository productRepository,
-            StoreRepository storeRepository) {
-        this.stockRepository = stockRepository;
-        this.productStoreMapper = productStoreMapper;
-        this.stockMapper = stockMapper;
-        this.productRepository = productRepository;
-        this.storeRepository = storeRepository;
-    }
+    private final GlobalPreferencesConfig globalPreferencesConfig;
+    private final EmailService emailService;
 
     public Page<ProductStoreResponse> listProductsByStore (Long storeID, Pageable pageable, ProductFilterRequest filterRequest) {
         Specification<StockEntity> spec = Specification.where(StockSpecifications.byStoreId(storeID))
@@ -141,6 +132,11 @@ public class StockService {
     public StockResponse increaseStock(Long productId, Long storeId, Double quantity) {
         StockEntity stock = findStockByProductAndStore(productId, storeId);
         stock.setQuantity(stock.getQuantity() + quantity);
+
+        if(stock.getQuantity() > globalPreferencesConfig.getStockAlertThreshold()){
+            stock.setLowStockAlertSent(false);
+        }
+
         return stockMapper.toResponse(stockRepository.save(stock));
     }
 
@@ -150,6 +146,7 @@ public class StockService {
             throw new InsufficientStockException("Stock not enough to decrease");
         }
         stock.setQuantity(stock.getQuantity() - quantity);
+            emailService.sendStockAlert(stock);
         return stockMapper.toResponse(stockRepository.save(stock));
     }
 

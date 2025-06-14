@@ -1,5 +1,6 @@
 package org.stockify.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
@@ -15,13 +16,9 @@ import org.stockify.model.service.TimeLogService;
 
 @RestController
 @RequestMapping("/timelogs")
+@RequiredArgsConstructor
 public class TimeLogController {
     private final TimeLogService timeLogService;
-
-    @Autowired
-    public TimeLogController(TimeLogService timeLogService) {
-        this.timeLogService = timeLogService;
-    }
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<TimeLogResponse>>> getAllTimeLogs(
@@ -35,16 +32,18 @@ public class TimeLogController {
         var pagedResult = timeLogService.getTimeLogs(id, date, clockInTime, clockOutTime, pageable);
         return ResponseEntity.ok(assembler.toModel(pagedResult));
     }
+//Add hateoas
 
     @PostMapping
     public ResponseEntity<TimeLogEntity> addTimeLog(@Validated @RequestBody TimeLogRequest timeLogRequest) {
         return ResponseEntity.status(201).body(timeLogService.createTimeLog(timeLogRequest));
     }
-
+//Add hateoas
     @PutMapping("/{id}")
     public ResponseEntity<TimeLogResponse> putTimeLog(@PathVariable Long id, @Validated @RequestBody TimeLogRequest timeLogRequest) {
         return ResponseEntity.status(201).body(timeLogService.updateTimeLog(id, timeLogRequest));
     }
+//Add hateoas
 
     @PatchMapping("/{id}")
     public ResponseEntity<TimeLogResponse> patchTimeLog(@PathVariable Long id, @Validated @RequestBody TimeLogRequest timeLogRequest) {

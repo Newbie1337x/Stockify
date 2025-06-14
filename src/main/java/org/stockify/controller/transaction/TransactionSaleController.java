@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.stockify.model.service.SaleService;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("stores/{storeID}/pos/{posID}/transactions/sales")
+
 public class TransactionSaleController {
 
     private final SaleService saleService;
@@ -46,7 +48,6 @@ public class TransactionSaleController {
         return ResponseEntity
                 .created(entityModel.getRequiredLink("self").toUri())
                 .body(entityModel);
-
     }
 }
 

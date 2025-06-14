@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -28,6 +30,7 @@ import org.stockify.model.service.PosService;
 
 @RestController
 @RequestMapping("/pos")
+@RequiredArgsConstructor
 @Tag(name = "POS", description = "API REST para gestionar los POS (Point of Sale)")
 public class PosController {
 
@@ -36,15 +39,6 @@ public class PosController {
     private final SessionPosModelAssembler sessionPosModelAssembler;
     private final SessionPosCreateModelAssembler sessionPosCreateModelAssembler;
 
-    public PosController(PosService posService, 
-                       PosModelAssembler posModelAssembler,
-                       SessionPosModelAssembler sessionPosModelAssembler,
-                       SessionPosCreateModelAssembler sessionPosCreateModelAssembler) {
-        this.posService = posService;
-        this.posModelAssembler = posModelAssembler;
-        this.sessionPosModelAssembler = sessionPosModelAssembler;
-        this.sessionPosCreateModelAssembler = sessionPosCreateModelAssembler;
-    }
 
     @Operation(summary = "Crear un nuevo POS")
     @PostMapping("/{idStore}")

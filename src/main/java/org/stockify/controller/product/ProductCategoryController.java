@@ -1,6 +1,8 @@
 package org.stockify.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -17,17 +19,13 @@ import org.stockify.model.service.ProductService;
 
 @RestController
 @RequestMapping("/products/{productId}/categories")
+@RequiredArgsConstructor
 public class ProductCategoryController {
 
     private final ProductService productService;
     private final CategoryModelAssembler categoryModelAssembler;
     private final ProductModelAssembler productModelAssembler;
 
-    public ProductCategoryController(ProductService productService, CategoryModelAssembler categoryModelAssembler, ProductModelAssembler productModelAssembler) {
-        this.productService = productService;
-        this.categoryModelAssembler = categoryModelAssembler;
-        this.productModelAssembler = productModelAssembler;
-    }
 
     @Operation(summary = "Remove a category from a product")
     @DeleteMapping("/{categoryId}")

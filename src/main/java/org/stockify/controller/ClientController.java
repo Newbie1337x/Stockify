@@ -1,6 +1,8 @@
 package org.stockify.controller;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,14 +21,11 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/clients")
+@RequiredArgsConstructor
 public class ClientController {
     private final ClientService clientService;
     private final ClientModelAssembler clientModelAssembler;
 
-    public ClientController(ClientService clientService, ClientModelAssembler clientModelAssembler) {
-        this.clientService = clientService;
-        this.clientModelAssembler = clientModelAssembler;
-    }
 
     @PostMapping
     public ResponseEntity<EntityModel<ClientResponse>> createClient(@Valid @RequestBody ClientRequest client) {

@@ -2,6 +2,8 @@ package org.stockify.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,17 +24,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
     private final ProductModelAssembler productModelAssembler;
 
-
-    public ProductController(ProductService productService,
-                             ProductModelAssembler productModelAssembler) {
-        this.productService = productService;
-        this.productModelAssembler = productModelAssembler;
-    }
 
     @Operation(summary = "List all products with optional filters")
     @GetMapping

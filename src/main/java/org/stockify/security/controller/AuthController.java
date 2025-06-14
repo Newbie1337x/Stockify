@@ -1,5 +1,6 @@
 package org.stockify.security.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,16 +14,11 @@ import org.stockify.security.service.JwtService;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
     private final JwtService jwtService;
-
-    public AuthController(AuthService authService, JwtService
-            jwtService) {
-        this.authService = authService;
-        this.jwtService = jwtService;
-    }
 
     @PostMapping
     public ResponseEntity<AuthResponse> authenticateUser(@RequestBody

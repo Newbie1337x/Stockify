@@ -3,6 +3,7 @@ package org.stockify.controller;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.assembler.SaleModelAssembler;
+import org.stockify.model.service.EmailService;
 import org.stockify.model.service.SaleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,16 +33,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RequestMapping("/sales")
 @Validated
 @Tag(name = "Sale", description = "Endpoints for managing sales")
+@RequiredArgsConstructor
 public class SaleController {
     private final SaleService saleService;
     private final SaleModelAssembler saleModelAssembler;
-
-    public SaleController(SaleService saleService, SaleModelAssembler saleModelAssembler) {
-        this.saleService = saleService;
-        this.saleModelAssembler = saleModelAssembler;
-    }
-
-
 
     @Operation(
             summary = "Get paged list of sales",

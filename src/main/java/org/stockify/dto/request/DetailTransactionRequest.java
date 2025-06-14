@@ -1,5 +1,6 @@
 package org.stockify.dto.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 @Value
 @Getter
 @Setter
+@Valid
 public class DetailTransactionRequest{
     @NotNull(message = "Product ID is required")
     Long productID;

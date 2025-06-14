@@ -2,6 +2,8 @@ package org.stockify.controller.store;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -10,34 +12,19 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.StoreRequest;
-import org.stockify.dto.request.ProductFilterRequest;
-import org.stockify.dto.response.ProductStoreResponse;
 import org.stockify.dto.response.StoreResponse;
-import org.stockify.model.assembler.ProductStoreModelAssembler;
 import org.stockify.model.assembler.StoreModelAssembler;
-import org.stockify.model.service.StockService;
 import org.stockify.model.service.StoreService;
 import java.net.URI;
 
 @RestController
 @RequestMapping("/stores")
+@RequiredArgsConstructor
 public class StoreController {
 
-    private final StockService stockService;
     private final StoreService storeService;
     private final StoreModelAssembler storeModelAssembler;
-    private final ProductStoreModelAssembler productStoreModelAssembler;
 
-    public StoreController(
-            StockService stockService, 
-            StoreService storeService,
-            StoreModelAssembler storeModelAssembler,
-            ProductStoreModelAssembler productStoreModelAssembler) {
-        this.stockService = stockService;
-        this.storeService = storeService;
-        this.storeModelAssembler = storeModelAssembler;
-        this.productStoreModelAssembler = productStoreModelAssembler;
-    }
 
     // Store endpoints
     @Operation(summary = "List all stores")

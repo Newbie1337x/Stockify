@@ -1,5 +1,7 @@
 package org.stockify.controller;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.EntityModel;
@@ -17,16 +19,11 @@ import org.springframework.data.web.PagedResourcesAssembler;
 
 @RestController
 @RequestMapping("/employees")
+@RequiredArgsConstructor
 public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final EmployeeModelAssembler employeeModelAssembler;
-
-    @Autowired
-    public EmployeeController(EmployeeService employeeService, EmployeeModelAssembler employeeModelAssembler) {
-        this.employeeService = employeeService;
-        this.employeeModelAssembler = employeeModelAssembler;
-    }
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<EmployeeResponse>>> getAllEmployees(

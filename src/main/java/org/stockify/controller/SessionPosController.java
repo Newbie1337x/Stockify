@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,18 +29,13 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/sessions")
 @Tag(name = "POS Sessions", description = "API REST para gestionar las sesiones de POS (Point of Sale)")
+@RequiredArgsConstructor
 public class SessionPosController {
 
     private final SessionPosService sessionPosService;
     private final SessionPosModelAssembler sessionPosModelAssembler;
     private SessionPosMapper sessionPosMapper;
 
-    @Autowired
-    public SessionPosController(SessionPosService sessionPosService, 
-                               SessionPosModelAssembler sessionPosModelAssembler) {
-        this.sessionPosService = sessionPosService;
-        this.sessionPosModelAssembler = sessionPosModelAssembler;
-    }
 
 //    @Operation(summary = "Obtener todas las sesiones de POS")
 //    @GetMapping

@@ -1,6 +1,8 @@
 package org.stockify.controller.provider;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,6 +22,7 @@ import org.stockify.model.service.ProviderService;
 
 @RestController
 @RequestMapping("/providers/{providerID}/products")
+@RequiredArgsConstructor
 public class ProviderProductController {
 
     private final ProductService productService;
@@ -27,12 +30,6 @@ public class ProviderProductController {
     private final ProviderModelAssembler providerModelAssembler;
     private final ProviderService providerService;
 
-    public ProviderProductController(ProductService productService, ProductModelAssembler productModelAssembler, ProviderModelAssembler providerModelAssembler, ProviderService providerService) {
-        this.productService = productService;
-        this.productModelAssembler = productModelAssembler;
-        this.providerModelAssembler = providerModelAssembler;
-        this.providerService = providerService;
-    }
 
     @Operation(summary = "List products associated with a provider")
     @GetMapping

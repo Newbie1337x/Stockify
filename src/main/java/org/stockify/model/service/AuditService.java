@@ -1,5 +1,4 @@
 package org.stockify.model.service;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.hibernate.envers.AuditReader;
@@ -11,7 +10,6 @@ import org.stockify.model.dto.TransactionAuditDTO;
 import org.stockify.model.entity.PurchaseEntity;
 import org.stockify.model.entity.SaleEntity;
 import org.stockify.model.entity.TransactionEntity;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class AuditService {
             List<Number> revisions = auditReader.getRevisions(PurchaseEntity.class, purchase.getId());
             for (Number rev : revisions) {
                 PurchaseEntity auditedPurchase = auditReader.find(PurchaseEntity.class, purchase.getId(), rev);
-                String revisionTypeStr = rev.equals(revisions.get(0)) ? "ADD" : "MOD";
+                String revisionTypeStr = rev.equals(revisions.getFirst()) ? "ADD" : "MOD";
                 PurchaseAuditDTO auditDTO = PurchaseAuditDTO.builder()
                         .revision(rev.longValue())
                         .revisionType(revisionTypeStr)
@@ -55,7 +53,7 @@ public class AuditService {
             List<Number> revisions = auditReader.getRevisions(SaleEntity.class, sale.getId());
             for (Number rev : revisions) {
                 SaleEntity auditedSale = auditReader.find(SaleEntity.class, sale.getId(), rev);
-                String revisionTypeStr = rev.equals(revisions.get(0)) ? "ADD" : "MOD";
+                String revisionTypeStr = rev.equals(revisions.getFirst()) ? "ADD" : "MOD";
                 SaleAuditDTO auditDTO = SaleAuditDTO.builder()
                         .revision(rev.longValue())
                         .revisionType(revisionTypeStr)
@@ -79,7 +77,7 @@ public class AuditService {
             List<Number> revisions = auditReader.getRevisions(TransactionEntity.class, transaction.getId());
             for (Number rev : revisions) {
                 TransactionEntity auditedTransaction = auditReader.find(TransactionEntity.class, transaction.getId(), rev);
-                String revisionTypeStr = rev.equals(revisions.get(0)) ? "ADD" : "MOD";
+                String revisionTypeStr = rev.equals(revisions.getFirst()) ? "ADD" : "MOD";
                 TransactionAuditDTO auditDTO = TransactionAuditDTO.builder()
                         .revision(rev.longValue())
                         .revisionType(revisionTypeStr)

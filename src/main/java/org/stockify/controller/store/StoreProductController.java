@@ -1,9 +1,7 @@
 package org.stockify.controller.store;
-
-
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import org.apache.coyote.Response;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -18,14 +16,11 @@ import org.stockify.model.service.StockService;
 
 @RestController
 @RequestMapping("/stores/{storeID}/products")
+@RequiredArgsConstructor
 public class StoreProductController {
 
     private final StockService stockService;
     private final ProductStoreModelAssembler productStoreModelAssembler;
-    public StoreProductController(StockService stockService, ProductStoreModelAssembler productStoreModelAssembler) {
-        this.stockService = stockService;
-        this.productStoreModelAssembler = productStoreModelAssembler;
-    }
 
     @Operation(summary = "List all products from a specific store which match the filter criteria")
     @GetMapping

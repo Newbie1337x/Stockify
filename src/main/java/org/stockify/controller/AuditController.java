@@ -1,5 +1,7 @@
 package org.stockify.controller;
 
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,14 +16,12 @@ import org.stockify.model.service.AuditService;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/audit")
 public class AuditController {
-
+    //Implement Hateoas and REST
     private final AuditService auditService;
 
-    public AuditController(AuditService auditService) {
-        this.auditService = auditService;
-    }
 
     @GetMapping("/transactions")
     public ResponseEntity<List<TransactionAuditDTO>> getAllTransactionAudit() {

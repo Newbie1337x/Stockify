@@ -1,6 +1,8 @@
 package org.stockify.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,6 +20,7 @@ import org.stockify.model.service.ProductService;
 import org.stockify.model.service.ProviderService;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/products/{productID}/providers")
 public class ProductProviderController {
 
@@ -26,12 +29,6 @@ public class ProductProviderController {
     private final ProviderService providerService;
     private final ProviderModelAssembler providerModelAssembler;
 
-    public ProductProviderController(ProductModelAssembler productModelAssembler, ProductService productService, ProviderService providerService, ProviderModelAssembler providerModelAssembler) {
-        this.productModelAssembler = productModelAssembler;
-        this.productService = productService;
-        this.providerService = providerService;
-        this.providerModelAssembler = providerModelAssembler;
-    }
 
     @Operation(summary = "Assign a provider to a product")
     @PutMapping("{providerID}")
