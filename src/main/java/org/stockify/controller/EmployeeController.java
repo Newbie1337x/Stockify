@@ -44,7 +44,7 @@ public class EmployeeController {
             }
     )
     @GetMapping
-    @PreAuthorize("hasAuthority('EMPLOYEE')")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<EmployeeResponse>>> getAllEmployees(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String lastName,
