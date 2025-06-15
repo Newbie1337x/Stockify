@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.audit.PurchaseAuditDTO;
 import org.stockify.dto.request.audit.SaleAuditDTO;
-import org.stockify.model.dto.TransactionAuditDTO;
+import org.stockify.dto.request.audit.TransactionAuditDTO;
 import org.stockify.model.entity.DetailTransactionEntity;
 import org.stockify.model.entity.PurchaseEntity;
 import org.stockify.model.entity.SaleEntity;
