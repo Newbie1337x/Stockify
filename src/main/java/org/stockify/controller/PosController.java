@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.pos.PosAmountRequest;
+import org.stockify.dto.request.pos.PosFilterRequest;
 import org.stockify.dto.request.sessionpos.SessionPosCloseRequest;
 import org.stockify.dto.request.sessionpos.SessionPosRequest;
 import org.stockify.dto.response.PosResponse;
@@ -25,10 +26,8 @@ import org.stockify.dto.response.SessionPosResponse;
 import org.stockify.model.assembler.PosModelAssembler;
 import org.stockify.model.assembler.SessionPosCreateModelAssembler;
 import org.stockify.model.assembler.SessionPosModelAssembler;
-import org.stockify.model.enums.Status;
 import org.stockify.model.service.PosService;
 
-import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/pos")
@@ -57,17 +56,10 @@ public class PosController {
             @ApiResponse(responseCode = "200", description = "Paged list of POS returned successfully"),
     })
     @GetMapping
-    public ResponseEntity<PagedModel<EntityModel<PosResponse>>> getPos(
-            @Parameter(description = "POS ID") @RequestParam(required = false) Long id,
-            @Parameter(description = "Store ID") @RequestParam(required = false) Long storeId,
-            @Parameter(description = "Pos status") @RequestParam(required = false) Status status,
-            @Parameter(description = "Employee ID") @RequestParam(required = false) Long employeeId,
-            @Parameter(description = "Current minimal amount") @RequestParam(required = false) BigDecimal currentAmountMin,
-            @Parameter(description = "Current max amount") @RequestParam(required = false) BigDecimal currentAmountMax,
-            @Parameter(hidden = true) @PageableDefault() Pageable pageable,
-            PagedResourcesAssembler<PosResponse> assembler) {
-        Page<PosResponse> posResponses = posService.findAllWithFilters(
-                id, storeId, status, employeeId, currentAmountMin, currentAmountMax, pageable);
+    public ResponseEntity<PagedModel<EntityModel<PosResponse>>> getPos(PosFilterRequest spec,
+                                                                       @Parameter(hidden = true) @PageableDefault() Pageable pageable,
+                                                                       PagedResourcesAssembler<PosResponse> assembler) {
+        Page<PosResponse> posResponses = posService.findAllWithFilters(spec, pageable);
         return ResponseEntity.ok(assembler.toModel(posResponses, posModelAssembler));
     }
 

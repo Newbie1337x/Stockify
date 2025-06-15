@@ -28,6 +28,12 @@ public class AuditService {
     @Autowired
     private TransactionMapper transactionMapper;
 
+
+    /**
+     * Obtiene todas las auditorías de compras.
+     *
+     * @return Lista de auditorías de compras.
+     */
     public List<PurchaseAuditDTO> getAllPurchaseAudits() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
         List<PurchaseEntity> purchases = entityManager.createQuery("SELECT p FROM PurchaseEntity p", PurchaseEntity.class).getResultList();
@@ -66,6 +72,12 @@ public class AuditService {
         return auditList;
     }
 
+
+    /**
+     * Obtiene todas las auditorías de ventas.
+     *
+     * @return Lista de auditorías de ventas.
+     */
     public List<SaleAuditDTO> getAllSaleAudits() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
         List<SaleEntity> sales = entityManager.createQuery("SELECT s FROM SaleEntity s", SaleEntity.class).getResultList();
@@ -104,6 +116,12 @@ public class AuditService {
         return auditList;
     }
 
+
+    /**
+     * Obtiene todas las auditorías de transacciones.
+     *
+     * @return Lista de auditorías de transacciones.
+     */
     public List<TransactionAuditDTO> getAllTransactionAudits() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
         List<TransactionEntity> transactions = entityManager.createQuery("SELECT t FROM TransactionEntity t", TransactionEntity.class).getResultList();

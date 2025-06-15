@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.pos.PosAmountRequest;
+import org.stockify.dto.request.pos.PosFilterRequest;
 import org.stockify.dto.request.sessionpos.SessionPosCloseRequest;
 import org.stockify.dto.request.sessionpos.SessionPosRequest;
 import org.stockify.dto.response.PosResponse;
@@ -43,6 +44,12 @@ public class PosService {
     private final StoreRepository storeRepository;
 
 
+
+    /**
+     * Guarda una nueva terminal POS (Point of Sale) asociada a un local.
+     * @param idLocal ID del local al que se asociará la terminal POS.
+     * @return {@link PosResponse} DTO con los datos de la terminal POS creada.
+     */
     public PosResponse save(Long idLocal) {
         PosEntity posEntity = PosEntity.builder()
                 .currentAmount(BigDecimal.ZERO)
@@ -54,16 +61,39 @@ public class PosService {
         return posMapper.toDto(posRepository.save(posEntity));
     }
 
+
+    /**
+     * Busca todas las terminales POS (Point of Sale) disponibles.
+     * @return {@link PosResponse} DTO con los datos de las terminales POS actualizadas.
+     */
     public List<PosResponse> findAll() {
         List<PosEntity> posEntities = posRepository.findAll();
         return posEntities.stream().map(posMapper::toDto).toList();
     }
 
+
+    /**
+     * Busca todas las terminales POS (Point of Sale) con paginación.
+     * @param pageable Información de paginación.
+     * @return Página de {@link PosResponse} DTOs con los datos de las terminales POS.
+     */
     public Page<PosResponse> findAll(Pageable pageable) {
         Page<PosEntity> posEntities = posRepository.findAll(pageable);
         return posEntities.map(posMapper::toDto);
     }
 
+    public Page<PosResponse> findAll(Specification<PosEntity> spec, Pageable pageable) {
+        Page<PosEntity> posEntities = posRepository.findAll(spec, pageable);
+        return posEntities.map(posMapper::toDto);
+    }
+
+
+    /**
+     * Busca una terminal POS (Point of Sale) por su ID.
+     * @param id ID de la terminal POS a buscar.
+     * @return {@link PosResponse} DTO con los datos de la terminal POS encontrada.
+     * @throws NotFoundException si no se encuentra la terminal POS con el ID proporcionado.
+     */
     public PosResponse findById(Long id) {
         PosEntity posEntity = posRepository
                 .findById(id)
@@ -71,6 +101,13 @@ public class PosService {
         return posMapper.toDto(posEntity);
     }
 
+
+    /**
+     * Busca todas las terminales POS (Point of Sale) por su estado.
+     * @param statusRequest Estado de la terminal POS a buscar.
+     * @param pageable Información de paginación.
+     * @return Página de {@link PosResponse} DTOs con los datos de las terminales POS encontradas.
+     */
     public Page<PosResponse> findByStatus(Status statusRequest, Pageable pageable) {
         Page<PosEntity> posEntities = posRepository.findByStatus(statusRequest, pageable);
         return posEntities.map(posMapper::toDto);
@@ -78,53 +115,26 @@ public class PosService {
 
     /**
      * Busca POS aplicando filtros individuales.
-     * @param id ID del POS (opcional).
-     * @param storeId ID de la tienda (opcional).
-     * @param status Estado del POS (opcional).
-     * @param employeeId ID del empleado (opcional).
-     * @param currentAmountMin Monto mínimo actual (opcional).
-     * @param currentAmountMax Monto máximo actual (opcional).
+     * id ID del POS (opcional).
+     * storeId ID de la tienda (opcional).
+     * status Estado del POS (opcional).
+     * employeeId ID del empleado (opcional).
+     * currentAmountMin Monto mínimo actual (opcional).
+     * currentAmountMax Monto máximo actual (opcional).
      * @param pageable Información de paginación.
      * @return Página de POS que cumplen con los filtros.
      */
-    public Page<PosResponse> findAllWithFilters(
-            Long id,
-            Long storeId,
-            Status status,
-            Long employeeId,
-            BigDecimal currentAmountMin,
-            BigDecimal currentAmountMax,
-            Pageable pageable) {
+    public Page<PosResponse> findAllWithFilters(PosFilterRequest filters, Pageable pageable) {
 
-        Specification<PosEntity> spec = Specification.where(null);
+            Specification<PosEntity> spec = Specification.where(PosSpecification.byId(filters.getId()))
+                    .and(PosSpecification.byStatus(filters.getStatus()))
+                    .and(PosSpecification.byEmployeeId(filters.getEmployeeId()))
+                    .and(PosSpecification.byStoreId(filters.getStoreId()))
+                    .and(PosSpecification.byCurrentAmountGreaterThan(filters.getCurrentAmount()))
+                    .and(PosSpecification.byCurrentAmountLessThan(filters.getCurrentAmount()));
 
-        if (id != null) {
-            spec = spec.and(PosSpecification.byId(id));
+            return findAll(spec, pageable);
         }
-
-        if (storeId != null) {
-            spec = spec.and(PosSpecification.byStoreId(storeId));
-        }
-
-        if (status != null) {
-            spec = spec.and(PosSpecification.byStatus(status));
-        }
-
-        if (employeeId != null) {
-            spec = spec.and(PosSpecification.byEmployeeId(employeeId));
-        }
-
-        if (currentAmountMin != null) {
-            spec = spec.and(PosSpecification.byCurrentAmountGreaterThan(currentAmountMin));
-        }
-
-        if (currentAmountMax != null) {
-            spec = spec.and(PosSpecification.byCurrentAmountLessThan(currentAmountMax));
-        }
-
-        return posRepository.findAll(spec, pageable)
-                .map(posMapper::toDto);
-    }
 
     public void addAmount(Long id, PosAmountRequest posAmountRequest) {
         posRepository.findById(id).ifPresent(posEntity -> {
