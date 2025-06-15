@@ -43,6 +43,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
+
+        if (jwtService.isTokenInvalidated(jwt)){
+            System.out.println("Entro a la validacion");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token has been invalidated");
+            return;
+        }
+
+        System.out.println("Pase la validacion");
+
         userEmail = jwtService.extractUsername(jwt);
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

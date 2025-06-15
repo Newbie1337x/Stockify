@@ -2,10 +2,7 @@ package org.stockify.security.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.security.model.dto.request.AuthRequest;
 import org.stockify.security.model.dto.request.CredentialRequest;
@@ -32,6 +29,12 @@ public class AuthController {
             @RequestBody RegisterEmployeeRequest registerEmployeeRequest) {
         AuthResponse response = authService.registerEmployee(registerEmployeeRequest);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("cerrar_sesion")
+    public ResponseEntity<String> cerrarSesion(@RequestHeader("Authorization") String token){
+        jwtService.invalidateToken(token);
+        return ResponseEntity.ok("Se ha cerrado el sesion");
     }
 
     @PostMapping

@@ -119,4 +119,6 @@ public class AuthService {
             throw new org.stockify.security.exception.AuthenticationException("Authentication failed: " + e.getMessage(), e);
         }
     }
+
+
 }
