@@ -182,6 +182,14 @@ public class ProductService {
         return new BulkProductResponse(requests.size(),created,skipped,error,results);
     }
 
+
+    /**
+     * Importa productos desde un archivo CSV.
+     *
+     * @param archivo Archivo CSV con los datos de los productos
+     * @return Respuesta con estadísticas de la operación (creados, omitidos, errores) y detalles de cada elemento
+     * @throws Exception si ocurre un error al procesar el archivo
+     */
     public BulkProductResponse importProductsCsv(MultipartFile archivo) throws Exception {
         // Parsear CSV a DTOs
         InputStreamReader reader = new InputStreamReader(archivo.getInputStream());
