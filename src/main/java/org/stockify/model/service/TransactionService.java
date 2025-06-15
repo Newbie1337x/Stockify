@@ -54,7 +54,17 @@ public class TransactionService {
         this.sessionPosRepository = sessionPosRepository;
     }
 
-    //This method is uses to controllers
+    /**
+     * Creates and saves a monetary transaction without product details.
+     * This is typically used for simple financial operations such as cash withdrawals,
+     * paying external services (e.g., taxis), or recording generic money movements.
+     *
+     * @param request the basic transaction data
+     * @param idLocal the ID of the store where the transaction occurs
+     * @param idPos the ID of the POS terminal used
+     * @param type the type of transaction (e.g., CASH_OUT, TRANSFER)
+     * @return a response summarizing the created transaction
+     */
     public TransactionCreatedResponse saveTransaction(TransactionCreatedRequest request, Long idLocal, Long idPos, TransactionType type) {
         if (!posRepository.existsById(idPos)) {
             throw new NotFoundException("POS with ID " + idPos + " not found.");
@@ -78,6 +88,18 @@ public class TransactionService {
         return transactionMapper.toDtoCreated(transactionRepository
                 .save(transactionEntity));
     }
+
+    /**
+     * Creates and persists a complete transaction with product details.
+     * This is used specifically by sales and purchase services to register operations
+     * that involve specific products, their quantities, and prices.
+     *
+     * @param request the detailed transaction request including products and quantities
+     * @param idLocal the ID of the store associated with the transaction
+     * @param idPos the ID of the POS terminal involved
+     * @param type the type of transaction (SALE or PURCHASE)
+     * @return the persisted TransactionEntity
+     */
     public TransactionEntity createTransaction(TransactionRequest request, Long idLocal, Long idPos, TransactionType type) {
 
         if (!posRepository.existsById(idPos)) {
