@@ -99,4 +99,16 @@ public class PurchaseService {
     }
 
 
+    /**
+     * Busca una compra por su ID.
+     *
+     * @param id ID de la compra a buscar
+     * @return DTO con los datos de la compra encontrada
+     * @throws NotFoundException si no se encuentra la compra
+     */
+    public PurchaseResponse findById(Long id) {
+        PurchaseEntity purchase = purchaseRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Purchase not found with id: " + id));
+        return purchaseMapper.toResponseDTO(purchase);
+    }
 }
