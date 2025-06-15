@@ -57,15 +57,16 @@ public class SessionPosService {
         return sessionPosMapper.toDto(repository.save(sessionPosEntity));
     }
 
-    public SessionPosEntity findById(Long id)
-    {
-        return repository.findById(id).orElseThrow(NotFoundException::new);
+    public SessionPosResponse findById(Long id) {
+        SessionPosEntity entity = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("SessionPos with ID " + id + " not found."));
+        return sessionPosMapper.toDto(entity);
     }
 
     public SessionPosEntity findByIdPosAndCloseTime(Long id, LocalDateTime closeTime)
     {
         return repository.findByPosEntity_IdAndCloseTime(id,closeTime)
-                .orElseThrow(NotFoundException::new);
+                .orElseThrow(()-> new NotFoundException("SessionPos with ID " + id + " not found."));
     }
 
     public Boolean isOpened(Long id, LocalDateTime closeTime)
