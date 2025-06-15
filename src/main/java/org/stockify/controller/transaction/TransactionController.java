@@ -21,6 +21,14 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    /**
+     * Creates a generic transaction of type OTHER (e.g., cash withdrawals, paying external services).
+     *
+     * @param storeID ID of the store where the transaction occurs
+     * @param posID ID of the POS terminal used
+     * @param request DTO with the basic transaction data
+     * @return ResponseEntity with the created transaction details
+     */
     @Operation(summary = "Create a generic transaction (type = OTHER)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Transaction created successfully"),

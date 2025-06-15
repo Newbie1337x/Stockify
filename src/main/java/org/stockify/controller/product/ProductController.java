@@ -39,6 +39,7 @@ public class ProductController {
     private final ProductService productService;
     private final ProductModelAssembler productModelAssembler;
 
+
     @Operation(summary = "List all products with optional filters")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Paged list of products returned successfully")
@@ -54,6 +55,7 @@ public class ProductController {
         return ResponseEntity.ok(assembler.toModel(products, productModelAssembler));
     }
 
+
     @Operation(summary = "Create multiple products in bulk")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "207", description = "Multi-status response with results of each product creation")
@@ -63,6 +65,7 @@ public class ProductController {
             @RequestBody List<@Valid ProductRequest> products) {
         return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(productService.saveAll(products));
     }
+
 
     @PostMapping(value = "/import", consumes = "multipart/form-data")
     @Operation(summary = "Import products from CSV file")
@@ -81,6 +84,7 @@ public class ProductController {
         }
     }
 
+
     @Operation(summary = "Get a product by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product found"),
@@ -92,6 +96,8 @@ public class ProductController {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.findById(productID)));
     }
 
+
+
     @Operation(summary = "Create a new product")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product created successfully"),
@@ -102,6 +108,7 @@ public class ProductController {
             @Valid @RequestBody ProductRequest product) {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.save(product)));
     }
+
 
     @Operation(summary = "Delete a product by ID")
     @ApiResponses(value = {
@@ -115,6 +122,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+
     @Operation(summary = "Update an existing product by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product updated successfully"),
@@ -127,6 +135,7 @@ public class ProductController {
             @Valid @RequestBody ProductRequest product) {
         return ResponseEntity.ok().body(productModelAssembler.toModel(productService.update(productID, product)));
     }
+
 
     @Operation(summary = "Patch an existing product by ID")
     @ApiResponses(value = {

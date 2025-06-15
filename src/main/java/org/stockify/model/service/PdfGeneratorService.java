@@ -63,6 +63,14 @@ public class PdfGeneratorService {
                         .transaction(dto).build()));
     }
 
+    /**
+     * Generates a PDF from HTML using Thymeleaf templates.
+     *
+     * @param dto the transaction data transfer object
+     * @param outputPath the path where the PDF will be saved
+     * @param transaction the transaction entity
+     * @throws Exception if an error occurs during PDF generation
+     */
     private void generateHtmlToPdf(TransactionResponse dto, String outputPath, TransactionEntity transaction) throws Exception {
         // Configurar Thymeleaf
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();

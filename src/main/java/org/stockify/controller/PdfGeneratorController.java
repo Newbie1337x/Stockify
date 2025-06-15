@@ -23,7 +23,7 @@ public class PdfGeneratorController {
 
     private final PdfGeneratorService pdfGeneratorService;
 
-    @Operation(summary = "Generate PDF for a transaction by ID")
+    @Operation(summary = "Generate PDF for a transaction (purchase or sale only) by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "PDF generated successfully"),
             @ApiResponse(responseCode = "404", description = "Transaction not found"),

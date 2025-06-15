@@ -143,6 +143,11 @@ public class TransactionService {
     }
 
 
+    /**
+     * Retrieves all transactions from the repository.
+     *
+     * @return a list of TransactionResponse objects representing all transactions
+     */
     public List<TransactionResponse> findAll()
     {
         return transactionRepository
