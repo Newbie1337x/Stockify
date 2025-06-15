@@ -1,4 +1,4 @@
-package org.stockify.dto.request;
+package org.stockify.dto.request.transaction;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -6,9 +6,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Value;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * DTO for {@link org.stockify.model.entity.DetailTransactionEntity}

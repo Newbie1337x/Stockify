@@ -14,9 +14,7 @@ import org.stockify.model.entity.StoreEntity;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.NotFoundException;
-import org.stockify.model.mapper.DetailTransactionMapper;
 import org.stockify.model.mapper.TransactionMapper;
-import org.stockify.model.repository.PosRepository;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.repository.TransactionRepository;
@@ -79,18 +77,22 @@ public class TransactionService {
         TransactionEntity transactionEntity = transactionMapper.toEntity(request);
         transactionEntity.setDetailTransactions(detailTransactions);
 
+
         //FIX: asignar la transacción a cada detalle
         detailTransactions.forEach(detail -> detail.setTransaction(transactionEntity));
+
 
         // Setear la sesión del POS
         transactionEntity.setSessionPosEntity(
                 sessionPosService.findByIdPosAndCloseTime(idPos, null)
         );
 
+
         // Buscar y setear el local
         StoreEntity store = storeRepository.findById(idLocal)
                 .orElseThrow(() -> new NotFoundException("Store with ID " + idLocal + " not found."));
         transactionEntity.setStore(store);
+
 
         // Calcular el total
         transactionEntity.setTotal(
@@ -101,8 +103,10 @@ public class TransactionService {
                         .orElse(BigDecimal.ZERO)
         );
 
+
         transactionEntity.setDescription(request.getDescription());
         transactionEntity.setType(type);
+
 
         // Guardar y devolver el response
         return transactionMapper.toDto(transactionRepository.save(transactionEntity));

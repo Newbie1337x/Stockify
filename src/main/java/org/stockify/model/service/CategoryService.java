@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.stockify.dto.request.CategoryRequest;
+import org.stockify.dto.request.category.CategoryRequest;
 import org.stockify.dto.response.CategoryResponse;
 import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.exception.NotFoundException;

@@ -52,9 +52,13 @@ public class SaleService {
         TransactionResponse transaction = transactionService.createTransaction(request.getTransaction(), storeID, posID, TransactionType.SALE);
 
         SaleEntity sale = saleMapper.toEntity(request);
+
+
         if (request.getClientId() != null) {
-            sale.setClient(clientRepository.findById(request.getClientId()).orElseThrow(() -> new NotFoundException("Client not found with ID"+ request.getClientId())));
+            sale.setClient(clientRepository.findById(request.getClientId()).orElseThrow(() ->
+                    new NotFoundException("Client not found with ID"+ request.getClientId())));
         }
+
         sale.setTransaction(transactionRepository.findById(transaction.getId())
                 .orElseThrow(() -> new NotFoundException("Transaction not found")));
 

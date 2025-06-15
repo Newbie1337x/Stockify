@@ -17,5 +17,6 @@ public class SessionPosFiltersRequest {
     private BigDecimal openingAmountMax;
     private BigDecimal closeAmountMin;
     private BigDecimal closeAmountMax;
+    private BigDecimal cashDifference;
     private Boolean isOpen;
 }

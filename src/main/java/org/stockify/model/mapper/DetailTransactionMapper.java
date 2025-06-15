@@ -2,7 +2,7 @@ package org.stockify.model.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.stockify.dto.request.DetailTransactionRequest;
+import org.stockify.dto.request.transaction.DetailTransactionRequest;
 import org.stockify.dto.response.DetailTransactionResponse;
 import org.stockify.model.entity.DetailTransactionEntity;
 

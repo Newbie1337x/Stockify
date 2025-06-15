@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.stockify.config.GlobalPreferencesConfig;
-import org.stockify.dto.request.ProductFilterRequest;
+import org.stockify.dto.request.product.ProductFilterRequest;
 import org.stockify.dto.request.stock.StockRequest;
 import org.stockify.dto.request.stock.StockTransferRequest;
 import org.stockify.dto.response.ProductStoreResponse;

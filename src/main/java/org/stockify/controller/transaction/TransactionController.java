@@ -47,7 +47,7 @@ public class TransactionController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "PDF generated successfully"),
             @ApiResponse(responseCode = "404", description = "Transaction not found"),
-            @ApiResponse(responseCode = "500", description = "PDF generation error")
+            @ApiResponse(responseCode = "500", description = "PDF generation error") //TODO a corregir
     })
     @GetMapping("/transaction/pdf/{idTransaction}")
     public ResponseEntity<EntityModel<TransactionPDFResponse>> generatePdf(

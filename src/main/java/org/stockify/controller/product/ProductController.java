@@ -2,6 +2,8 @@ package org.stockify.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,8 +20,9 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.dto.request.ProductFilterRequest;
-import org.stockify.dto.request.ProductRequest;
+import org.springframework.web.multipart.MultipartFile;
+import org.stockify.dto.request.product.ProductFilterRequest;
+import org.stockify.dto.request.product.ProductRequest;
 import org.stockify.dto.response.BulkProductResponse;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.assembler.ProductModelAssembler;
@@ -59,6 +62,23 @@ public class ProductController {
     public ResponseEntity<BulkProductResponse> bulkSaveProducts(
             @RequestBody List<@Valid ProductRequest> products) {
         return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(productService.saveAll(products));
+    }
+
+    @PostMapping(value = "/import", consumes = "multipart/form-data")
+    @Operation(summary = "Import products from CSV file")
+    @ApiResponse(responseCode = "200", description = "Successful import")
+    public ResponseEntity<BulkProductResponse> importProducts(
+            @Parameter(description = "CSV file with products", required = true,
+                    content = @Content(mediaType = "multipart/form-data",
+                            schema = @Schema(type = "string", format = "binary")))
+            @RequestParam("file") MultipartFile archivo) {
+
+        try {
+            BulkProductResponse response = productService.importProductsCsv(archivo);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Operation(summary = "Get a product by ID")

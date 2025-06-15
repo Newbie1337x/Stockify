@@ -14,7 +14,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.dto.request.ProductFilterRequest;
+import org.stockify.dto.request.product.ProductFilterRequest;
 import org.stockify.dto.response.ProductStoreResponse;
 import org.stockify.model.assembler.ProductStoreModelAssembler;
 import org.stockify.model.service.StockService;

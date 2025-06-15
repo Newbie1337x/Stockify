@@ -133,6 +133,8 @@ public class SessionPosService {
                 .and(SessionPosSpecifications.hasOpeningAmountLessThan(filtersRequest.getOpeningAmountMax()))
                 .and(SessionPosSpecifications.hasCloseAmountGreaterThan(filtersRequest.getCloseAmountMin()))
                 .and(SessionPosSpecifications.hasCloseAmountLessThan(filtersRequest.getCloseAmountMax()))
+                .and(SessionPosSpecifications.hasCashDifferenceGreaterThan(filtersRequest.getCashDifference()))
+                .and(SessionPosSpecifications.hasCashDifferenceLessThan(filtersRequest.getCashDifference()))
                 .and(SessionPosSpecifications.isOpen(filtersRequest.getIsOpen()));
         return findAll(spec, pageable);
     }

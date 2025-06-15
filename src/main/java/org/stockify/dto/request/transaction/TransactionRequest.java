@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.stockify.dto.request.DetailTransactionRequest;
 import org.stockify.model.enums.PaymentMethod;
 
 import java.util.List;

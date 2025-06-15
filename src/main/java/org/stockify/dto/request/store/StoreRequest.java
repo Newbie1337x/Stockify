@@ -1,4 +1,4 @@
-package org.stockify.dto.request;
+package org.stockify.dto.request.store;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

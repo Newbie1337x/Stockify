@@ -4,7 +4,6 @@ import lombok.Value;
 import org.stockify.model.enums.PaymentMethod;
 import org.stockify.model.enums.TransactionType;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -15,6 +14,7 @@ import java.util.Set;
 @Value
 public class TransactionResponse{
     Long id;
+    Long clientId;
     BigDecimal total;
     LocalDateTime dateTime;
     PaymentMethod paymentMethod;

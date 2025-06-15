@@ -1,5 +1,6 @@
 package org.stockify.model.service;
 
+import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,9 +10,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import org.stockify.dto.request.ProductFilterRequest;
-import org.stockify.dto.request.ProductRequest;
+import org.stockify.dto.request.product.ProductCSVRequest;
+import org.stockify.dto.request.product.ProductFilterRequest;
+import org.stockify.dto.request.product.ProductRequest;
 import org.stockify.dto.response.BulkItemResponse;
 import org.stockify.dto.response.BulkProductResponse;
 import org.stockify.dto.response.CategoryResponse;
@@ -28,9 +31,11 @@ import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.ProviderRepository;
 import org.stockify.model.specification.ProductSpecifications;
 import org.stockify.model.specification.SpecificationBuilder;
+
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 
 @Service
@@ -175,6 +180,24 @@ public class ProductService {
             }
         }
         return new BulkProductResponse(requests.size(),created,skipped,error,results);
+    }
+
+    public BulkProductResponse importProductsCsv(MultipartFile archivo) throws Exception {
+        // Parsear CSV a DTOs
+        InputStreamReader reader = new InputStreamReader(archivo.getInputStream());
+
+        List<ProductCSVRequest> csvDtos = new CsvToBeanBuilder<ProductCSVRequest>(reader)
+                .withType(ProductCSVRequest.class)
+                .withIgnoreLeadingWhiteSpace(true)
+                .build()
+                .parse();
+
+        // Convertir DTOs a ProductRequest
+        List<ProductRequest> requests = csvDtos.stream()
+                .map(productMapper::toRequest)
+                .collect(Collectors.toList());
+
+        return saveAll(requests);
     }
 
     /**

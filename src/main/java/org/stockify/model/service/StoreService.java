@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.stockify.dto.request.StoreRequest;
+import org.stockify.dto.request.store.StoreRequest;
 import org.stockify.dto.response.StoreResponse;
 import org.stockify.model.entity.StoreEntity;
 import org.stockify.model.exception.NotFoundException;
