@@ -107,14 +107,14 @@ public class AuthService {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            input.username(),
+                            input.email(),
                             input.password()
                     )
             );
-            return credentialsRepository.findByUsername(input.username())
-                    .orElseThrow(() -> new org.springframework.security.core.userdetails.UsernameNotFoundException("User not found with email: " + input.username()));
+            return credentialsRepository.findByEmail(input.email())
+                    .orElseThrow(() -> new org.springframework.security.core.userdetails.UsernameNotFoundException("User not found with email: " + input.email()));
         } catch (org.springframework.security.authentication.BadCredentialsException e) {
-            throw new org.springframework.security.authentication.BadCredentialsException("Invalid username or password");
+            throw new org.springframework.security.authentication.BadCredentialsException("Invalid email or password");
         } catch (Exception e) {
             throw new org.stockify.security.exception.AuthenticationException("Authentication failed: " + e.getMessage(), e);
         }

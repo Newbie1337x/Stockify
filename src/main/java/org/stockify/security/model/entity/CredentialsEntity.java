@@ -67,7 +67,7 @@ public class CredentialsEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.email;
     }
 
     @Override

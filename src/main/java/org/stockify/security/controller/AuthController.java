@@ -37,7 +37,7 @@ public class AuthController {
         return ResponseEntity.ok("Se ha cerrado el sesion");
     }
 
-    @PostMapping
+    @PostMapping("iniciar_sesion")
     public ResponseEntity<AuthResponse> authenticateUser(@RequestBody
                                                          AuthRequest authRequest){
 

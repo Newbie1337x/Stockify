@@ -12,12 +12,13 @@ public interface CredentialRepository extends JpaRepository<CredentialsEntity, L
 
     Optional<CredentialsEntity> findByUsername(String username);
     Boolean existsByEmail(String email);
+    Optional<CredentialsEntity> findByEmail(String email);
 
     @Query("""
     SELECT c FROM CredentialsEntity c
     JOIN FETCH c.roles r
     JOIN FETCH r.permits
-    WHERE c.username = :username
+    WHERE c.email = :email
     """)
-    Optional<CredentialsEntity> findByUsernameWithRolesAndPermits(@Param("username") String username);
+    Optional<CredentialsEntity> findByEmailWithRolesAndPermits(@Param("email") String email);
 }
