@@ -118,30 +118,8 @@ public class PurchaseController {
         PurchaseResponse response = purchaseService.updatePurchase(id, request);
         return ResponseEntity.ok(purchaseModelAssembler.toModel(response));
     }
-    @Operation(
-            summary = "Partially update a purchase by ID",
-            description = "Apply a partial update to an existing purchase by its ID."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Purchase patched successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PurchaseResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Purchase not found",
-                    content = @Content
-            )
-    })
-    @PatchMapping("/{id}")
-    public ResponseEntity<EntityModel<PurchaseResponse>> patch(
-            @Parameter(description = "ID of the purchase to patch", required = true) @PathVariable Long id,
-            @Valid @RequestBody PurchaseRequest request
-    ) {
-        PurchaseResponse response = purchaseService.patchPurchase(id, request);
-        return ResponseEntity.ok(purchaseModelAssembler.toModel(response));
-    }
+
+
 
 
 }
