@@ -1,4 +1,5 @@
 package org.stockify.dto.request.pos;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -9,18 +10,12 @@ import org.stockify.model.entity.PosEntity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-/**
- * DTO de petición utilizado para actualizar el monto actual ({@code currentAmount})
- * de una entidad {@link PosEntity}.
- * Representa el saldo disponible en un punto de venta (POS), con validaciones que
- * aseguran que el valor no sea nulo ni negativo.
- */
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class PosAmountRequest {
+    @Schema(description = "Current amount available in the POS", example = "1500.00", required = true)
     @NotNull(message = "currentAmount must not be null")
     private BigDecimal currentAmount;
 }

@@ -5,7 +5,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
-import org.stockify.controller.StoreController;
+import org.stockify.controller.store.StoreController;
+import org.stockify.controller.store.StoreProductController;
 import org.stockify.dto.response.StoreResponse;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -24,7 +25,7 @@ public class StoreModelAssembler implements RepresentationModelAssembler<StoreRe
                 linkTo(methodOn(StoreController.class)
                         .getAllStores(PageRequest.of(0, 10), null))
                         .withRel("stores"),
-                linkTo(methodOn(StoreController.class)
+                linkTo(methodOn(StoreProductController.class)
                         .getProductsFromStore(storeResponse.id(), PageRequest.of(0, 10), null, null))
                         .withRel("products")
         );

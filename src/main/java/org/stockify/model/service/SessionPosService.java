@@ -1,9 +1,11 @@
 package org.stockify.model.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.stockify.dto.request.sessionpos.SessionPosFiltersRequest;
 import org.stockify.dto.request.sessionpos.SessionPosRequest;
 import org.stockify.dto.response.SessionPosCreateResponse;
 import org.stockify.dto.response.SessionPosResponse;
@@ -13,21 +15,18 @@ import org.stockify.model.mapper.SessionPosMapper;
 import org.stockify.model.repository.SessionPosRepository;
 import org.stockify.model.specification.SessionPosSpecifications;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+
 public class SessionPosService {
 
     private final SessionPosRepository repository;
     private final SessionPosMapper sessionPosMapper;
 
-    public SessionPosService(SessionPosRepository repository, SessionPosMapper sessionPosMapper) {
-        this.repository = repository;
-        this.sessionPosMapper = sessionPosMapper;
-    }
 
     /**
      * Guarda una nueva sesión POS en la base de datos a partir de un objeto de solicitud (DTO).
@@ -107,85 +106,36 @@ public class SessionPosService {
     }
 
     /**
-     * Busca sesiones de POS aplicando filtros.
-     * @param employeeId ID del empleado (opcional).
-     * @param posId ID del POS (opcional).
-     * @param openingTimeStart Fecha de inicio para filtrar por fecha de apertura (opcional).
-     * @param openingTimeEnd Fecha de fin para filtrar por fecha de apertura (opcional).
-     * @param closeTimeStart Fecha de inicio para filtrar por fecha de cierre (opcional).
-     * @param closeTimeEnd Fecha de fin para filtrar por fecha de cierre (opcional).
-     * @param openingAmountMin Monto mínimo de apertura (opcional).
-     * @param openingAmountMax Monto máximo de apertura (opcional).
-     * @param closeAmountMin Monto mínimo de cierre (opcional).
-     * @param closeAmountMax Monto máximo de cierre (opcional).
-     * @param isOpen Si es true, filtra solo sesiones abiertas; si es false, filtra solo sesiones cerradas; si es null, no filtra por estado (opcional).
+     * Busca sesiones de POS aplicando filtros:
+     * employeeId ID del empleado (opcional).
+     * posId ID del POS (opcional).
+     * openingTimeStart Fecha de inicio para filtrar por fecha de apertura (opcional).
+     * openingTimeEnd Fecha de fin para filtrar por fecha de apertura (opcional).
+     * closeTimeStart Fecha de inicio para filtrar por fecha de cierre (opcional).
+     * closeTimeEnd Fecha de fin para filtrar por fecha de cierre (opcional).
+     * openingAmountMin Monto mínimo de apertura (opcional).
+     * openingAmountMax Monto máximo de apertura (opcional).
+     * closeAmountMin Monto mínimo de cierre (opcional).
+     * closeAmountMax Monto máximo de cierre (opcional).
+     * isOpen Si es true, filtra solo sesiones abiertas; si es false, filtra solo sesiones cerradas; si es null, no filtra por estado (opcional).
      * @param pageable Información de paginación.
      * @return Página de sesiones de POS que cumplen con los filtros.
      */
-    public Page<SessionPosResponse> findAllWithFilters(
-            Long employeeId,
-            Long posId,
-            LocalDateTime openingTimeStart,
-            LocalDateTime openingTimeEnd,
-            LocalDateTime closeTimeStart,
-            LocalDateTime closeTimeEnd,
-            BigDecimal openingAmountMin,
-            BigDecimal openingAmountMax,
-            BigDecimal closeAmountMin,
-            BigDecimal closeAmountMax,
-            Boolean isOpen,
-            Pageable pageable) {
+    public Page<SessionPosResponse> findAllWithFilters(SessionPosFiltersRequest filtersRequest, Pageable pageable) {
 
-        Specification<SessionPosEntity> spec = Specification.where(null);
-
-        if (employeeId != null) {
-            spec = spec.and(SessionPosSpecifications.hasEmployeeId(employeeId));
-        }
-
-        if (posId != null) {
-            spec = spec.and(SessionPosSpecifications.hasPosId(posId));
-        }
-
-        if (openingTimeStart != null) {
-            spec = spec.and(SessionPosSpecifications.hasOpeningTimeAfter(openingTimeStart));
-        }
-
-        if (openingTimeEnd != null) {
-            spec = spec.and(SessionPosSpecifications.hasOpeningTimeBefore(openingTimeEnd));
-        }
-
-        if (closeTimeStart != null) {
-            spec = spec.and(SessionPosSpecifications.hasCloseTimeAfter(closeTimeStart));
-        }
-
-        if (closeTimeEnd != null) {
-            spec = spec.and(SessionPosSpecifications.hasCloseTimeBefore(closeTimeEnd));
-        }
-
-        if (openingAmountMin != null) {
-            spec = spec.and(SessionPosSpecifications.hasOpeningAmountGreaterThan(openingAmountMin));
-        }
-
-        if (openingAmountMax != null) {
-            spec = spec.and(SessionPosSpecifications.hasOpeningAmountLessThan(openingAmountMax));
-        }
-
-        if (closeAmountMin != null) {
-            spec = spec.and(SessionPosSpecifications.hasCloseAmountGreaterThan(closeAmountMin));
-        }
-
-        if (closeAmountMax != null) {
-            spec = spec.and(SessionPosSpecifications.hasCloseAmountLessThan(closeAmountMax));
-        }
-
-        if (isOpen != null) {
-            if (isOpen) {
-                spec = spec.and(SessionPosSpecifications.isOpen());
-            } else {
-                spec = spec.and(SessionPosSpecifications.isClosed());
-            }
-        }
-
+        Specification<SessionPosEntity> spec = Specification.where(SessionPosSpecifications.hasPosId(filtersRequest.getPosId()))
+                .and(SessionPosSpecifications.hasEmployeeId(filtersRequest.getEmployeeId()))
+                .and(SessionPosSpecifications.hasOpeningTimeAfter(filtersRequest.getOpeningTimeStart()))
+                .and(SessionPosSpecifications.hasOpeningTimeBefore(filtersRequest.getOpeningTimeEnd()))
+                .and(SessionPosSpecifications.hasCloseTimeAfter(filtersRequest.getCloseTimeStart()))
+                .and(SessionPosSpecifications.hasCloseTimeBefore(filtersRequest.getCloseTimeEnd()))
+                .and(SessionPosSpecifications.hasOpeningAmountGreaterThan(filtersRequest.getOpeningAmountMin()))
+                .and(SessionPosSpecifications.hasOpeningAmountLessThan(filtersRequest.getOpeningAmountMax()))
+                .and(SessionPosSpecifications.hasCloseAmountGreaterThan(filtersRequest.getCloseAmountMin()))
+                .and(SessionPosSpecifications.hasCloseAmountLessThan(filtersRequest.getCloseAmountMax()))
+                .and(SessionPosSpecifications.hasCashDifferenceGreaterThan(filtersRequest.getCashDifference()))
+                .and(SessionPosSpecifications.hasCashDifferenceLessThan(filtersRequest.getCashDifference()))
+                .and(SessionPosSpecifications.isOpen(filtersRequest.getIsOpen()));
         return findAll(spec, pageable);
     }
     

@@ -5,8 +5,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
-import org.stockify.controller.ProductController;
-import org.stockify.dto.request.ProductFilterRequest;
+import org.stockify.controller.product.ProductController;
+import org.stockify.dto.request.product.ProductFilterRequest;
 import org.stockify.dto.response.ProductResponse;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;

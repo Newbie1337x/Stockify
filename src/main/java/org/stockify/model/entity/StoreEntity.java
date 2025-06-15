@@ -36,6 +36,9 @@ public class StoreEntity {
     @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
     private Set<PosEntity> posEntities;
 
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
+    private Set<TransactionEntity> transactions;
+
 
 
 }

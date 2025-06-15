@@ -1,27 +1,28 @@
 package org.stockify.dto.response;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
-/**
- * DTO de respuesta que representa los datos enviados desde el servidor al cliente.
- * Se utiliza para devolver información estructurada después de procesar una solicitud.
- */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-    public class PosResponse {
+public class PosResponse {
+
+    @Schema(description = "Unique identifier of the POS", example = "1001")
     private Long id;
+
+    @Schema(description = "Current cash amount in the POS", example = "2500.75")
     private BigDecimal currentAmount;
+
+    @Schema(description = "Current status of the POS", example = "OPEN")
     private Status status;
+
+    @Schema(description = "Identifier of the associated store", example = "10")
     private Long idStore;
 }

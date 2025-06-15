@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Stockify Buy</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+<h2>Transaction</h2>
+<p><strong>Provider:</strong> <span th:text="${providerName}"></span></p>
+<p><strong>TransactionId:</strong> <span th:text="${transactionId}"></span></p>
+<p><strong>Date:</strong> <span th:text="${date}"></span></p>
+
+<table>
+    <thead>
+    <tr>
+        <th>Description</th>
+        <th>Quantity</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${items}">
+        <td th:text="${item.description}"></td>
+        <td th:text="${item.quantity}"></td>
+        <td th:text="${item.price} + ' $'"></td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Total: <span th:text="${total} + ' $'"></span></h3>
+</body>
+</html>

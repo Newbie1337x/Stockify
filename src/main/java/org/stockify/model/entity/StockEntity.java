@@ -7,7 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "stock")
+@Table(name = "stock",uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"product_id", "store_id"
+        })
+})
+
 public class StockEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +32,6 @@ public class StockEntity {
     @Column(name = "quantity", nullable = false)
     private Double quantity;
 
+    @Column(nullable = false ,columnDefinition = "boolean default false")
+    private boolean lowStockAlertSent;
 }

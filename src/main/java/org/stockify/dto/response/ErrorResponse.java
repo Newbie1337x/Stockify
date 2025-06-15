@@ -1,19 +1,22 @@
 package org.stockify.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
-
-/**
- * DTO de respuesta utilizada para representar detalles de un error ocurrido durante el procesamiento de una solicitud.
- * Incluye información relevante como el mensaje de error, tipo de error, código de estado HTTP,
- * ruta de la solicitud y marca de tiempo del momento en que ocurrió el error.
- */
+@Schema(description = "Error response DTO")
 public record ErrorResponse(
+        @Schema(description = "Error message describing what went wrong", example = "Resource not found")
         String message,
+
+        @Schema(description = "Type or category of the error", example = "NotFoundException")
         String error,
+
+        @Schema(description = "HTTP status code", example = "404")
         int status,
+
+        @Schema(description = "Request path where the error occurred", example = "/api/products/1")
         String path,
+
+        @Schema(description = "Timestamp when the error occurred", example = "2025-06-15T14:30:00")
         LocalDateTime timestamp
-)
-
-{}
-
+){}

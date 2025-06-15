@@ -11,8 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface ClientRepository extends JpaRepository<ClientEntity, Long>, JpaSpecificationExecutor<ClientEntity> {
-    /// ESTO ESTÁ BIEN O NO HACE FALTA ?
-    Page<ClientEntity> findByFirstName(String firstName, Pageable pageable);
     Optional<ClientEntity> findById(Long id);
     Page<ClientEntity> findAll(Pageable pageable);
 }

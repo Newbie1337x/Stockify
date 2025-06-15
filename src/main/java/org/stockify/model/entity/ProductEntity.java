@@ -19,7 +19,7 @@ public class ProductEntity {
 
     @Column(name = "id", nullable = false)
     private Long id;
-    
+
     @Column(name = "name", unique = true ,nullable = false)
     private String name;
 
@@ -30,9 +30,13 @@ public class ProductEntity {
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
+    @ColumnDefault("0")
+    @Column(name = "unit_price", precision = 10,scale = 2)
+    private BigDecimal unitPrice;
+
     //Check
     @ColumnDefault("-1")
-    @Column(name = "sku", unique = true)
+    @Column(name = "sku", unique = false)
     private String sku;
 
     @Column(name = "barcode" , unique = true)
@@ -58,6 +62,9 @@ public class ProductEntity {
             inverseJoinColumns = @JoinColumn(name = "provider_id")
     )
     private Set<ProviderEntity> providers;
+    // Relationship with DetailTransactionEntity
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private Set<DetailTransactionEntity> detailTransactions;
 
     public ProductEntity(){
         categories = new HashSet<>();

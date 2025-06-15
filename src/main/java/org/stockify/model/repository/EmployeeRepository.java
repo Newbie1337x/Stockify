@@ -15,16 +15,9 @@ import java.util.Optional;
 @Repository
 public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long>,
         JpaSpecificationExecutor<EmployeeEntity> {
-    List<EmployeeEntity> getEmployeeEntitiesByName(String name);
-    List<EmployeeEntity> getEmployeeEntitiesByLastName(String lastName);
+
     List<EmployeeEntity> findByStatus(Status status);
-    Optional<EmployeeEntity> findByDni(String dni);
     Boolean existsByDni(String dni);
-
    Optional<EmployeeEntity> getEmployeeEntityByDni(String dni);
-
-    Page<EmployeeEntity> getEmployeeEntitiesByName(String name, Pageable pageable);
-    Page<EmployeeEntity> getEmployeeEntitiesByLastName(String lastName, Pageable pageable);
-    Page<EmployeeEntity> findByStatus(Status status, Pageable pageable);
 
 }

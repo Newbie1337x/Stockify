@@ -1,10 +1,11 @@
 package org.stockify.model.assembler;
 
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
-import org.stockify.controller.StoreController;
+import org.stockify.controller.store.StoreStockController;
+import org.stockify.controller.store.StoreController;
 import org.stockify.dto.response.StockResponse;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -17,8 +18,8 @@ public class StockModelAssembler implements RepresentationModelAssembler<StockRe
     @Override
     public EntityModel<StockResponse> toModel(@NotNull StockResponse stockResponse) {
         return EntityModel.of(stockResponse,
-                linkTo(methodOn(StoreController.class)
-                        .getStock(stockResponse.product_id(), stockResponse.store_id()))
+                linkTo(methodOn(StoreStockController.class)
+                        .getStock(stockResponse.store_id(), stockResponse.product_id()))
                         .withSelfRel(),
                 linkTo(methodOn(StoreController.class)
                         .getStoreById(stockResponse.store_id()))

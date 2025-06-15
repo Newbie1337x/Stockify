@@ -13,8 +13,6 @@ import java.util.List;
 @Repository
 public interface PosRepository extends JpaRepository<PosEntity,Long>, JpaSpecificationExecutor<PosEntity> {
 
-
-    List<PosEntity> findByStatus(Status status);
-
     Page<PosEntity> findByStatus(Status status, Pageable pageable);
+    boolean existsById(Long posId);
 }

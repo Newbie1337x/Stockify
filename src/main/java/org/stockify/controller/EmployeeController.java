@@ -1,146 +1,109 @@
 package org.stockify.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.model.assembler.EmployeeModelAssembler;
 import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.service.EmployeeService;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.data.web.PagedResourcesAssembler;
 
 @RestController
-@RequestMapping("/employee")
-@Tag(name = "Employees", description = "Operations related to employee management")
+@RequestMapping("/employees")
+@RequiredArgsConstructor
+@Tag(name = "Employees", description = "Operations for managing employees")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final EmployeeModelAssembler employeeModelAssembler;
 
-    @Autowired
-    public EmployeeController(EmployeeService employeeService, EmployeeModelAssembler employeeModelAssembler) {
-        this.employeeService = employeeService;
-        this.employeeModelAssembler = employeeModelAssembler;
-    }
-
-    @Operation(
-            summary = "List employees",
-            description = "Retrieves a paginated list of employees with optional filters by ID, name, last name, and DNI.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Employees retrieved successfully")
-            }
-    )
+    @Operation(summary = "List all employees with optional filters")
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_EMPLOYEE') and hasAuthority('READ')")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "List of employees retrieved successfully")
+    })
     public ResponseEntity<PagedModel<EntityModel<EmployeeResponse>>> getAllEmployees(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) Long id,
-            @RequestParam(required = false) String dni,
-            @PageableDefault(size = 10) Pageable pageable,
+            @Parameter(description = "Filter by employee name") @RequestParam(required = false) String name,
+            @Parameter(description = "Filter by employee last name") @RequestParam(required = false) String lastName,
+            @Parameter(description = "Filter by employee DNI") @RequestParam(required = false) String dni,
+            @Parameter(hidden = true) Pageable pageable,
             PagedResourcesAssembler<EmployeeResponse> pagedAssembler
     ) {
-        Page<EmployeeResponse> employeePage = employeeService.getEmployees(id, name, lastName, dni, pageable);
+        Page<EmployeeResponse> employeePage = employeeService.getEmployees(name, lastName, dni, pageable);
         PagedModel<EntityModel<EmployeeResponse>> model = pagedAssembler.toModel(employeePage, employeeModelAssembler);
         return ResponseEntity.ok(model);
     }
 
-
-    @Operation(
-            summary = "Get employee by ID",
-            description = "Retrieves an employee by their unique ID.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Employee retrieved successfully",
-                            content = @Content(schema = @Schema(implementation = EmployeeResponse.class))
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Employee not found",
-                            content = @Content
-                    )
-            }
-    )
-    @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<EmployeeResponse>> getEmployeeById(@PathVariable Long id) {
-        EmployeeResponse employee = employeeService.getEmployeeById(id);
+    @Operation(summary = "Get employee by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
+    @GetMapping("/{employeeID}")
+    public ResponseEntity<EntityModel<EmployeeResponse>> getEmployeeById(
+            @Parameter(description = "ID of the employee") @PathVariable Long employeeID) {
+        EmployeeResponse employee = employeeService.getEmployeeById(employeeID);
         return ResponseEntity.ok(employeeModelAssembler.toModel(employee));
     }
 
-    @Operation(
-            summary = "Create a new employee",
-            description = "Registers a new employee in the system.",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "201",
-                            description = "Employee created successfully",
-                            content = @Content(schema = @Schema(implementation = EmployeeEntity.class))
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid request data",
-                            content = @Content
-                    )
-            }
-    )
+    @Operation(summary = "Create a new employee")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Employee created successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error")
+    })
     @PostMapping
-    public ResponseEntity<EmployeeEntity> createEmployee(
-            @Validated @RequestBody EmployeeRequest employeeRequest
-    ){
+    public ResponseEntity<EmployeeResponse> createEmployee(
+            @Valid @RequestBody EmployeeRequest employeeRequest) {
         return ResponseEntity.status(201).body(employeeService.createEmployee(employeeRequest));
     }
 
-    @Operation(
-            summary = "Delete an employee",
-            description = "Deletes an employee by their ID.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Employee deleted successfully"),
-                    @ApiResponse(responseCode = "404", description = "Employee not found")
-            }
-    )
-    @DeleteMapping("/{id}")
-    public ResponseEntity<EmployeeResponse> deleteEmployee(@PathVariable Long id) {
-        employeeService.delete(id);
-        return ResponseEntity.status(200).body(null);
+    @Operation(summary = "Delete an employee by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
+    @DeleteMapping("/{employeeID}")
+    public ResponseEntity<Void> deleteEmployee(
+            @Parameter(description = "ID of the employee") @PathVariable Long employeeID) {
+        employeeService.delete(employeeID);
+        return ResponseEntity.ok().build();
     }
 
-    @Operation(
-            summary = "Fully update an employee",
-            description = "Updates all fields of an employee identified by their ID.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Employee updated successfully")
-            }
-    )
-    @PutMapping("/{id}")
-    public ResponseEntity<EmployeeEntity> putEmployee(@PathVariable Long id, @RequestBody EmployeeRequest employeeRequest) {
-        EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, id);
-        return ResponseEntity.status(200).body(employeeEntity);
+    @Operation(summary = "Fully update an employee")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
+    @PutMapping("/{employeeID}")
+    public ResponseEntity<EmployeeEntity> putEmployee(
+            @Parameter(description = "ID of the employee") @PathVariable Long employeeID,
+            @RequestBody EmployeeRequest employeeRequest) {
+        EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, employeeID);
+        return ResponseEntity.ok(employeeEntity);
     }
 
-    @Operation(
-            summary = "Partially update an employee",
-            description = "Updates one or more fields of an employee identified by their ID.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Employee partially updated successfully")
-            }
-    )
-    @PatchMapping("/{id}")
-    public ResponseEntity<EmployeeEntity> patchEmployee(@PathVariable Long id, @RequestBody EmployeeRequest employeeRequest) {
-        EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, id);
+    @Operation(summary = "Partially update an employee")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
+    @PatchMapping("/{employeeID}")
+    public ResponseEntity<EmployeeEntity> patchEmployee(
+            @Parameter(description = "ID of the employee") @PathVariable Long employeeID,
+            @RequestBody EmployeeRequest employeeRequest) {
+        EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, employeeID);
         return ResponseEntity.ok(employeeEntity);
     }
 }
