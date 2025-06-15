@@ -61,16 +61,6 @@ public class EmployeeService {
     }
 
     /**
-     * Verifica si existe un empleado con el DNI especificado.
-     * 
-     * @param dni DNI a verificar
-     * @return true si existe un empleado con ese DNI, false en caso contrario
-     */
-    public Boolean existByDni(String dni) {
-        return employeeRepository.existsByDni(dni);
-    }
-
-    /**
      * Busca un empleado por su ID.
      * 
      * @param id ID del empleado a buscar
