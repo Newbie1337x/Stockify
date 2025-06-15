@@ -1,6 +1,7 @@
 package org.stockify.model.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
@@ -44,15 +46,6 @@ public class TransactionService {
     private final ProductRepository productRepository;
     private final PosRepository posRepository;
     private final SessionPosRepository sessionPosRepository;
-
-    public TransactionService(TransactionRepository transactionRepository, TransactionMapper transactionMapper, StoreRepository storeRepository, PosRepository posRepository, ProductRepository productRepository, SessionPosRepository sessionPosRepository) {
-        this.transactionRepository = transactionRepository;
-        this.transactionMapper = transactionMapper;
-        this.storeRepository = storeRepository;
-        this.productRepository = productRepository;
-        this.posRepository = posRepository;
-        this.sessionPosRepository = sessionPosRepository;
-    }
 
     /**
      * Creates and saves a monetary transaction without product details.
