@@ -82,6 +82,12 @@ public class PosService {
         return posEntities.map(posMapper::toDto);
     }
 
+    /**
+     * Busca todas las terminales POS (Point of Sale) aplicando una especificación.
+     * @param spec Especificación para filtrar los resultados.
+     * @param pageable Información de paginación.
+     * @return Página de {@link PosResponse} DTOs con los datos de las terminales POS filtradas.
+     */
     public Page<PosResponse> findAll(Specification<PosEntity> spec, Pageable pageable) {
         Page<PosEntity> posEntities = posRepository.findAll(spec, pageable);
         return posEntities.map(posMapper::toDto);
@@ -136,6 +142,12 @@ public class PosService {
             return findAll(spec, pageable);
         }
 
+
+    /**
+     * Agrega una cantidad a la terminal POS (Point of Sale) especificada.
+     * @param id
+     * @param posAmountRequest
+     */
     public void addAmount(Long id, PosAmountRequest posAmountRequest) {
         posRepository.findById(id).ifPresent(posEntity -> {
             posEntity.setCurrentAmount(posAmountRequest.getCurrentAmount());
