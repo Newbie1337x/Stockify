@@ -1,4 +1,4 @@
-package org.stockify.controller;
+package org.stockify.controller.shift;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,12 +20,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.shift.ShiftFilterRequest;
 import org.stockify.dto.request.shift.ShiftRequest;
-import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.dto.response.shift.ShiftResponse;
 import org.stockify.model.assembler.ShiftModelAssembler;
 import org.stockify.model.service.ShiftService;
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/shifts")
@@ -111,27 +109,6 @@ public class ShiftController {
         ShiftResponse shiftResponse = shiftService.findById(shiftID);
 
         return ResponseEntity.ok(shiftModelAssembler.toModel(shiftResponse));
-    }
-
-    @Operation(
-        summary = "Get employees assigned to a shift",
-        description = "Get a list of all employees assigned to a specific work shift identified by its ID."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200", 
-            description = "List of employees returned successfully",
-            content = @Content(mediaType = "application/json")
-        ),
-        @ApiResponse(responseCode = "404", description = "Shift not found")
-    })
-    @GetMapping("/{shiftID}/employee")
-    public ResponseEntity<List<EmployeeResponse>> getEmployeesByShiftId(
-            @Parameter(description = "ID of the shift to get employees for", required = true)
-            @PathVariable Long shiftID) {
-        List<EmployeeResponse> employeeResponses = shiftService.findEmployeesByShiftId(shiftID);
-
-        return ResponseEntity.ok(employeeResponses);
     }
 
     @Operation(

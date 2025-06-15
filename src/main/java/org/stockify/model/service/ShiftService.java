@@ -145,4 +145,29 @@ public class ShiftService {
         ShiftEntity updatedShift = shiftRepository.save(existingShift);
         return shiftMapper.toDto(updatedShift);
     }
+
+    public ShiftResponse deleteEmployeeFromShift(Long shiftId, Long employeeId) {
+        ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
+                .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found"));
+        EmployeeEntity employeeEntity = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new NotFoundException("Employee with ID " + employeeId + " not found"));
+        shiftEntity.getEmployeeEntities().remove(employeeEntity);
+        return shiftMapper.toDto(shiftRepository.save(shiftEntity));
+    }
+
+    public ShiftResponse deleteAllEmployeesFromShift(Long shiftId) {
+        ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
+                .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found"));
+        shiftEntity.getEmployeeEntities().clear();
+        return shiftMapper.toDto(shiftRepository.save(shiftEntity));
+    }
+
+    public ShiftResponse addEmployeeToShift(Long shiftId, Long employeeId) {
+        ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
+                .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found"));
+        EmployeeEntity employeeEntity = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new NotFoundException("Employee with ID " + employeeId + " not found"));
+        shiftEntity.getEmployeeEntities().add(employeeEntity);
+        return shiftMapper.toDto(shiftRepository.save(shiftEntity));
+    }
 }

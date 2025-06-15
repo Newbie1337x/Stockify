@@ -3,7 +3,7 @@ package org.stockify.model.assembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
-import org.stockify.controller.ShiftController;
+import org.stockify.controller.shift.ShiftController;
 import org.stockify.dto.request.shift.ShiftFilterRequest;
 import org.stockify.dto.response.shift.ShiftResponse;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
