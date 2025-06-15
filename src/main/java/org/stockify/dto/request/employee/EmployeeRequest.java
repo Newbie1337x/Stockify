@@ -16,7 +16,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @Schema(name = "EmployeeRequest", description = "Request body for creating or updating an employee.")
-public class EmployeeRequest implements Serializable {
+public class EmployeeRequest{
 
     @NotBlank
     @Schema(description = "Employee's first name", example = "Juan")
@@ -32,11 +32,12 @@ public class EmployeeRequest implements Serializable {
     @Schema(description = "Employee's last name", example = "Pérez")
     private String lastName;
 
-    @NotNull
-    @Schema(description = "Current status of the employee", example = "ONLINE")
-    private Status status;
-
-    @NotNull
-    @Schema(description = "Indicates if the employee is active", example = "true")
-    private Boolean active;
+//
+//    @NotNull
+//    @Schema(description = "Current status of the employee", example = "ONLINE")
+//    private Status status;
+//
+//    @NotNull
+//    @Schema(description = "Indicates if the employee is active", example = "true")
+//    private Boolean active;
 }

@@ -23,7 +23,7 @@ public class EmployeeResponse {
     @Schema(description = "Employee's DNI (national identity document number)", example = "12345678")
     private String dni;
 
-    @Schema(description = "Current status of the employee", example = "ACTIVE")
+    @Schema(description = "Current status of the employee", example = "ONLINE")
     private Status status;
 
     @Schema(description = "Indicates if the employee is active", example = "true")

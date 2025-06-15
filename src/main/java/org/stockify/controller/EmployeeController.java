@@ -64,7 +64,7 @@ public class EmployeeController {
             @ApiResponse(responseCode = "400", description = "Validation error")
     })
     @PostMapping
-    public ResponseEntity<EmployeeEntity> createEmployee(
+    public ResponseEntity<EmployeeResponse> createEmployee(
             @Valid @RequestBody EmployeeRequest employeeRequest) {
         return ResponseEntity.status(201).body(employeeService.createEmployee(employeeRequest));
     }

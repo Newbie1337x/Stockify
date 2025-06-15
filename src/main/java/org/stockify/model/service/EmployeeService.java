@@ -30,10 +30,14 @@ public class EmployeeService {
      * @param employeeRequest DTO con los datos del empleado a crear
      * @return La entidad del empleado creado
      */
-    public EmployeeEntity createEmployee(EmployeeRequest employeeRequest) {
-        EmployeeEntity employeeEntity = employeeMapper.toEntity(employeeRequest);
-        employeeRepository.save(employeeMapper.toEntity(employeeRequest));
-        return employeeEntity;
+    public EmployeeResponse createEmployee(EmployeeRequest employeeRequest) {
+       EmployeeEntity employee = employeeMapper.toEntity(employeeRequest);
+       employee.setActive(true);
+       employee.setStatus(Status.OFFLINE);
+      return  employeeMapper
+              .toResponseDto
+                      (employeeRepository
+                              .save(employee));
     }
 
     /**

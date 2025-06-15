@@ -1,7 +1,6 @@
 package org.stockify.model.service;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import org.stockify.model.entity.StoreEntity;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.NotFoundException;
-import org.stockify.model.mapper.DetailTransactionMapper;
 import org.stockify.model.mapper.TransactionMapper;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.StoreRepository;
@@ -43,20 +41,16 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
     private final StoreRepository storeRepository;
-    private final SessionPosService sessionPosService;
     private final ProductRepository productRepository;
     private final PosRepository posRepository;
-    private final PosService posService;
     private final SessionPosRepository sessionPosRepository;
 
-    public TransactionService(TransactionRepository transactionRepository, TransactionMapper transactionMapper, DetailTransactionMapper detailTransactionMapper, StoreRepository storeRepository, PosRepository posRepository, SessionPosService sessionPosService, ProductRepository productRepository, PosService posService, SessionPosRepository sessionPosRepository) {
+    public TransactionService(TransactionRepository transactionRepository, TransactionMapper transactionMapper, StoreRepository storeRepository, PosRepository posRepository, ProductRepository productRepository, SessionPosRepository sessionPosRepository) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
         this.storeRepository = storeRepository;
-        this.sessionPosService = sessionPosService;
         this.productRepository = productRepository;
         this.posRepository = posRepository;
-        this.posService = posService;
         this.sessionPosRepository = sessionPosRepository;
     }
 
