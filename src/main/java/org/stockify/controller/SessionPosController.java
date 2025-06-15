@@ -53,8 +53,7 @@ public class SessionPosController {
     @GetMapping("/{id}")  //TODO: arroja error 500 si la sesion tiene valores nulos
     public ResponseEntity<EntityModel<SessionPosResponse>> getSessionById(
             @Parameter(description = "Session Id") @PathVariable Long id) {
-        SessionPosEntity sessionEntity = sessionPosService.findById(id);
-        SessionPosResponse sessionResponse = sessionPosMapper.toDto(sessionEntity);
+        SessionPosResponse sessionResponse = sessionPosService.findById(id);
         return ResponseEntity.ok(sessionPosModelAssembler.toModel(sessionResponse));
     }
 
