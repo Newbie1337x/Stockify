@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.stockify.model.dto.PurchaseAuditDTO;
-import org.stockify.model.dto.SaleAuditDTO;
+import org.stockify.dto.request.audit.PurchaseAuditDTO;
+import org.stockify.dto.request.audit.SaleAuditDTO;
 import org.stockify.model.dto.TransactionAuditDTO;
 import org.stockify.model.service.AuditService;
 
