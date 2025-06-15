@@ -10,6 +10,7 @@ import org.stockify.dto.request.purchase.PurchaseRequest;
 import org.stockify.dto.response.PurchaseResponse;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.PurchaseEntity;
+import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.PurchaseMapper;
@@ -48,10 +49,12 @@ public class PurchaseService {
         request.getTransaction().getDetailTransactions()
                 .forEach(detail -> stockService.increaseStock(detail.getProductID(), storeID, detail.getQuantity()));
 
-        TransactionResponse transaction = transactionService.createTransaction(request.getTransaction(), storeID, posID, TransactionType.PURCHASE);
+        TransactionEntity transaction = transactionService.createTransaction(request.getTransaction(), storeID, posID, TransactionType.PURCHASE);
         PurchaseEntity purchase = purchaseMapper.toEntity(request);
+
         purchase.setTransaction(transactionRepository.findById(transaction.getId())
                 .orElseThrow(() -> new NotFoundException("Transaction not found")));
+
         purchase.setProvider(providerRepository.findById(request.getProviderId()).orElseThrow(() -> new NotFoundException("Provider not found")));
 
         return purchaseMapper.toResponseDTO(purchaseRepository.save(purchase));

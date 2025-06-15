@@ -126,9 +126,17 @@ public class PosService {
                 .map(posMapper::toDto);
     }
 
-    public void patchAmount(Long id, PosAmountRequest posAmountRequest) {
+    public void addAmount(Long id, PosAmountRequest posAmountRequest) {
         posRepository.findById(id).ifPresent(posEntity -> {
             posEntity.setCurrentAmount(posAmountRequest.getCurrentAmount());
+            posRepository.save(posEntity);
+        });
+    }
+
+    public void addAmount(Long id, BigDecimal totalAmount)
+    {
+        posRepository.findById(id).ifPresent(posEntity -> {
+            posEntity.setCurrentAmount(posEntity.getCurrentAmount().add(totalAmount));
             posRepository.save(posEntity);
         });
     }

@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.stockify.dto.request.transaction.TransactionCreatedRequest;
 import org.stockify.dto.request.transaction.TransactionRequest;
+import org.stockify.dto.response.TransactionCreatedResponse;
 import org.stockify.dto.response.TransactionPDFResponse;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.DetailTransactionEntity;
@@ -14,10 +16,12 @@ import org.stockify.model.entity.StoreEntity;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.NotFoundException;
+import org.stockify.model.mapper.DetailTransactionMapper;
 import org.stockify.model.mapper.TransactionMapper;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.repository.TransactionRepository;
+import org.stockify.model.repository.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -35,23 +39,56 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-@RequiredArgsConstructor
-
 public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
     private final StoreRepository storeRepository;
     private final SessionPosService sessionPosService;
     private final ProductRepository productRepository;
+    private final PosRepository posRepository;
+    private final PosService posService;
+    private final SessionPosRepository sessionPosRepository;
 
-    public TransactionResponse saveTransaction(TransactionRequest request) {
-        return transactionMapper
-                .toDto(transactionRepository
-                                .save(transactionMapper
-                                        .toEntity(request)));
+    public TransactionService(TransactionRepository transactionRepository, TransactionMapper transactionMapper, DetailTransactionMapper detailTransactionMapper, StoreRepository storeRepository, PosRepository posRepository, SessionPosService sessionPosService, ProductRepository productRepository, PosService posService, SessionPosRepository sessionPosRepository) {
+        this.transactionRepository = transactionRepository;
+        this.transactionMapper = transactionMapper;
+        this.storeRepository = storeRepository;
+        this.sessionPosService = sessionPosService;
+        this.productRepository = productRepository;
+        this.posRepository = posRepository;
+        this.posService = posService;
+        this.sessionPosRepository = sessionPosRepository;
     }
 
-    public TransactionResponse createTransaction(TransactionRequest request, Long idLocal, Long idPos, TransactionType type) {
+    //This method is uses to controllers
+    public TransactionCreatedResponse saveTransaction(TransactionCreatedRequest request, Long idLocal, Long idPos, TransactionType type) {
+        if (!posRepository.existsById(idPos)) {
+            throw new NotFoundException("POS with ID " + idPos + " not found.");
+        }
+        TransactionEntity transactionEntity = transactionMapper.toEntity(request);
+        transactionEntity.setTotal(request.getTotalAmount());
+
+        // Setear la sesión del POS
+        transactionEntity.setSessionPosEntity(
+                sessionPosRepository.findByPosEntity_IdAndCloseTime
+                        (idPos, null).orElseThrow
+                        (() -> new NotFoundException("POS with ID " + idPos + " not found."))
+        );
+        // Buscar y setear el local
+        StoreEntity store = storeRepository.findById(idLocal)
+                .orElseThrow(() -> new NotFoundException("Store with ID " + idLocal + " not found."));
+        transactionEntity.setStore(store);
+        transactionEntity.setDescription(request.getDescription());
+        transactionEntity.setType(type);
+
+        return transactionMapper.toDtoCreated(transactionRepository
+                .save(transactionEntity));
+    }
+    public TransactionEntity createTransaction(TransactionRequest request, Long idLocal, Long idPos, TransactionType type) {
+
+        if (!posRepository.existsById(idPos)) {
+            throw new NotFoundException("POS with ID " + idPos + " not found.");
+        }
 
         // Convertir cada detalle a entidad, seteando producto, cantidad, subtotal
         Set<DetailTransactionEntity> detailTransactions = request
@@ -78,21 +115,20 @@ public class TransactionService {
         transactionEntity.setDetailTransactions(detailTransactions);
 
 
-        //FIX: asignar la transacción a cada detalle
-        detailTransactions.forEach(detail -> detail.setTransaction(transactionEntity));
-
+        detailTransactions.forEach
+                (detail -> detail.setTransaction(transactionEntity));
 
         // Setear la sesión del POS
         transactionEntity.setSessionPosEntity(
-                sessionPosService.findByIdPosAndCloseTime(idPos, null)
+                sessionPosRepository.findByPosEntity_IdAndCloseTime
+                        (idPos, null).orElseThrow
+                        (() -> new NotFoundException("POS with ID " + idPos + " not found."))
         );
-
 
         // Buscar y setear el local
         StoreEntity store = storeRepository.findById(idLocal)
                 .orElseThrow(() -> new NotFoundException("Store with ID " + idLocal + " not found."));
         transactionEntity.setStore(store);
-
 
         // Calcular el total
         transactionEntity.setTotal(
@@ -103,13 +139,11 @@ public class TransactionService {
                         .orElse(BigDecimal.ZERO)
         );
 
-
         transactionEntity.setDescription(request.getDescription());
         transactionEntity.setType(type);
 
-
         // Guardar y devolver el response
-        return transactionMapper.toDto(transactionRepository.save(transactionEntity));
+        return transactionRepository.save(transactionEntity);
     }
 
 

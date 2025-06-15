@@ -1,5 +1,5 @@
 package org.stockify.controller.transaction;
-
+import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.stockify.dto.request.transaction.TransactionCreatedRequest;
 import org.stockify.dto.request.transaction.TransactionRequest;
+import org.stockify.dto.response.TransactionCreatedResponse;
 import org.stockify.dto.response.TransactionPDFResponse;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.enums.TransactionType;
@@ -31,17 +33,14 @@ public class TransactionController {
             @ApiResponse(responseCode = "404", description = "Store or POS not found")
     })
     @PostMapping("/stores/{storeID}/pos/{posID}/transactions")
-    public ResponseEntity<TransactionResponse> createTransaction(
+    public ResponseEntity<TransactionCreatedResponse> createTransaction(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Parameter(description = "ID of the POS") @PathVariable Long posID,
-            @Valid @RequestBody TransactionRequest request) {
-
-        TransactionResponse response = transactionService.createTransaction(
-                request, storeID, posID, TransactionType.OTHER
-        );
-
-        return ResponseEntity.ok(response);
+             @RequestBody @Valid TransactionCreatedRequest request) {
+        return ResponseEntity.ok(transactionService.saveTransaction(
+                request, storeID, posID, TransactionType.OTHER));
     }
+
 
     @Operation(summary = "Generate PDF for a transaction by ID")
     @ApiResponses(value = {

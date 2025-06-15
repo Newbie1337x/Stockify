@@ -91,7 +91,7 @@ public class PosController {
     public ResponseEntity<Void> patchAmount(
             @Parameter(description = "POS ID") @PathVariable Long id,
             @RequestBody @Valid PosAmountRequest posAmountRequest) {
-        posService.patchAmount(id, posAmountRequest);
+        posService.addAmount(id, posAmountRequest);
         return ResponseEntity.ok().build();
     }
 
