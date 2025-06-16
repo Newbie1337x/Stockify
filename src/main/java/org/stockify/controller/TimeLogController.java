@@ -13,6 +13,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.employee.TimeLogRequest;
@@ -41,6 +42,8 @@ public class TimeLogController {
         @ApiResponse(responseCode = "400", description = "Filter parameters are invalid")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('READ') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<TimeLogResponse>>> getAllTimeLogs(
             @Parameter(description = "Time log ID to filter")
             @RequestParam(required = false) Long id,
@@ -76,6 +79,8 @@ public class TimeLogController {
         @ApiResponse(responseCode = "404", description = "Employee not found")
     })
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<TimeLogResponse> addTimeLog(
             @Parameter(description = "Time log data to create", required = true)
             @Validated @RequestBody TimeLogRequest timeLogRequest) {
@@ -96,6 +101,8 @@ public class TimeLogController {
         @ApiResponse(responseCode = "404", description = "Time log not found")
     })
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<TimeLogResponse> putTimeLog(
             @Parameter(description = "ID of the time log to update", required = true)
             @PathVariable Long id, 
@@ -120,6 +127,8 @@ public class TimeLogController {
         @ApiResponse(responseCode = "404", description = "Time log not found")
     })
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<TimeLogResponse> patchTimeLog(
             @Parameter(description = "ID of the time log to partially update", required = true)
             @PathVariable Long id, 

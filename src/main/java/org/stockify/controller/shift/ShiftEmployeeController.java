@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.dto.response.shift.ShiftResponse;
@@ -33,6 +34,8 @@ public class ShiftEmployeeController {
             @ApiResponse(responseCode = "404", description = "Shift not found")
     })
     @DeleteMapping
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('DELETE')")
     public ResponseEntity<EntityModel<ShiftResponse>> removeAllEmployeesFromShift(
             @Parameter(description = "ID of the shift", required = true)
             @PathVariable Long shiftId) {
@@ -49,6 +52,8 @@ public class ShiftEmployeeController {
             @ApiResponse(responseCode = "404", description = "Shift or employee not found")
     })
     @DeleteMapping("/{employeeId}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('DELETE')")
     public ResponseEntity<EntityModel<ShiftResponse>> removeEmployeeFromShift(
             @Parameter(description = "ID of the shift", required = true) @PathVariable Long shiftId,
             @Parameter(description = "ID of the employee to remove", required = true) @PathVariable Long employeeId) {
@@ -65,6 +70,8 @@ public class ShiftEmployeeController {
             @ApiResponse(responseCode = "404", description = "Shift or employee not found")
     })
     @PutMapping("/{employeeId}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ShiftResponse>> addEmployeetoShift(
             @Parameter(description = "ID of the shift", required = true) @PathVariable Long shiftId,
             @Parameter(description = "ID of the employee to add", required = true) @PathVariable Long employeeId) {
@@ -81,6 +88,8 @@ public class ShiftEmployeeController {
             @ApiResponse(responseCode = "404", description = "Shift not found")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('READ') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('READ')")
     public ResponseEntity<List<EmployeeResponse>> getEmployeesFromShift(
             @Parameter(description = "ID of the shift to get employees for", required = true)
             @PathVariable Long shiftId) {

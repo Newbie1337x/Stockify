@@ -41,6 +41,8 @@ public class EmployeeController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of employees retrieved successfully")
     })
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('READ') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<EmployeeResponse>>> getAllEmployees(
             @Parameter(description = "Filter by employee name") @RequestParam(required = false) String name,
             @Parameter(description = "Filter by employee last name") @RequestParam(required = false) String lastName,
@@ -59,7 +61,8 @@ public class EmployeeController {
             @ApiResponse(responseCode = "404", description = "Employee not found")
     })
     @GetMapping("/admin/{employeeID}")
-    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('READ')")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('READ') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<EmployeeResponse>> getEmployeeById(
             @Parameter(description = "ID of the employee") @PathVariable Long employeeID) {
         EmployeeResponse employee = employeeService.getEmployeeById(employeeID);
@@ -67,6 +70,9 @@ public class EmployeeController {
     }
 
     @GetMapping("/{employeeId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ') or " +
+            "hasRole('ROLE_EMPLOYEE') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<EmployeeResponse>> getProfile(@PathVariable Long employeeId, Authentication authentication) {
         CredentialsEntity credentials = (CredentialsEntity) authentication.getPrincipal();
 
@@ -89,6 +95,8 @@ public class EmployeeController {
             @ApiResponse(responseCode = "400", description = "Validation error")
     })
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EmployeeResponse> createEmployee(
             @Valid @RequestBody EmployeeRequest employeeRequest) {
         return ResponseEntity.status(201).body(employeeService.createEmployee(employeeRequest));
@@ -100,6 +108,8 @@ public class EmployeeController {
             @ApiResponse(responseCode = "404", description = "Employee not found")
     })
     @DeleteMapping("/{employeeID}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('DELETE')")
     public ResponseEntity<Void> deleteEmployee(
             @Parameter(description = "ID of the employee") @PathVariable Long employeeID) {
         employeeService.delete(employeeID);
@@ -112,6 +122,8 @@ public class EmployeeController {
             @ApiResponse(responseCode = "404", description = "Employee not found")
     })
     @PutMapping("/{employeeID}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EmployeeEntity> putEmployee(
             @Parameter(description = "ID of the employee") @PathVariable Long employeeID,
             @RequestBody EmployeeRequest employeeRequest) {
@@ -125,6 +137,8 @@ public class EmployeeController {
             @ApiResponse(responseCode = "404", description = "Employee not found")
     })
     @PatchMapping("/{employeeID}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EmployeeEntity> patchEmployee(
             @Parameter(description = "ID of the employee") @PathVariable Long employeeID,
             @RequestBody EmployeeRequest employeeRequest) {
