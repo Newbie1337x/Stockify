@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.model.entity.EmployeeEntity;
+import org.stockify.model.enums.Status;
 import org.stockify.model.mapper.CredentialMapper;
 import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
@@ -62,31 +64,72 @@ public class AuthService {
     }
 
     public AuthResponse registerEmployee(RegisterEmployeeRequest registerEmployeeRequest) {
-        if (credentialsRepository.existsByEmail(registerEmployeeRequest.getCredential().getEmail())){
+
+        // Verificar si el email ya está registrado
+        if (credentialsRepository.existsByEmail(registerEmployeeRequest.getCredential().getEmail())) {
             throw new IllegalArgumentException("Email address already in use");
         }
 
-        if (employeeRepository.findByDni(registerEmployeeRequest.getEmployee().getDni()).isPresent()){
-            throw new IllegalArgumentException("Dni is already in use");
+        // Verificar si el DNI ya está registrado
+        if (employeeRepository.getEmployeeEntityByDni(registerEmployeeRequest.getEmployee().getDni()).isPresent()) {
+            throw new IllegalArgumentException("DNI is already in use");
         }
 
+        // Mapear y guardar el empleado
         EmployeeEntity employee = employeeMapper.toEntity(registerEmployeeRequest.getEmployee());
+        employee.setStatus(Status.OFFLINE);
+        employee.setActive(true);
         employeeRepository.save(employee);
 
-        List<PermitEntity> permits = permitEmployee();
+        // Obtener rol
+        Role inputRole = registerEmployeeRequest.getCredential().getRoles();
+        if (inputRole == Role.ADMIN) {
+            throw new IllegalArgumentException("Administrators cannot be registered");
+        }
 
-        Set<RoleEntity> roles = new HashSet<>();
-        roles.add(RoleEntity.builder().role(Role.EMPLOYEE).permits(permits).build());
-        rolRepository.saveAll(roles);
+        Set<Permit> requestedPermits = registerEmployeeRequest.getCredential().getPermits();
+        Set<PermitEntity> permitEntities = new HashSet<>();
+
+        for (Permit p : requestedPermits) {
+            // Buscar el permiso existente, si no existe, crearlo y guardarlo
+            PermitEntity permitEntity = permitRepository.findByPermit(p)
+                    .orElseGet(() -> {
+                        // Create a new PermitEntity if it doesn't exist
+                        PermitEntity newPermit = PermitEntity.builder()
+                                .permit(p) // Assuming PermitEntity has a 'permit' field
+                                .build();
+                        // Save the new permit to the database
+                        return permitRepository.save(newPermit);
+                    });
+            permitEntities.add(permitEntity);
+        }
 
 
+        // Buscar o crear el RoleEntity con sus permisos
+        RoleEntity roleEntity = rolRepository.findByRole(inputRole)
+                .orElseGet(() -> {
+                    RoleEntity newRole = RoleEntity.builder()
+                            .role(inputRole)
+                            .permits(permitEntities)
+                            .build();
+                    return rolRepository.save(newRole);
+                });
+
+        // Crear las credenciales
         CredentialsEntity credentials = credentialMapper.toEntity(registerEmployeeRequest.getCredential());
         credentials.setEmployee(employee);
-        credentials.setRoles(roles);
         credentials.setPassword(passwordEncoder.encode(registerEmployeeRequest.getCredential().getPassword()));
+
+        // Asignar el rol (único)
+        credentials.setRoles(Set.of(roleEntity));
+
+        // Guardar las credenciales
         credentialsRepository.save(credentials);
+
+        // Generar token y devolver respuesta
         return new AuthResponse(jwtService.generateToken(credentials));
     }
+
 
     private List<PermitEntity> permitEmployee(){
         List<PermitEntity> permits = new ArrayList<>();

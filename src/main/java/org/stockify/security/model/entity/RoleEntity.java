@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.stockify.security.model.enums.Role;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -27,6 +28,6 @@ public class RoleEntity {
             name = "role_permits",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permit_id"))
-    List<PermitEntity> permits;
+    Set<PermitEntity> permits;
 }
 

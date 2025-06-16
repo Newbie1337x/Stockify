@@ -2,6 +2,8 @@ package org.stockify.security.model.dto.request;
 
 import lombok.*;
 import org.stockify.security.model.entity.RoleEntity;
+import org.stockify.security.model.enums.Permit;
+import org.stockify.security.model.enums.Role;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,5 +17,6 @@ public class CredentialRequest {
     private String username;
     private String password;
     private String email;
-    private Set<RoleEntity> roles;
+    private Role roles;
+    private Set<Permit> permits;
 }
