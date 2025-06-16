@@ -27,7 +27,7 @@ public class PdfGeneratorController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "PDF generated successfully"),
             @ApiResponse(responseCode = "404", description = "Transaction not found"),
-            @ApiResponse(responseCode = "500", description = "PDF generation error") //TODO a corregir
+            @ApiResponse(responseCode = "400", description = "Transaction type not supported for PDF generation")
     })
     @GetMapping("/transaction/pdf/{idTransaction}")
     public ResponseEntity<EntityModel<TransactionPDFResponse>> generatePdf(
