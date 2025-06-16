@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
 
-import java.util.List;
-
 @Repository
 public interface PosRepository extends JpaRepository<PosEntity,Long>, JpaSpecificationExecutor<PosEntity> {
 

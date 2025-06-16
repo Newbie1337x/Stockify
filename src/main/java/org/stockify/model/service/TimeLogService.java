@@ -11,11 +11,15 @@ import org.stockify.model.entity.TimeLogEntity;
 import org.stockify.model.mapper.TimeLogMapper;
 import org.stockify.model.repository.TimeLogRepository;
 import org.stockify.model.specification.TimeLogSpecifications;
-
+import org.stockify.model.exception.NotFoundException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.NoSuchElementException;
 
+/**
+ * Service responsible for managing employee time log records.
+ * Provides functionalities for creating, retrieving, updating, and filtering logs based on employee ID,
+ * date, and clock-in/clock-out times.
+ */
 @RequiredArgsConstructor
 @Service
 public class TimeLogService {
@@ -24,10 +28,10 @@ public class TimeLogService {
     private final TimeLogMapper timeLogMapper;
 
     /**
-     * Crea un nuevo registro de horario (TimeLog) para un empleado.
+     * Creates and saves a new time log entry for an employee.
      *
-     * @param timeLogRequest DTO con los datos del registro a crear
-     * @return Entidad persistida con ID generado
+     * @param timeLogRequest the DTO containing the time log data to be saved
+     * @return a {@link TimeLogResponse} representing the saved entry with a generated ID
      */
     public TimeLogResponse createTimeLog(TimeLogRequest timeLogRequest) {
         TimeLogEntity timeLogEntity = timeLogMapper.toEntity(timeLogRequest);
@@ -35,14 +39,14 @@ public class TimeLogService {
     }
 
     /**
-     * Obtiene una lista paginada de registros de horarios, con filtros opcionales por empleado, fecha y horarios.
+     * Retrieves a paginated list of time logs, optionally filtered by date, clock-in time, and clock-out time.
      *
-     * @param employeeId ID del empleado (obligatorio)
-     * @param date Fecha en formato ISO (opcional)
-     * @param clockInTime Hora de entrada en formato HH:mm:ss (opcional)
-     * @param clockOutTime Hora de salida en formato HH:mm:ss (opcional)
-     * @param pageable Parámetros de paginación y ordenamiento
-     * @return Página con los registros que coincidan con los filtros
+     * @param employeeId    the ID of the employee (required)
+     * @param date          the date filter in ISO format (optional)
+     * @param clockInTime   the clock-in time filter in HH:mm:ss format (optional)
+     * @param clockOutTime  the clock-out time filter in HH:mm:ss format (optional)
+     * @param pageable      pagination and sorting parameters
+     * @return a {@link Page} of {@link TimeLogResponse} matching the given filters
      */
     public Page<TimeLogResponse> getTimeLogs(
             Long employeeId, String date, String clockInTime, String clockOutTime, Pageable pageable
@@ -61,22 +65,29 @@ public class TimeLogService {
     }
 
     /**
-     * Obtiene un registro de horario por su ID.
+     * Retrieves a single time log entry by its unique ID.
      *
-     * @param id ID del registro a buscar
-     * @return DTO con los datos del registro encontrado
-     * @throws NoSuchElementException si no se encuentra el ID
+     * @param id the ID of the time log to retrieve
+     * @return a {@link TimeLogResponse} representing the found time log
+     * @throws NotFoundException if no time log is found with the provided ID
      */
     public TimeLogResponse getTimeLogById(long id) {
-        return timeLogMapper.toResponse(timeLogRepository.findById(id).get());
+        return timeLogMapper
+                .toResponse(timeLogRepository
+                        .findById(id)
+                        .orElseThrow(
+                                () -> new NotFoundException("TimeLog not found with id: " + id)
+                        )
+                );
     }
 
     /**
-     * Actualiza un registro de horario existente por su ID.
+     * Updates an existing time log entry by its ID.
+     * The existing record will be overwritten with the values from the provided request.
      *
-     * @param id ID del registro a actualizar
-     * @param timeLogRequest DTO con los nuevos datos
-     * @return DTO con el registro actualizado
+     * @param id             the ID of the time log to update
+     * @param timeLogRequest the DTO containing the updated data
+     * @return a {@link TimeLogResponse} representing the updated time log
      */
     public TimeLogResponse updateTimeLog(long id, TimeLogRequest timeLogRequest) {
         TimeLogEntity timeLogEntity = timeLogMapper.toEntity(timeLogRequest);
