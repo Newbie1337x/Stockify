@@ -20,17 +20,16 @@ import org.stockify.model.mapper.TransactionMapper;
 import org.stockify.model.repository.ClientRepository;
 import org.stockify.model.repository.PosRepository;
 import org.stockify.model.repository.SaleRepository;
-import org.stockify.model.repository.TransactionRepository;
 import org.stockify.model.specification.SaleSpecification;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SaleService {
 
     private final StockService stockService;
     private final TransactionService transactionService;
     private final SaleMapper saleMapper;
-    private final TransactionRepository transactionRepository;
     private final ClientRepository clientRepository;
     private final SaleRepository saleRepository;
     private final TransactionMapper transactionMapper;
@@ -47,7 +46,7 @@ public class SaleService {
      * @return DTO con los datos de la venta creada
      * @throws NotFoundException si no se encuentra el cliente o la transacción
      */
-    @Transactional
+    
     public SaleResponse createSale(SaleRequest request, long storeID, long posID){
 
         if (!posRepository.existsById(posID)) {

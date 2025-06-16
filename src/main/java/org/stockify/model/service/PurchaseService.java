@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.stockify.dto.request.purchase.PurchaseFilterRequest;
 import org.stockify.dto.request.purchase.PurchaseRequest;
 import org.stockify.dto.response.PurchaseResponse;
-import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.PurchaseEntity;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
@@ -21,7 +20,7 @@ import org.stockify.model.specification.PurchaseSpecification;
 
 @Service
 @RequiredArgsConstructor
-
+@Transactional
 public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
