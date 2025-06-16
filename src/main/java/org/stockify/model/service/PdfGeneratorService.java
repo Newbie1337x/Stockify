@@ -71,7 +71,7 @@ public class PdfGeneratorService {
         if (transaction.getType() == TransactionType.PURCHASE || transaction.getType() == TransactionType.SALE) {
             generateHtmlToPdf(dto, outputPath, transaction);
         } else {
-            throw new NotFoundException("Transaction type not supported for PDF generation.");
+            throw new TypeNotAcceptedException("Transaction type not supported for PDF generation.");
         }
 
         // Return response with PDF file path and transaction details
@@ -83,6 +83,7 @@ public class PdfGeneratorService {
     }
 
     /**
+     * Generates a PDF from HTML using Thymeleaf templates.
      *
      * Converts transaction data into an HTML string using Thymeleaf templates and then generates a PDF file.
      * <p>
@@ -108,16 +109,15 @@ public class PdfGeneratorService {
         // Prepare Thymeleaf context with transaction variables
         Context context = new Context();
 
+        // Comprovar si es una compra o una venta y completar el contexto
         if (transaction.getType() == TransactionType.PURCHASE && transaction.getPurchase() != null) {
-            // For purchases, add provider name and relevant fields
             String providerName = transaction.getPurchase().getProvider().getBusinessName();
             context.setVariable("providerName", providerName);
             context.setVariable("transactionId", dto.getId());
             context.setVariable("date", dto.getDateTime());
             context.setVariable("total", dto.getTotal());
         } else {
-            // For sales or others, add customer and POS-related details
-            String customerName = ""; // This could be extended if customer data available
+            String customerName = transaction.getSale().getClient().getFirstName() + " " + transaction.getSale().getClient().getLastName();
             context.setVariable("customerName", customerName);
             context.setVariable("transactionId", dto.getId());
             context.setVariable("storeName", dto.getStoreName());

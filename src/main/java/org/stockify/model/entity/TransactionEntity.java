@@ -63,6 +63,10 @@ public class TransactionEntity {
     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     private PurchaseEntity purchase;
 
+    @OneToOne(mappedBy = "transaction", cascade = CascadeType.ALL)
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+    private SaleEntity sale;
+
     @PrePersist
     public void prePersist(){
         this.dateTime = LocalDateTime.now();
