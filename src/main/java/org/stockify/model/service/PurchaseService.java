@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.stockify.dto.request.purchase.PurchaseFilterRequest;
 import org.stockify.dto.request.purchase.PurchaseRequest;
 import org.stockify.dto.response.PurchaseResponse;
-import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.PurchaseEntity;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
@@ -21,7 +20,7 @@ import org.stockify.model.specification.PurchaseSpecification;
 
 @Service
 @RequiredArgsConstructor
-
+@Transactional
 public class PurchaseService {
 
     private final PurchaseRepository purchaseRepository;
@@ -99,4 +98,16 @@ public class PurchaseService {
     }
 
 
+    /**
+     * Busca una compra por su ID.
+     *
+     * @param id ID de la compra a buscar
+     * @return DTO con los datos de la compra encontrada
+     * @throws NotFoundException si no se encuentra la compra
+     */
+    public PurchaseResponse findById(Long id) {
+        PurchaseEntity purchase = purchaseRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Purchase not found with id: " + id));
+        return purchaseMapper.toResponseDTO(purchase);
+    }
 }

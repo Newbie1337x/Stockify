@@ -20,8 +20,6 @@ import org.stockify.model.specification.CategorySpecification;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
-    private final Logger logger = LoggerFactory.getLogger(CategoryService.class); //TODO: why is this here?
-
     /**
      * Busca categorías aplicando filtros y paginación.
      * 

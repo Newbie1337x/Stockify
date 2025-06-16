@@ -2,13 +2,10 @@ package org.stockify.model.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.transaction.TransactionCreatedRequest;
 import org.stockify.dto.request.transaction.TransactionRequest;
 import org.stockify.dto.response.TransactionCreatedResponse;
-import org.stockify.dto.response.TransactionPDFResponse;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.DetailTransactionEntity;
 import org.stockify.model.entity.ProductEntity;
@@ -21,18 +18,8 @@ import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.repository.TransactionRepository;
 import org.stockify.model.repository.*;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.xhtmlrenderer.pdf.ITextRenderer;
-
-import javax.swing.filechooser.FileSystemView;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -156,100 +143,17 @@ public class TransactionService {
     }
 
 
+    /**
+     * Retrieves all transactions from the repository.
+     *
+     * @return a list of TransactionResponse objects representing all transactions
+     */
     public List<TransactionResponse> findAll()
     {
         return transactionRepository
                 .findAll()
                 .stream()
                 .map(transactionMapper::toDto).toList();
-    }
-
-
-    public ResponseEntity<EntityModel<TransactionPDFResponse>> generatePdf(Long id) throws Exception {
-        TransactionEntity transaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Transaction with ID " + id + " not found."));
-
-        // Convertir a DTO
-        TransactionResponse dto = transactionMapper.toDto(transaction);
-
-
-
-        // Generar PDF en el siguiente directorio
-        String fileName = "transaction_" + id + ".pdf";
-        String outputPath = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + fileName;
-
-        // Verificar si es una compra o una venta
-        if (transaction.getType() == TransactionType.PURCHASE || transaction.getType() == TransactionType.SALE ) {
-            generateHtmlToPdf(dto, outputPath, transaction);
-        } else {
-            throw new NotFoundException("Transaction type not supported for PDF generation.");
-        }
-
-        // Retornar la respuesta con el PDF generado
-        return ResponseEntity.ok(EntityModel.of(
-                TransactionPDFResponse.builder()
-                        .path(outputPath)
-                        .transaction(dto).build()));
-    }
-
-
-    private void generateHtmlToPdf(TransactionResponse dto, String outputPath, TransactionEntity transaction) throws Exception {
-        // Configurar Thymeleaf
-        ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
-        resolver.setTemplateMode("HTML");
-        resolver.setPrefix("");
-        resolver.setSuffix(".html");
-        resolver.setCharacterEncoding("UTF-8");
-
-        TemplateEngine templateEngine = new TemplateEngine();
-        templateEngine.setTemplateResolver(resolver);
-
-        // Preparar el contexto
-        Context context = new Context();
-
-        // Comprovar si es una compra o una venta y completar el contexto
-
-        if (transaction.getType() == TransactionType.PURCHASE && transaction.getPurchase() != null) {
-            String providerName = transaction.getPurchase().getProvider().getBusinessName();
-
-            context.setVariable("providerName", providerName);
-            context.setVariable("transactionId", dto.getId());
-            context.setVariable("date", dto.getDateTime());
-            context.setVariable("total", dto.getTotal());
-        }else {
-            String customerName = "";
-            context.setVariable("customerName", customerName);
-            context.setVariable("transactionId", dto.getId());
-            context.setVariable("storeName", dto.getStoreName());
-            context.setVariable("pos", dto.getIdPos());
-            context.setVariable("date", dto.getDateTime());
-            context.setVariable("total", dto.getTotal());
-        }
-
-        // Convertir los detalles de transacción a un formato adecuado para la plantilla
-        List<Map<String, Object>> items = dto.getDetailTransactions().stream()
-                .map(detail -> {
-                    Map<String, Object> item = new HashMap<>();
-                    item.put("description", detail.getProduct().getName());
-                    item.put("quantity", detail.getQuantity());
-                    item.put("price", detail.getProduct().getPrice());
-                    return item;
-                })
-                .collect(Collectors.toList());
-        context.setVariable("items", items);
-
-        // Usar buyTemplate.html para compras
-        String templateName = transaction.getType() == TransactionType.PURCHASE ? "buyTemplate" : "saleTemplate";
-        String html = templateEngine.process(templateName, context);
-
-        // Convertir HTML a PDF
-        ITextRenderer renderer = new ITextRenderer();
-        renderer.setDocumentFromString(html);
-        renderer.layout();
-
-        try (FileOutputStream os = new FileOutputStream(outputPath)) {
-            renderer.createPDF(os);
-        }
     }
 
 

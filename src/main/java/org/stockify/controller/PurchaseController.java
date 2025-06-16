@@ -18,6 +18,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.purchase.PurchaseFilterRequest;
+import org.stockify.dto.request.purchase.PurchaseRequest;
 import org.stockify.dto.response.PurchaseResponse;
 import org.stockify.model.assembler.PurchaseModelAssembler;
 import org.stockify.model.service.PurchaseService;
@@ -50,11 +51,6 @@ public class PurchaseController {
             PagedResourcesAssembler<PurchaseResponse> assembler
     ) {
         Page<PurchaseResponse> page = purchaseService.getAllPurchases(pageable, filter);
-
-        if (page.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
         PagedModel<EntityModel<PurchaseResponse>> pagedModel = assembler.toModel(page, purchaseModelAssembler);
         return ResponseEntity.ok(pagedModel);
     }
@@ -72,4 +68,58 @@ public class PurchaseController {
         purchaseService.deletePurchase(id);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(
+            summary = "Get a purchase by ID",
+            description = "Retrieve the details of a specific purchase transaction by its ID. Returns the purchase with HATEOAS links."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Purchase found and returned successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PurchaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Purchase not found",
+                    content = @Content
+            )
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<EntityModel<PurchaseResponse>> getById(
+            @Parameter(description = "ID of the purchase to retrieve", required = true)
+            @PathVariable Long id
+    ) {
+        PurchaseResponse response = purchaseService.findById(id);
+        return ResponseEntity.ok(purchaseModelAssembler.toModel(response));
+    }
+
+    @Operation(
+            summary = "Update a purchase by ID",
+            description = "Fully update an existing purchase by its ID."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Purchase updated successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PurchaseResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Purchase not found",
+                    content = @Content
+            )
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<EntityModel<PurchaseResponse>> update(
+            @Parameter(description = "ID of the purchase to update", required = true) @PathVariable Long id,
+            @Valid @RequestBody PurchaseRequest request
+    ) {
+        PurchaseResponse response = purchaseService.updatePurchase(id, request);
+        return ResponseEntity.ok(purchaseModelAssembler.toModel(response));
+    }
+
+
+
+
 }

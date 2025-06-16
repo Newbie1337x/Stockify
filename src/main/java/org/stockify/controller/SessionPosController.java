@@ -35,15 +35,6 @@ public class SessionPosController {
     private SessionPosMapper sessionPosMapper;
 
 
-//    @Operation(summary = "Obtener todas las sesiones de POS")
-//    @GetMapping
-//    public ResponseEntity<PagedModel<EntityModel<SessionPosResponse>>> getAllSessions(
-
-//            @PageableDefault(size = 10) Pageable pageable,
-//            PagedResourcesAssembler<SessionPosResponse> assembler) {
-//        Page<SessionPosResponse> sessionResponses = sessionPosService.findAll(pageable);
-//        return ResponseEntity.ok(assembler.toModel(sessionResponses, sessionPosModelAssembler));
-//    }
 
     @Operation(
         summary = "Get session by ID",
@@ -56,14 +47,12 @@ public class SessionPosController {
             description = "Session found and returned successfully",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = SessionPosResponse.class))
         ),
-        @ApiResponse(responseCode = "404", description = "Session not found"),
-        //@ApiResponse(responseCode = "500", description = "Error interno del servidor")    TODO: Verificar si se quiere arrojar un error 500
+        @ApiResponse(responseCode = "404", description = "Session not found")
     })
-    @GetMapping("/{id}")  //TODO: arroja error 500 si la sesion tiene valores nulos
+    @GetMapping("/{id}")
     public ResponseEntity<EntityModel<SessionPosResponse>> getSessionById(
             @Parameter(description = "Session Id") @PathVariable Long id) {
-        SessionPosEntity sessionEntity = sessionPosService.findById(id);
-        SessionPosResponse sessionResponse = sessionPosMapper.toDto(sessionEntity);
+        SessionPosResponse sessionResponse = sessionPosService.findById(id);
         return ResponseEntity.ok(sessionPosModelAssembler.toModel(sessionResponse));
     }
 

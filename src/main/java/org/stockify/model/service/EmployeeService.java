@@ -41,24 +41,6 @@ public class EmployeeService {
     }
 
     /**
-     * Obtiene todos los empleados del sistema.
-     * 
-     * @return Lista de todos los empleados convertidos a DTO de respuesta
-     */
-    public List<EmployeeResponse> getAllEmployees() {
-        return employeeMapper.toResponseDtoList(employeeRepository.findAll());
-    }
-
-    /**
-     * Obtiene todos los empleados activos (con estado ONLINE).
-     * 
-     * @return Lista de empleados activos convertidos a DTO de respuesta
-     */
-    public List<EmployeeResponse> getAllEmplyeesActive() {
-        return findByStatus(Status.ONLINE);
-    }
-
-    /**
      * Busca empleados aplicando filtros y paginación.
      *
      * @param name Nombre del empleado (opcional)
@@ -78,17 +60,6 @@ public class EmployeeService {
         return entities.map(employeeMapper::toResponseDto);
     }
 
-
-    /**
-     * Verifica si existe un empleado con el DNI especificado.
-     * 
-     * @param dni DNI a verificar
-     * @return true si existe un empleado con ese DNI, false en caso contrario
-     */
-    public Boolean existByDni(String dni) {
-        return employeeRepository.existsByDni(dni);
-    }
-
     /**
      * Busca un empleado por su ID.
      * 
@@ -101,29 +72,6 @@ public class EmployeeService {
                 .map(employeeMapper::toResponseDto)
                 .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
     }
-
-    /*
-    public EmployeeEntity getEmployeeEntityById(Long id) {
-        return employeeRepository.findById(id).orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
-    }
-
-    public EmployeeResponse getEmployeeByDni(String dni) {
-        return employeeRepository.findByDni(dni);
-    }
-
-    public List<EmployeeResponse> getEmployeeByName(String name) {
-        return employeeRepository.getEmployeeEntitiesByName(name)
-                .stream()
-                .map(employeeMapper::toResponseDto)
-                .toList();
-    }
-
-    public List<EmployeeResponse> getEmployeeByLastName(String lastName) {
-        return employeeRepository.getEmployeeEntitiesByLastName(lastName)
-                .stream()
-                .map(employeeMapper::toResponseDto)
-                .toList();
-    }*/
 
     /**
      * Elimina lógicamente un empleado (lo marca como inactivo).
@@ -152,20 +100,6 @@ public class EmployeeService {
     }
 
     /**
-     * Busca empleados por su estado y que estén activos.
-     * 
-     * @param statusRequest Estado a buscar (ONLINE/OFFLINE)
-     * @return Lista de empleados que coinciden con el estado y están activos
-     */
-    public List<EmployeeResponse> findByStatus(Status statusRequest) {
-        return employeeRepository.findByStatus(statusRequest)
-                .stream()
-                .filter(EmployeeEntity::getActive)
-                .map(employeeMapper::toResponseDto)
-                .toList();
-    }
-
-    /**
      * Busca un empleado por su DNI.
      * 
      * @param dni DNI del empleado a buscar
@@ -173,23 +107,5 @@ public class EmployeeService {
      */
     public Optional<EmployeeEntity> getEmployeeEntityByDni(String dni) {
         return employeeRepository.getEmployeeEntityByDni(dni);
-    }
-
-    /**
-     * Cambia el estado de un empleado entre ONLINE y OFFLINE.
-     * 
-     * @param id ID del empleado cuyo estado se cambiará
-     * @return El nuevo estado del empleado
-     * @throws NotFoundException si no se encuentra el empleado con el ID especificado
-     */
-    public Status toggleStatus(Long id) {
-        EmployeeEntity employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
-        Status next = (employee.getStatus() == Status.ONLINE)
-                ? Status.OFFLINE
-                : Status.ONLINE;
-        employee.setStatus(next);
-        employeeRepository.save(employee);
-        return next;
     }
 }

@@ -145,4 +145,52 @@ public class ShiftService {
         ShiftEntity updatedShift = shiftRepository.save(existingShift);
         return shiftMapper.toDto(updatedShift);
     }
+
+    /**
+     * Elimina un empleado de un turno específico.
+     *
+     * @param shiftId ID del turno del que se eliminará el empleado
+     * @param employeeId ID del empleado a eliminar del turno
+     * @return DTO con los datos del turno actualizado
+     * @throws NotFoundException si no se encuentra el turno o el empleado especificado
+     */
+    public ShiftResponse deleteEmployeeFromShift(Long shiftId, Long employeeId) {
+        ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
+                .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found"));
+        EmployeeEntity employeeEntity = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new NotFoundException("Employee with ID " + employeeId + " not found"));
+        shiftEntity.getEmployeeEntities().remove(employeeEntity);
+        return shiftMapper.toDto(shiftRepository.save(shiftEntity));
+    }
+
+/**
+     * Elimina todos los empleados de un turno específico.
+     *
+     * @param shiftId ID del turno del que se eliminarán todos los empleados
+     * @return DTO con los datos del turno actualizado
+     * @throws NotFoundException si no se encuentra el turno especificado
+     */
+    public ShiftResponse deleteAllEmployeesFromShift(Long shiftId) {
+        ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
+                .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found"));
+        shiftEntity.getEmployeeEntities().clear();
+        return shiftMapper.toDto(shiftRepository.save(shiftEntity));
+    }
+
+    /**
+     * Agrega un empleado a un turno específico.
+     *
+     * @param shiftId ID del turno al que se agregará el empleado
+     * @param employeeId ID del empleado a agregar al turno
+     * @return DTO con los datos del turno actualizado
+     * @throws NotFoundException si no se encuentra el turno o el empleado especificado
+     */
+    public ShiftResponse addEmployeeToShift(Long shiftId, Long employeeId) {
+        ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
+                .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found"));
+        EmployeeEntity employeeEntity = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new NotFoundException("Employee with ID " + employeeId + " not found"));
+        shiftEntity.getEmployeeEntities().add(employeeEntity);
+        return shiftMapper.toDto(shiftRepository.save(shiftEntity));
+    }
 }
