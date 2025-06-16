@@ -1,4 +1,5 @@
 package org.stockify.model.service;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,11 @@ import org.stockify.model.repository.PurchaseRepository;
 import org.stockify.model.repository.TransactionRepository;
 import org.stockify.model.specification.PurchaseSpecification;
 
+/**
+ * Service class responsible for handling business logic related to purchases.
+ * It provides operations for creating, updating, deleting, and querying purchases,
+ * as well as managing related stock updates and transaction associations.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -30,41 +36,42 @@ public class PurchaseService {
     private final TransactionRepository transactionRepository;
     private final ProviderRepository providerRepository;
 
-
-    //-- CRUD operations --
-
     /**
-     * Crea una nueva compra en el sistema y actualiza el stock de los productos.
-     * 
-     * @param request DTO con los datos de la compra a crear
-     * @param storeID ID de la tienda donde se realiza la compra
-     * @param posID ID del punto de venta donde se realiza la compra
-     * @return DTO con los datos de la compra creada
-     * @throws NotFoundException si no se encuentra la transacción o el proveedor
+     * Creates a new purchase and updates the stock of the corresponding products.
+     *
+     * @param request the DTO containing the details of the purchase to be created
+     * @param storeID the ID of the store where the purchase takes place
+     * @param posID the ID of the point of sale associated with the purchase
+     * @return the response DTO with the created purchase details
+     * @throws NotFoundException if the transaction or provider cannot be found
      */
     @Transactional
     public PurchaseResponse createPurchase(PurchaseRequest request, Long storeID, Long posID) {
 
         request.getTransaction().getDetailTransactions()
-                .forEach(detail -> stockService.increaseStock(detail.getProductID(), storeID, detail.getQuantity()));
+                .forEach(detail -> stockService.increaseStock(
+                        detail.getProductID(), storeID, detail.getQuantity()));
 
-        TransactionEntity transaction = transactionService.createTransaction(request.getTransaction(), storeID, posID, TransactionType.PURCHASE);
+        TransactionEntity transaction = transactionService.createTransaction(
+                request.getTransaction(), storeID, posID, TransactionType.PURCHASE);
+
         PurchaseEntity purchase = purchaseMapper.toEntity(request);
 
         purchase.setTransaction(transactionRepository.findById(transaction.getId())
                 .orElseThrow(() -> new NotFoundException("Transaction not found")));
 
-        purchase.setProvider(providerRepository.findById(request.getProviderId()).orElseThrow(() -> new NotFoundException("Provider not found")));
+        purchase.setProvider(providerRepository.findById(request.getProviderId())
+                .orElseThrow(() -> new NotFoundException("Provider not found")));
 
         return purchaseMapper.toResponseDTO(purchaseRepository.save(purchase));
     }
 
     /**
-     * Actualiza una compra existente.
-     * 
-     * @param id ID de la compra a actualizar
-     * @param request DTO con los nuevos datos de la compra
-     * @return DTO con los datos de la compra actualizada
+     * Updates an existing purchase.
+     *
+     * @param id the ID of the purchase to update
+     * @param request the DTO containing the updated purchase data
+     * @return the response DTO with the updated purchase details
      */
     public PurchaseResponse updatePurchase(Long id, PurchaseRequest request) {
         PurchaseEntity purchaseEntity = purchaseMapper.toEntity(request);
@@ -73,20 +80,20 @@ public class PurchaseService {
     }
 
     /**
-     * Elimina una compra por su ID.
-     * 
-     * @param id ID de la compra a eliminar
+     * Deletes a purchase by its ID.
+     *
+     * @param id the ID of the purchase to delete
      */
     public void deletePurchase(Long id) {
         purchaseRepository.deleteById(id);
     }
 
     /**
-     * Busca compras aplicando filtros y paginación.
-     * 
-     * @param pageable Información de paginación
-     * @param request DTO con los filtros a aplicar (ID de transacción, ID de proveedor, ID de compra)
-     * @return Página de compras que cumplen con los filtros
+     * Retrieves all purchases that match the given filter criteria and pagination configuration.
+     *
+     * @param pageable the pagination and sorting information
+     * @param request the filter DTO containing optional transaction ID, provider ID, and purchase ID
+     * @return a page of purchase response DTOs that match the criteria
      */
     public Page<PurchaseResponse> getAllPurchases(Pageable pageable, PurchaseFilterRequest request) {
         Specification<PurchaseEntity> spec = Specification
@@ -97,13 +104,12 @@ public class PurchaseService {
                 .map(purchaseMapper::toResponseDTO);
     }
 
-
     /**
-     * Busca una compra por su ID.
+     * Retrieves a purchase by its ID.
      *
-     * @param id ID de la compra a buscar
-     * @return DTO con los datos de la compra encontrada
-     * @throws NotFoundException si no se encuentra la compra
+     * @param id the ID of the purchase to retrieve
+     * @return the response DTO containing the found purchase details
+     * @throws NotFoundException if the purchase with the given ID does not exist
      */
     public PurchaseResponse findById(Long id) {
         PurchaseEntity purchase = purchaseRepository.findById(id)

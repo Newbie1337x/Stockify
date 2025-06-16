@@ -14,19 +14,22 @@ import org.stockify.model.mapper.ClientMapper;
 import org.stockify.model.repository.ClientRepository;
 import org.stockify.model.specification.ClientSpecification;
 
+/**
+ * Service class responsible for managing client-related operations,
+ * including searching, saving, updating, and deleting clients.
+ */
 @Service
 @RequiredArgsConstructor
-
 public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
 
     /**
-     * Busca un cliente por su ID.
-     * 
-     * @param id ID del cliente a buscar
-     * @return DTO con los datos del cliente encontrado
-     * @throws ClientNotFoundException si no se encuentra ningún cliente con el ID especificado
+     * Finds a client by their ID.
+     *
+     * @param id the ID of the client to find
+     * @return a DTO containing the client data
+     * @throws ClientNotFoundException if no client is found with the specified ID
      */
     public ClientResponse findById(Long id) {
         ClientEntity clientEntity = clientRepository.findById(id)
@@ -35,11 +38,11 @@ public class ClientService {
     }
 
     /**
-     * Busca clientes aplicando filtros y paginación.
-     * 
-     * @param filterRequest DTO con los filtros a aplicar (nombre, apellido, DNI, teléfono)
-     * @param pageable Información de paginación
-     * @return Página de clientes que cumplen con los filtros
+     * Searches for clients matching the given filter criteria with pagination.
+     *
+     * @param filterRequest DTO containing filter criteria (first name, last name, DNI, phone)
+     * @param pageable      pagination information
+     * @return a paginated list of clients matching the filters
      */
     public Page<ClientResponse> findAll(ClientFilterRequest filterRequest, Pageable pageable) {
         Specification<ClientEntity> specification = Specification
@@ -53,10 +56,10 @@ public class ClientService {
     }
 
     /**
-     * Guarda un nuevo cliente en el sistema.
-     * 
-     * @param clientRequest DTO con los datos del cliente a crear
-     * @return DTO con los datos del cliente creado
+     * Saves a new client in the system.
+     *
+     * @param clientRequest DTO containing the client data to create
+     * @return a DTO with the saved client data
      */
     public ClientResponse save(ClientRequest clientRequest) {
         ClientEntity clientEntity = clientMapper.toEntity(clientRequest);
@@ -64,29 +67,28 @@ public class ClientService {
     }
 
     /**
-     * Elimina un cliente por su ID.
-     * 
-     * @param id ID del cliente a eliminar
-     * @throws ClientNotFoundException si no se encuentra ningún cliente con el ID especificado
+     * Deletes a client by their ID.
+     *
+     * @param id the ID of the client to delete
+     * @throws ClientNotFoundException if no client is found with the specified ID
      */
     public void delete(Long id) {
-        if(!clientRepository.existsById(id)) {
+        if (!clientRepository.existsById(id)) {
             throw new ClientNotFoundException("Client with id " + id + " not found");
         }
         clientRepository.deleteById(id);
     }
 
     /**
-     * Actualiza parcialmente un cliente existente.
-     * 
-     * @param id ID del cliente a actualizar parcialmente
-     * @param clientRequest DTO con los datos a actualizar del cliente
-     * @return DTO con los datos del cliente actualizado
-     * @throws ClientNotFoundException si no se encuentra ningún cliente con el ID especificado
+     * Partially updates an existing client with the provided data.
+     *
+     * @param id            the ID of the client to update partially
+     * @param clientRequest DTO containing the fields to update
+     * @return a DTO with the updated client data
+     * @throws ClientNotFoundException if no client is found with the specified ID
      */
-    public ClientResponse updateClientPartial (Long id, ClientRequest clientRequest) {
-        ClientEntity existingClient =
-                clientRepository.findById(id)
+    public ClientResponse updateClientPartial(Long id, ClientRequest clientRequest) {
+        ClientEntity existingClient = clientRepository.findById(id)
                 .orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
 
         clientMapper.partialUpdateClientEntity(clientRequest, existingClient);
@@ -96,14 +98,14 @@ public class ClientService {
     }
 
     /**
-     * Actualiza completamente un cliente existente.
-     * 
-     * @param id ID del cliente a actualizar
-     * @param clientRequest DTO con los nuevos datos del cliente
-     * @return DTO con los datos del cliente actualizado
-     * @throws ClientNotFoundException si no se encuentra ningún cliente con el ID especificado
+     * Fully updates an existing client with the provided data.
+     *
+     * @param id            the ID of the client to update
+     * @param clientRequest DTO containing the new client data
+     * @return a DTO with the updated client data
+     * @throws ClientNotFoundException if no client is found with the specified ID
      */
-    public ClientResponse updateClientFull (Long id, ClientRequest clientRequest) {
+    public ClientResponse updateClientFull(Long id, ClientRequest clientRequest) {
         ClientEntity existingClient = clientRepository.findById(id)
                 .orElseThrow(() -> new ClientNotFoundException("Client with id " + id + " not found"));
 

@@ -12,7 +12,9 @@ import org.stockify.model.mapper.StoreMapper;
 import org.stockify.model.repository.StoreRepository;
 
 /**
- * Servicio para gestionar operaciones relacionadas con tiendas (stores).
+ * Service class responsible for managing store-related operations.
+ * Provides functionality to create, update, retrieve, and delete stores,
+ * including support for full and partial updates and paginated results.
  */
 @Service
 @RequiredArgsConstructor
@@ -22,10 +24,10 @@ public class StoreService {
     private final StoreMapper storeMapper;
 
     /**
-     * Obtiene todas las tiendas paginadas.
+     * Retrieves a paginated list of all stores.
      *
-     * @param pageable Parámetros de paginación y ordenamiento
-     * @return Página de respuestas con las tiendas
+     * @param pageable pagination and sorting parameters
+     * @return a {@link Page} of {@link StoreResponse} representing the stores
      */
     public Page<StoreResponse> findAll(Pageable pageable) {
         Page<StoreEntity> stores = storeRepository.findAll(pageable);
@@ -33,11 +35,11 @@ public class StoreService {
     }
 
     /**
-     * Busca una tienda por su ID.
+     * Retrieves a store by its ID.
      *
-     * @param id ID de la tienda a buscar
-     * @return DTO con los datos de la tienda encontrada
-     * @throws NotFoundException si la tienda no existe
+     * @param id the ID of the store to retrieve
+     * @return a {@link StoreResponse} containing the store's data
+     * @throws NotFoundException if no store is found with the given ID
      */
     public StoreResponse findById(Long id) {
         StoreEntity store = getStoreById(id);
@@ -45,10 +47,10 @@ public class StoreService {
     }
 
     /**
-     * Guarda una nueva tienda en la base de datos.
+     * Saves a new store in the database.
      *
-     * @param request DTO con los datos de la tienda a crear
-     * @return DTO con los datos de la tienda creada
+     * @param request the DTO containing the store data to create
+     * @return a {@link StoreResponse} representing the newly created store
      */
     public StoreResponse save(StoreRequest request) {
         StoreEntity store = storeMapper.toEntity(request);
@@ -57,12 +59,12 @@ public class StoreService {
     }
 
     /**
-     * Actualiza completamente una tienda existente.
+     * Updates all fields of an existing store.
      *
-     * @param id ID de la tienda a actualizar
-     * @param request DTO con los nuevos datos
-     * @return DTO con los datos de la tienda actualizada
-     * @throws NotFoundException si la tienda no existe
+     * @param id      the ID of the store to update
+     * @param request the DTO containing the updated store data
+     * @return a {@link StoreResponse} with the updated store information
+     * @throws NotFoundException if the store with the given ID does not exist
      */
     public StoreResponse update(Long id, StoreRequest request) {
         StoreEntity store = getStoreById(id);
@@ -72,12 +74,13 @@ public class StoreService {
     }
 
     /**
-     * Aplica una actualización parcial (patch) a una tienda.
+     * Applies a partial update (patch) to an existing store.
+     * Only non-null fields in the request will be updated.
      *
-     * @param id ID de la tienda a modificar
-     * @param request DTO con los datos parciales a modificar
-     * @return DTO con los datos de la tienda actualizada
-     * @throws NotFoundException si la tienda no existe
+     * @param id      the ID of the store to update
+     * @param request the DTO containing the fields to update
+     * @return a {@link StoreResponse} representing the updated store
+     * @throws NotFoundException if the store with the given ID does not exist
      */
     public StoreResponse patch(Long id, StoreRequest request) {
         StoreEntity store = getStoreById(id);
@@ -86,20 +89,21 @@ public class StoreService {
     }
 
     /**
-     * Elimina una tienda por su ID.
+     * Deletes a store by its ID.
      *
-     * @param id ID de la tienda a eliminar
+     * @param id the ID of the store to delete
      */
     public void deleteById(Long id) {
         storeRepository.deleteById(id);
     }
 
     /**
-     * Obtiene una tienda por su ID o lanza una excepción si no existe.
+     * Retrieves a {@link StoreEntity} by its ID or throws an exception if not found.
+     * This method is used internally for validation or data access.
      *
-     * @param id ID de la tienda
-     * @return Entidad de tienda
-     * @throws NotFoundException si la tienda no existe
+     * @param id the ID of the store to retrieve
+     * @return the {@link StoreEntity} instance
+     * @throws NotFoundException if the store does not exist
      */
     public StoreEntity getStoreById(Long id) {
         return storeRepository.findById(id)

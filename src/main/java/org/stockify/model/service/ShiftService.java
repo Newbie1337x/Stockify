@@ -17,57 +17,61 @@ import org.stockify.model.mapper.ShiftMapper;
 import org.stockify.model.repository.EmployeeRepository;
 import org.stockify.model.repository.ShiftRepository;
 import org.stockify.model.specification.ShiftSpecification;
+
 import java.util.List;
 import java.util.stream.Collectors;
-@RequiredArgsConstructor
 
+/**
+ * Service class responsible for managing shift-related operations.
+ * It provides methods to create, retrieve, update, and delete shifts,
+ * as well as to assign or remove employees from shifts.
+ */
+@RequiredArgsConstructor
 @Service
 public class ShiftService {
+
     private final ShiftRepository shiftRepository;
     private final ShiftMapper shiftMapper;
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper employeeMapper;
 
     /**
-     * Guarda un nuevo turno en el sistema.
-     * 
-     * @param shiftRequest DTO con los datos del turno a crear
-     * @return DTO con los datos del turno creado
-     * @throws NotFoundException si no se encuentran los empleados especificados
+     * Creates and persists a new shift based on the given request.
+     *
+     * @param shiftRequest DTO containing the details of the shift to be created
+     * @return DTO representing the created shift
+     * @throws NotFoundException if no employees with the specified IDs are found
      */
     public ShiftResponse save(ShiftRequest shiftRequest) {
         ShiftEntity shiftEntity = shiftMapper.toEntity(shiftRequest);
         List<EmployeeEntity> employees = employeeRepository.findAllById(shiftRequest.getEmployeeIds());
-        if(employees.isEmpty()) {
+        if (employees.isEmpty()) {
             throw new NotFoundException("Employee not found");
         }
-
         shiftEntity.setEmployeeEntities(employees);
         ShiftEntity savedEntity = shiftRepository.save(shiftEntity);
-
-
-        return shiftMapper.toDto(shiftRepository.save(savedEntity));
+        return shiftMapper.toDto(savedEntity);
     }
 
     /**
-     * Elimina un turno por su ID.
-     * 
-     * @param id ID del turno a eliminar
-     * @throws NotFoundException si no se encuentra ningún turno con el ID especificado
+     * Deletes a shift by its ID.
+     *
+     * @param id the ID of the shift to be deleted
+     * @throws NotFoundException if no shift exists with the specified ID
      */
-    public void delete (Long id) {
-        if(!shiftRepository.existsById(id)) {
+    public void delete(Long id) {
+        if (!shiftRepository.existsById(id)) {
             throw new NotFoundException("Shift with ID " + id + " not found");
         }
         shiftRepository.deleteById(id);
     }
 
     /**
-     * Busca un turno por su ID.
-     * 
-     * @param id ID del turno a buscar
-     * @return DTO con los datos del turno encontrado
-     * @throws NotFoundException si no se encuentra ningún turno con el ID especificado
+     * Retrieves a shift by its ID.
+     *
+     * @param id the ID of the shift to be retrieved
+     * @return DTO containing the shift's information
+     * @throws NotFoundException if no shift exists with the specified ID
      */
     public ShiftResponse findById(Long id) {
         ShiftEntity shiftEntity = shiftRepository.findById(id)
@@ -76,11 +80,11 @@ public class ShiftService {
     }
 
     /**
-     * Busca turnos aplicando filtros y paginación.
-     * 
-     * @param filterRequest DTO con los filtros a aplicar (día, hora de entrada, hora de salida, IDs de empleados)
-     * @param pageable Información de paginación
-     * @return Página de turnos que cumplen con los filtros
+     * Retrieves all shifts that match the given filter criteria, with pagination support.
+     *
+     * @param filterRequest DTO containing the filter parameters such as day range, entry and exit times, and employee IDs
+     * @param pageable pagination parameters
+     * @return a page of shifts that match the given filters
      */
     public Page<ShiftResponse> findAll(ShiftFilterRequest filterRequest, Pageable pageable) {
         Specification<ShiftEntity> specification = Specification
@@ -94,15 +98,15 @@ public class ShiftService {
     }
 
     /**
-     * Busca los empleados asignados a un turno.
-     * 
-     * @param shiftId ID del turno del que se buscarán los empleados
-     * @return Lista de DTOs con los datos de los empleados asignados al turno
-     * @throws NotFoundException si no se encuentra ningún turno con el ID especificado
+     * Retrieves all employees assigned to a specific shift.
+     *
+     * @param shiftId the ID of the shift
+     * @return a list of employee DTOs assigned to the shift
+     * @throws NotFoundException if the shift with the given ID is not found
      */
     public List<EmployeeResponse> findEmployeesByShiftId(Long shiftId) {
         ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
-                .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found")) ;
+                .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found"));
 
         return shiftEntity.getEmployeeEntities()
                 .stream()
@@ -111,64 +115,63 @@ public class ShiftService {
     }
 
     /**
-     * Actualiza parcialmente un turno existente.
-     * 
-     * @param id ID del turno a actualizar parcialmente
-     * @param shiftRequest DTO con los datos a actualizar del turno
-     * @return DTO con los datos del turno actualizado
-     * @throws NotFoundException si no se encuentra ningún turno con el ID especificado
+     * Partially updates a shift with the fields provided in the request.
+     *
+     * @param id the ID of the shift to be updated
+     * @param shiftRequest DTO containing the fields to update
+     * @return DTO representing the updated shift
+     * @throws NotFoundException if no shift exists with the specified ID
      */
     public ShiftResponse updateShiftPartial(Long id, ShiftRequest shiftRequest) {
         ShiftEntity existingShift = shiftRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Shift with ID " + id + " not found"));
 
         shiftMapper.partialUpdateShiftEntity(shiftRequest, existingShift);
-
         ShiftEntity updatedShift = shiftRepository.save(existingShift);
         return shiftMapper.toDto(updatedShift);
     }
 
     /**
-     * Actualiza completamente un turno existente.
-     * 
-     * @param id ID del turno a actualizar
-     * @param shiftRequest DTO con los nuevos datos del turno
-     * @return DTO con los datos del turno actualizado
-     * @throws NotFoundException si no se encuentra ningún turno con el ID especificado
+     * Fully replaces a shift with the data provided in the request.
+     *
+     * @param id the ID of the shift to be replaced
+     * @param shiftRequest DTO containing the new shift data
+     * @return DTO representing the updated shift
+     * @throws NotFoundException if no shift exists with the specified ID
      */
     public ShiftResponse updateShiftFull(Long id, ShiftRequest shiftRequest) {
         ShiftEntity existingShift = shiftRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Shift with ID " + id + " not found"));
 
         shiftMapper.updateShiftEntity(shiftRequest, existingShift);
-
         ShiftEntity updatedShift = shiftRepository.save(existingShift);
         return shiftMapper.toDto(updatedShift);
     }
 
     /**
-     * Elimina un empleado de un turno específico.
+     * Removes a specific employee from a given shift.
      *
-     * @param shiftId ID del turno del que se eliminará el empleado
-     * @param employeeId ID del empleado a eliminar del turno
-     * @return DTO con los datos del turno actualizado
-     * @throws NotFoundException si no se encuentra el turno o el empleado especificado
+     * @param shiftId the ID of the shift
+     * @param employeeId the ID of the employee to remove
+     * @return DTO representing the updated shift
+     * @throws NotFoundException if the shift or employee is not found
      */
     public ShiftResponse deleteEmployeeFromShift(Long shiftId, Long employeeId) {
         ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found"));
         EmployeeEntity employeeEntity = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new NotFoundException("Employee with ID " + employeeId + " not found"));
+
         shiftEntity.getEmployeeEntities().remove(employeeEntity);
         return shiftMapper.toDto(shiftRepository.save(shiftEntity));
     }
 
-/**
-     * Elimina todos los empleados de un turno específico.
+    /**
+     * Removes all employees from a given shift.
      *
-     * @param shiftId ID del turno del que se eliminarán todos los empleados
-     * @return DTO con los datos del turno actualizado
-     * @throws NotFoundException si no se encuentra el turno especificado
+     * @param shiftId the ID of the shift
+     * @return DTO representing the updated shift
+     * @throws NotFoundException if the shift is not found
      */
     public ShiftResponse deleteAllEmployeesFromShift(Long shiftId) {
         ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
@@ -178,18 +181,19 @@ public class ShiftService {
     }
 
     /**
-     * Agrega un empleado a un turno específico.
+     * Adds a specific employee to a given shift.
      *
-     * @param shiftId ID del turno al que se agregará el empleado
-     * @param employeeId ID del empleado a agregar al turno
-     * @return DTO con los datos del turno actualizado
-     * @throws NotFoundException si no se encuentra el turno o el empleado especificado
+     * @param shiftId the ID of the shift
+     * @param employeeId the ID of the employee to add
+     * @return DTO representing the updated shift
+     * @throws NotFoundException if the shift or employee is not found
      */
     public ShiftResponse addEmployeeToShift(Long shiftId, Long employeeId) {
         ShiftEntity shiftEntity = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new NotFoundException("Shift with ID " + shiftId + " not found"));
         EmployeeEntity employeeEntity = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new NotFoundException("Employee with ID " + employeeId + " not found"));
+
         shiftEntity.getEmployeeEntities().add(employeeEntity);
         return shiftMapper.toDto(shiftRepository.save(shiftEntity));
     }

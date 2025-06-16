@@ -24,6 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ *
+ * Service responsible for generating PDF documents from transaction data.
+ * This service fetches transaction details, maps them to DTOs, processes HTML templates using Thymeleaf,
+ * and converts the resulting HTML into a PDF file stored in the user's home directory.
+ * It currently supports PDF generation only for PURCHASE and SALE transaction types.
+ *
+ */
 @Service
 @RequiredArgsConstructor
 public class PdfGeneratorService {
@@ -32,47 +40,62 @@ public class PdfGeneratorService {
     private final TransactionMapper transactionMapper;
 
     /**
-     * Generates a PDF for a transaction by its ID.
      *
-     * @param id the ID of the transaction
-     * @return a ResponseEntity containing the path to the generated PDF
-     * @throws Exception if an error occurs during PDF generation
+     * Generates a PDF file for a transaction identified by its ID.
+     *
+     * <p>
+     * The method fetches the transaction entity from the database, verifies if its type is supported,
+     * then generates the corresponding PDF using an HTML template rendered with Thymeleaf.
+     * The resulting PDF file is saved to the user's home directory with a filename pattern:
+     * transaction_{id}.pdf.
+     * </p>
+     *
+     * @param id the unique identifier of the transaction
+     * @return a {@link ResponseEntity} containing an {@link EntityModel} with a {@link TransactionPDFResponse}
+     *         that includes the path to the generated PDF and transaction data
+     * @throws NotFoundException if the transaction does not exist, or if the transaction type is not supported for PDF generation
+     * @throws Exception         if any error occurs during the PDF generation process
      */
     public ResponseEntity<EntityModel<TransactionPDFResponse>> generatePdf(Long id) throws Exception {
         TransactionEntity transaction = transactionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Transaction with ID " + id + " not found."));
 
-        // Convertir a DTO
+        // Map entity to DTO for template rendering
         TransactionResponse dto = transactionMapper.toDto(transaction);
 
-        // Generar PDF en el siguiente directorio
+        // Define an output PDF file path in the user's home directory
         String fileName = "transaction_" + id + ".pdf";
         String outputPath = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + fileName;
 
-        // Verificar si es una compra o una venta
+        // Only PURCHASE and SALE types supported for PDF generation
         if (transaction.getType() == TransactionType.PURCHASE || transaction.getType() == TransactionType.SALE) {
             generateHtmlToPdf(dto, outputPath, transaction);
         } else {
             throw new NotFoundException("Transaction type not supported for PDF generation.");
         }
 
-        // Retornar la respuesta con el PDF generado
+        // Return response with PDF file path and transaction details
         return ResponseEntity.ok(EntityModel.of(
                 TransactionPDFResponse.builder()
                         .path(outputPath)
-                        .transaction(dto).build()));
+                        .transaction(dto)
+                        .build()));
     }
 
     /**
-     * Generates a PDF from HTML using Thymeleaf templates.
      *
-     * @param dto the transaction data transfer object
-     * @param outputPath the path where the PDF will be saved
-     * @param transaction the transaction entity
-     * @throws Exception if an error occurs during PDF generation
+     * Converts transaction data into an HTML string using Thymeleaf templates and then generates a PDF file.
+     * <p>
+     * This method sets up Thymeleaf with a classpath template resolver, creates a context with transaction data,
+     * processes either a purchase or sale HTML template,
+     * and renders it to a PDF file using the Flying Saucer library.
+     * @param dto          the transaction data transfer object containing transaction details for the template
+     * @param outputPath   the file system path where the generated PDF should be saved
+     * @param transaction  the original transaction entity, used to determine a transaction type and related details
+     * @throws Exception if any IO or rendering error occurs during PDF generation
      */
     private void generateHtmlToPdf(TransactionResponse dto, String outputPath, TransactionEntity transaction) throws Exception {
-        // Configurar Thymeleaf
+        // Configure Thymeleaf template resolver for HTML files with UTF-8 encoding
         ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
         resolver.setTemplateMode("HTML");
         resolver.setPrefix("");
@@ -82,19 +105,19 @@ public class PdfGeneratorService {
         TemplateEngine templateEngine = new TemplateEngine();
         templateEngine.setTemplateResolver(resolver);
 
-        // Preparar el contexto
+        // Prepare Thymeleaf context with transaction variables
         Context context = new Context();
 
-        // Comprovar si es una compra o una venta y completar el contexto
         if (transaction.getType() == TransactionType.PURCHASE && transaction.getPurchase() != null) {
+            // For purchases, add provider name and relevant fields
             String providerName = transaction.getPurchase().getProvider().getBusinessName();
-
             context.setVariable("providerName", providerName);
             context.setVariable("transactionId", dto.getId());
             context.setVariable("date", dto.getDateTime());
             context.setVariable("total", dto.getTotal());
         } else {
-            String customerName = "";
+            // For sales or others, add customer and POS-related details
+            String customerName = ""; // This could be extended if customer data available
             context.setVariable("customerName", customerName);
             context.setVariable("transactionId", dto.getId());
             context.setVariable("storeName", dto.getStoreName());
@@ -103,7 +126,7 @@ public class PdfGeneratorService {
             context.setVariable("total", dto.getTotal());
         }
 
-        // Convertir los detalles de transacción a un formato adecuado para la plantilla
+        // Prepare transaction detail items as a list of maps for the template
         List<Map<String, Object>> items = dto.getDetailTransactions().stream()
                 .map(detail -> {
                     Map<String, Object> item = new HashMap<>();
@@ -115,11 +138,13 @@ public class PdfGeneratorService {
                 .collect(Collectors.toList());
         context.setVariable("items", items);
 
-        // Usar buyTemplate.html para compras
+        // Select a template based on a transaction type
         String templateName = transaction.getType() == TransactionType.PURCHASE ? "buyTemplate" : "saleTemplate";
+
+        // Process HTML content
         String html = templateEngine.process(templateName, context);
 
-        // Convertir HTML a PDF
+        // Render HTML to PDF using Flying Saucer (ITextRenderer)
         ITextRenderer renderer = new ITextRenderer();
         renderer.setDocumentFromString(html);
         renderer.layout();
