@@ -76,7 +76,7 @@ public class TimeLogController {
         @ApiResponse(responseCode = "404", description = "Employee not found")
     })
     @PostMapping
-    public ResponseEntity<TimeLogEntity> addTimeLog(
+    public ResponseEntity<TimeLogResponse> addTimeLog(
             @Parameter(description = "Time log data to create", required = true)
             @Validated @RequestBody TimeLogRequest timeLogRequest) {
         return ResponseEntity.status(201).body(timeLogService.createTimeLog(timeLogRequest));

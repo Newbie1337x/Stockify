@@ -14,9 +14,6 @@ public class TransactionResponse {
     @Schema(description = "Unique identifier of the transaction", example = "1")
     Long id;
 
-    @Schema(description = "Identifier of the client", example = "123")
-    Long clientId;
-
     @Schema(description = "Total amount of the transaction", example = "150.50")
     BigDecimal total;
 

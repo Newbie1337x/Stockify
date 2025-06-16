@@ -13,7 +13,8 @@ public interface SaleMapper {
     @Mapping(target = "id", ignore = true)
     SaleEntity toEntity(SaleRequest dto);
 
-    @Mapping(target = "dniClient", source = "client.dni")
+    @Mapping(target = "clientDni", source = "client.dni")
+    @Mapping(target = "clientId", source = "client.id")
     @Mapping(target = "transaction", source = "transaction", qualifiedByName = "toTransactionResponse")
     SaleResponse toResponseDTO (SaleEntity entity);
 

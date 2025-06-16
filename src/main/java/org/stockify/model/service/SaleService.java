@@ -65,12 +65,14 @@ public class SaleService {
                 .forEach(detail ->
                         stockService.decreaseStock(detail.getProductID(), storeID, detail.getQuantity()));
 
+
         SaleEntity sale = saleMapper.toEntity(request);
         //Crea la transaccion
         sale.setTransaction(
                 transactionService
                         .createTransaction
                                 (request.getTransaction(), storeID, posID, TransactionType.SALE));
+
 
         if (request.getClientId() != null) {
             sale.setClient(clientRepository
@@ -79,8 +81,6 @@ public class SaleService {
                             new NotFoundException("Client not found with ID"+ request.getClientId())));
         }
         posService.addAmount(posID, sale.getTransaction().getTotal());
-
-
         return saleMapper.toResponseDTO(saleRepository.save(sale));
     }
 

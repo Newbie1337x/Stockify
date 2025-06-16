@@ -29,9 +29,9 @@ public class TimeLogService {
      * @param timeLogRequest DTO con los datos del registro a crear
      * @return Entidad persistida con ID generado
      */
-    public TimeLogEntity createTimeLog(TimeLogRequest timeLogRequest) {
+    public TimeLogResponse createTimeLog(TimeLogRequest timeLogRequest) {
         TimeLogEntity timeLogEntity = timeLogMapper.toEntity(timeLogRequest);
-        return timeLogRepository.save(timeLogEntity);
+        return timeLogMapper.toResponse(timeLogRepository.save(timeLogEntity));
     }
 
     /**
