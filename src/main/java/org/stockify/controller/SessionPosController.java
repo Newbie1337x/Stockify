@@ -67,8 +67,7 @@ public class SessionPosController {
             description = "List of sessions returned successfully",
             content = @Content(mediaType = "application/json")
         ),
-        @ApiResponse(responseCode = "400", description = "Filter parameters are invalid"),
-        //@ApiResponse(responseCode = "500", description = "Error interno del servidor") TODO: Verificar si se quiere arrojar un error 500
+        @ApiResponse(responseCode = "400", description = "Filter parameters are invalid")
     })
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<SessionPosResponse>>> getAllSessions(
