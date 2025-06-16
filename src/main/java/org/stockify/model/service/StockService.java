@@ -111,7 +111,7 @@ public class StockService {
      * @param productId the product ID
      * @param storeId   the store ID
      * @return stock response DTO
-     * @throws NotFoundException if product, store or stock not found
+     * @throws NotFoundException if a product, store or stock isn't found
      */
     public StockResponse getStock(Long productId, Long storeId) {
         StockEntity stock = findStockByProductAndStore(productId, storeId);
