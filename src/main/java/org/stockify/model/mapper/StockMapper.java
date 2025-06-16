@@ -1,7 +1,7 @@
 package org.stockify.model.mapper;
 
 import org.mapstruct.*;
-import org.stockify.dto.request.StockRequest;
+import org.stockify.dto.request.stock.StockRequest;
 import org.stockify.dto.response.StockResponse;
 import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.StockEntity;
@@ -10,6 +10,7 @@ import org.stockify.model.entity.StoreEntity;
 @Mapper(componentModel = "spring")
 public interface StockMapper {
 
+    @Mapping(target = "lowStockAlertSent", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "product", source = "product")
     @Mapping(target = "store", source = "store")

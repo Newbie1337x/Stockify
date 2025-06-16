@@ -1,7 +1,8 @@
 package org.stockify.model.mapper;
 
 import org.mapstruct.*;
-import org.stockify.dto.request.ProductRequest;
+import org.stockify.dto.request.product.ProductCSVRequest;
+import org.stockify.dto.request.product.ProductRequest;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.model.entity.CategoryEntity;
 import org.stockify.model.entity.ProductEntity;
@@ -9,6 +10,7 @@ import org.stockify.model.entity.ProviderEntity;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Mapper(componentModel = "spring", uses = {StockMapper.class})
 public interface ProductMapper {
@@ -18,6 +20,7 @@ public interface ProductMapper {
     @Mapping(source = "stocks", target = "stocks")
     ProductResponse toResponse(ProductEntity entity);
 
+    @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -35,6 +38,7 @@ public interface ProductMapper {
     /**
      * Lógica interna del update (excepto categorías)
      */
+    @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @Mapping(target = "id", ignore = true)
@@ -45,6 +49,7 @@ public interface ProductMapper {
     /**
      * PATCH: ignora campos nulos, actualiza los que vienen con datos
      */
+    @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "stocks", ignore = true)
     @Mapping(target = "providers", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -77,6 +82,24 @@ public interface ProductMapper {
         if (providers == null || providers.isEmpty()) return Set.of();
         return providers.stream()
                 .map(ProviderEntity::getId)
+                .collect(Collectors.toSet());
+    }
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "stocks", ignore = true)
+    @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "providers", ignore = true)
+    @Mapping(target = "detailTransactions", ignore = true)
+    ProductEntity toEntity(ProductCSVRequest dto);
+    @Mapping(target = "categories", source = "categories", qualifiedByName = "stringToCategorySet")
+    ProductRequest toRequest(ProductCSVRequest dto);
+
+    @Named("stringToCategorySet")
+    static Set<String> mapCategories(String value) {
+        if (value == null || value.isBlank()) return Set.of();
+        return Stream.of(value.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
                 .collect(Collectors.toSet());
     }
 }

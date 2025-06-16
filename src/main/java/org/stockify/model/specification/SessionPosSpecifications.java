@@ -68,13 +68,8 @@ public class SessionPosSpecifications {
                 amount == null ? null : cb.lessThanOrEqualTo(root.get("cashDifference"), amount);
     }
     
-    public static Specification<SessionPosEntity> isOpen() {
+    public static Specification<SessionPosEntity> isOpen(Boolean isOpen) {
         return (root, query, cb) ->
-                cb.isNull(root.get("closeTime"));
-    }
-    
-    public static Specification<SessionPosEntity> isClosed() {
-        return (root, query, cb) ->
-                cb.isNotNull(root.get("closeTime"));
+                isOpen == null ? null : isOpen ? cb.isNull(root.get("closeTime")) : cb.isNotNull(root.get("closeTime"));
     }
 }

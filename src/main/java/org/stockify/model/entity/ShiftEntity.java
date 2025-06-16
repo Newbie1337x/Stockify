@@ -10,7 +10,6 @@ import java.util.List;
 @Table(name = "shifts")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

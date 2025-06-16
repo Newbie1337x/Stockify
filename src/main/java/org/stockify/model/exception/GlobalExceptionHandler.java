@@ -9,10 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.stockify.dto.response.ErrorResponse;
+import org.zalando.problem.spring.web.advice.ProblemHandling;
 import java.time.LocalDateTime;
 
+
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler implements ProblemHandling {
 
     @ExceptionHandler(DuplicatedUniqueConstraintException.class)
     public ResponseEntity<ErrorResponse> handleDuplicatedUniqueConstraintException(
@@ -22,10 +24,9 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
     }
 
-    // Catch bad request on Sorts
     @ExceptionHandler(PropertyReferenceException.class)
     public ResponseEntity<ErrorResponse> handleInvalidSort(PropertyReferenceException ex, HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex, request);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, new InvalidSortParameterException("'Sort' value is invalid.  " + ex.getMessage()), request);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -36,9 +37,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex,
-                                                             HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(HttpServletRequest request,
+    DataIntegrityViolationException ex) {
+        String msg = ex.getMostSpecificCause().getMessage();
+
+        return buildErrorResponse(HttpStatus.CONFLICT,new DuplicatedUniqueConstraintException(msg) , request);
     }
 
     @ExceptionHandler(InvalidSessionStatusException.class)
@@ -49,15 +52,16 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
     }
 
-    @ExceptionHandler(NotEnoughException.class)
+    @ExceptionHandler(InsufficientStockException.class)
     public ResponseEntity<ErrorResponse> handleNotEnough
-            ( NotEnoughException ex,
+            ( InsufficientStockException ex,
               HttpServletRequest request){
         {
             return buildErrorResponse(HttpStatus.CONFLICT, ex,request);
         }
-
     }
+
+
 
 
     private <T extends Throwable> ResponseEntity<ErrorResponse> buildErrorResponse(

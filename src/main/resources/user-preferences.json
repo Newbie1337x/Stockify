@@ -1,0 +1,6 @@
+{
+  "mailEnabled" : true,
+  "stockAlertEnabled" : true,
+  "stockAlertThreshold" : 10.0,
+  "emailAddress" : "example@example"
+}

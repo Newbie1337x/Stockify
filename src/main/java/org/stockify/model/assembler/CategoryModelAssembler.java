@@ -20,10 +20,7 @@ public class CategoryModelAssembler implements RepresentationModelAssembler<Cate
         return EntityModel.of(categoryResponse,
                 linkTo(methodOn(CategoryController.class)
                         .getCategoryById(categoryResponse.id()))
-                        .withSelfRel(),
-                linkTo(methodOn(CategoryController.class)
-                        .listCategories(PageRequest.of(0, 10),null))
-                        .withRel("categories")
+                        .withSelfRel()
         );
     }
 }

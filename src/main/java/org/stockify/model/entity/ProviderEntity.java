@@ -49,4 +49,7 @@ public class ProviderEntity {
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private Set<ProductEntity> productList;
+
+    @OneToMany(mappedBy = "provider", fetch = FetchType.LAZY)
+    private Set<PurchaseEntity> purchaseList;
 }

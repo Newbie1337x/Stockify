@@ -12,7 +12,4 @@ import java.util.List;
 
 @Repository
 public interface TimeLogRepository extends JpaRepository<TimeLogEntity, Long>, JpaSpecificationExecutor<TimeLogEntity> {
-    List<TimeLogEntity> findByDate(LocalDate date);
-    List<TimeLogEntity> findByClockInTime(LocalTime clockInTime);
-    List<TimeLogEntity> findByClockOutTime(LocalTime clockOutTime);
 }

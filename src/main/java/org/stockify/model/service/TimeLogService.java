@@ -1,6 +1,6 @@
 package org.stockify.model.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,30 +14,36 @@ import org.stockify.model.specification.TimeLogSpecifications;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.NoSuchElementException;
 
+@RequiredArgsConstructor
 @Service
 public class TimeLogService {
 
     private final TimeLogRepository timeLogRepository;
     private final TimeLogMapper timeLogMapper;
 
-    @Autowired
-    public TimeLogService(TimeLogRepository timeLogRepository, TimeLogMapper timeLogMapper) {
-        this.timeLogRepository = timeLogRepository;
-        this.timeLogMapper = timeLogMapper;
-    }
-
-    public TimeLogEntity createTimeLog(TimeLogRequest timeLogRequest) {
-        System.out.println("---------------------------------------------------");
-        System.out.println(timeLogRequest);
+    /**
+     * Crea un nuevo registro de horario (TimeLog) para un empleado.
+     *
+     * @param timeLogRequest DTO con los datos del registro a crear
+     * @return Entidad persistida con ID generado
+     */
+    public TimeLogResponse createTimeLog(TimeLogRequest timeLogRequest) {
         TimeLogEntity timeLogEntity = timeLogMapper.toEntity(timeLogRequest);
-        System.out.println("----------------------------------------------------");
-        System.out.println(timeLogEntity);
-        return timeLogRepository.save(timeLogEntity);
+        return timeLogMapper.toResponse(timeLogRepository.save(timeLogEntity));
     }
 
+    /**
+     * Obtiene una lista paginada de registros de horarios, con filtros opcionales por empleado, fecha y horarios.
+     *
+     * @param employeeId ID del empleado (obligatorio)
+     * @param date Fecha en formato ISO (opcional)
+     * @param clockInTime Hora de entrada en formato HH:mm:ss (opcional)
+     * @param clockOutTime Hora de salida en formato HH:mm:ss (opcional)
+     * @param pageable Parámetros de paginación y ordenamiento
+     * @return Página con los registros que coincidan con los filtros
+     */
     public Page<TimeLogResponse> getTimeLogs(
             Long employeeId, String date, String clockInTime, String clockOutTime, Pageable pageable
     ) {
@@ -54,39 +60,28 @@ public class TimeLogService {
         return timeLogRepository.findAll(spec, pageable).map(timeLogMapper::toResponse);
     }
 
+    /**
+     * Obtiene un registro de horario por su ID.
+     *
+     * @param id ID del registro a buscar
+     * @return DTO con los datos del registro encontrado
+     * @throws NoSuchElementException si no se encuentra el ID
+     */
     public TimeLogResponse getTimeLogById(long id) {
         return timeLogMapper.toResponse(timeLogRepository.findById(id).get());
     }
 
-    /*
-    public List<TimeLogResponse> getAllTimeLogs() {
-        return timeLogMapper.toResponseList(timeLogRepository.findAll());
-    }
-
-
-    public List<TimeLogResponse> getTimeLogByDate(String date) {
-        LocalDate localDate = LocalDate.parse(date);
-        return timeLogMapper.toResponseList(timeLogRepository.findByDate(localDate));
-    }
-
-    public List<TimeLogResponse> getTimeLogByClockInTime(String clockInTime) {
-        LocalTime localTime = LocalTime.parse(clockInTime);
-        return timeLogMapper.toResponseList(timeLogRepository.findByClockInTime(localTime));
-    }
-
-    public List<TimeLogResponse> getTimeLogByClockOutTime(String clockOutTime) {
-        LocalTime localTime = LocalTime.parse(clockOutTime);
-        return timeLogMapper.toResponseList(timeLogRepository.findByClockOutTime(localTime));
-    }
-
+    /**
+     * Actualiza un registro de horario existente por su ID.
+     *
+     * @param id ID del registro a actualizar
+     * @param timeLogRequest DTO con los nuevos datos
+     * @return DTO con el registro actualizado
      */
-
     public TimeLogResponse updateTimeLog(long id, TimeLogRequest timeLogRequest) {
         TimeLogEntity timeLogEntity = timeLogMapper.toEntity(timeLogRequest);
         timeLogEntity.setId(id);
         return timeLogMapper.toResponse(timeLogRepository.save(timeLogEntity));
     }
-
-    
 
 }

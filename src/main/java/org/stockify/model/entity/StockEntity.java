@@ -32,4 +32,6 @@ public class StockEntity {
     @Column(name = "quantity", nullable = false)
     private Double quantity;
 
+    @Column(nullable = false ,columnDefinition = "boolean default false")
+    private boolean lowStockAlertSent;
 }

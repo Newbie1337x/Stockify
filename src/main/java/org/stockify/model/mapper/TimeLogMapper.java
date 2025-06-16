@@ -11,6 +11,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {EmployeeMapper.class})
 public interface TimeLogMapper {
+    @Mapping(target = "id", ignore = true)
     @Mapping(target ="employee",expression = "java(mapEmployee(dto.getEmployeeId()))")
     TimeLogEntity toEntity(TimeLogRequest dto);
     @Mapping(target = "employeeId", source = "employee.id")
