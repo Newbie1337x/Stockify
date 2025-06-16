@@ -3,6 +3,7 @@ package org.stockify.security.service;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.employee.EmployeeRequest;
@@ -64,25 +65,21 @@ public class AuthService {
     }
 
     public AuthResponse registerEmployee(RegisterEmployeeRequest registerEmployeeRequest) {
-
-        // Verificar si el email ya está registrado
         if (credentialsRepository.existsByEmail(registerEmployeeRequest.getCredential().getEmail())) {
             throw new IllegalArgumentException("Email address already in use");
         }
 
-        // Verificar si el DNI ya está registrado
         if (employeeRepository.getEmployeeEntityByDni(registerEmployeeRequest.getEmployee().getDni()).isPresent()) {
             throw new IllegalArgumentException("DNI is already in use");
         }
 
-        // Mapear y guardar el empleado
         EmployeeEntity employee = employeeMapper.toEntity(registerEmployeeRequest.getEmployee());
         employee.setStatus(Status.OFFLINE);
         employee.setActive(true);
         employeeRepository.save(employee);
 
-        // Obtener rol
         Role inputRole = registerEmployeeRequest.getCredential().getRoles();
+        // Verifico si estan intentando crear un administrador en la ruta publica
         if (inputRole == Role.ADMIN) {
             throw new IllegalArgumentException("Administrators cannot be registered");
         }
@@ -91,21 +88,17 @@ public class AuthService {
         Set<PermitEntity> permitEntities = new HashSet<>();
 
         for (Permit p : requestedPermits) {
-            // Buscar el permiso existente, si no existe, crearlo y guardarlo
+            // Busco si el permiso existe, si no existe, lo creo y lo guardo
             PermitEntity permitEntity = permitRepository.findByPermit(p)
                     .orElseGet(() -> {
-                        // Create a new PermitEntity if it doesn't exist
                         PermitEntity newPermit = PermitEntity.builder()
-                                .permit(p) // Assuming PermitEntity has a 'permit' field
+                                .permit(p)
                                 .build();
-                        // Save the new permit to the database
                         return permitRepository.save(newPermit);
                     });
             permitEntities.add(permitEntity);
         }
 
-
-        // Buscar o crear el RoleEntity con sus permisos
         RoleEntity roleEntity = rolRepository.findByRole(inputRole)
                 .orElseGet(() -> {
                     RoleEntity newRole = RoleEntity.builder()
@@ -115,18 +108,14 @@ public class AuthService {
                     return rolRepository.save(newRole);
                 });
 
-        // Crear las credenciales
         CredentialsEntity credentials = credentialMapper.toEntity(registerEmployeeRequest.getCredential());
         credentials.setEmployee(employee);
         credentials.setPassword(passwordEncoder.encode(registerEmployeeRequest.getCredential().getPassword()));
 
-        // Asignar el rol (único)
         credentials.setRoles(Set.of(roleEntity));
 
-        // Guardar las credenciales
         credentialsRepository.save(credentials);
-
-        // Generar token y devolver respuesta
+        
         return new AuthResponse(jwtService.generateToken(credentials));
     }
 
@@ -154,8 +143,18 @@ public class AuthService {
                             input.password()
                     )
             );
-            return credentialsRepository.findByEmail(input.email())
-                    .orElseThrow(() -> new org.springframework.security.core.userdetails.UsernameNotFoundException("User not found with email: " + input.email()));
+
+            CredentialsEntity credentials = credentialsRepository.findByEmail(input.email())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + input.email()));
+
+            // Cambiar el estado del empleado a ONLINE
+            EmployeeEntity employee = credentials.getEmployee();
+            if (employee != null) {
+                employee.setStatus(Status.ONLINE);
+                employeeRepository.save(employee); // Guardás el cambio
+            }
+
+            return credentials;
         } catch (org.springframework.security.authentication.BadCredentialsException e) {
             throw new org.springframework.security.authentication.BadCredentialsException("Invalid email or password");
         } catch (Exception e) {

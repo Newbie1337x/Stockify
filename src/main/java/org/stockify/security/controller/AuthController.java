@@ -31,21 +31,17 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("cerrar_sesion")
+    @PostMapping("/cerrar_sesion")
     public ResponseEntity<String> cerrarSesion(@RequestHeader("Authorization") String token){
         jwtService.invalidateToken(token);
         return ResponseEntity.ok("Se ha cerrado el sesion");
     }
 
-    @PostMapping("iniciar_sesion")
+    @PostMapping("/iniciar_sesion")
     public ResponseEntity<AuthResponse> authenticateUser(@RequestBody
                                                          AuthRequest authRequest){
-
-        System.out.println(authRequest);
         UserDetails user = authService.authenticate(authRequest);
-        System.out.println(user);
         String token = jwtService.generateToken(user);
-        System.out.println(token);
         return ResponseEntity.ok(new AuthResponse(token));
     }
 }
