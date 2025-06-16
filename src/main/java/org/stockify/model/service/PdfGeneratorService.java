@@ -9,6 +9,7 @@ import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.NotFoundException;
+import org.stockify.model.exception.TypeNotAcceptedException;
 import org.stockify.model.mapper.TransactionMapper;
 import org.stockify.model.repository.TransactionRepository;
 import org.thymeleaf.TemplateEngine;
@@ -53,7 +54,7 @@ public class PdfGeneratorService {
         if (transaction.getType() == TransactionType.PURCHASE || transaction.getType() == TransactionType.SALE) {
             generateHtmlToPdf(dto, outputPath, transaction);
         } else {
-            throw new NotFoundException("Transaction type not supported for PDF generation.");
+            throw new TypeNotAcceptedException("Transaction type not supported for PDF generation.");
         }
 
         // Retornar la respuesta con el PDF generado

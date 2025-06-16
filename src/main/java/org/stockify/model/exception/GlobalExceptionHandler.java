@@ -61,6 +61,13 @@ public class GlobalExceptionHandler implements ProblemHandling {
         }
     }
 
+    @ExceptionHandler(TypeNotAcceptedException.class)
+    public ResponseEntity<ErrorResponse> handleTypeNotAcceptedException(
+            TypeNotAcceptedException ex,
+            HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex, request);
+    }
+
 
 
 
