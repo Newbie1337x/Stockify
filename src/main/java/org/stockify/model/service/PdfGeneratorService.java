@@ -95,7 +95,7 @@ public class PdfGeneratorService {
             context.setVariable("date", dto.getDateTime());
             context.setVariable("total", dto.getTotal());
         } else {
-            String customerName = "";
+            String customerName = transaction.getSale().getClient().getFirstName() + " " + transaction.getSale().getClient().getLastName();
             context.setVariable("customerName", customerName);
             context.setVariable("transactionId", dto.getId());
             context.setVariable("storeName", dto.getStoreName());
