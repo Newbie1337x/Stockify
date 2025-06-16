@@ -91,7 +91,7 @@ public class ClientController {
             @Parameter(description = "ID of the client") @PathVariable Long clientID) {
 
         clientService.delete(clientID);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "Partially update a client by ID")
