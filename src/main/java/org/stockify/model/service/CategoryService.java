@@ -1,7 +1,6 @@
 package org.stockify.model.service;
+
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,18 +13,24 @@ import org.stockify.model.mapper.CategoryMapper;
 import org.stockify.model.repository.CategoryRepository;
 import org.stockify.model.specification.CategorySpecification;
 
+/**
+ * Service class responsible for managing categories, including
+ * operations such as searching, creating, updating, deleting,
+ * and partial updates of categories.
+ */
 @Service
 @RequiredArgsConstructor
-
 public class CategoryService {
+
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+
     /**
-     * Busca categorías aplicando filtros y paginación.
-     * 
-     * @param pageable Información de paginación
-     * @param name Nombre de la categoría para filtrar (opcional)
-     * @return Página de categorías que cumplen con los filtros
+     * Retrieves a paginated list of categories filtered optionally by name.
+     *
+     * @param pageable pagination information
+     * @param name     optional category name filter
+     * @return a paginated list of categories matching the filter criteria
      */
     public Page<CategoryResponse> findAll(Pageable pageable, String name) {
         Specification<CategoryEntity> spec = CategorySpecification.hasName(name);
@@ -34,21 +39,21 @@ public class CategoryService {
     }
 
     /**
-     * Busca una categoría por su ID.
-     * 
-     * @param id ID de la categoría a buscar
-     * @return DTO con los datos de la categoría encontrada
-     * @throws NotFoundException si no se encuentra ninguna categoría con el ID especificado
+     * Finds a category by its ID.
+     *
+     * @param id the ID of the category to find
+     * @return a DTO with the category data
+     * @throws NotFoundException if no category is found with the specified ID
      */
     public CategoryResponse findById(int id) {
         return categoryMapper.toResponse(findEntityById(id));
     }
 
     /**
-     * Guarda una nueva categoría en el sistema.
-     * 
-     * @param request DTO con los datos de la categoría a crear
-     * @return DTO con los datos de la categoría creada
+     * Saves a new category in the system.
+     *
+     * @param request DTO containing the data for the new category
+     * @return a DTO with the saved category data
      */
     public CategoryResponse save(CategoryRequest request) {
         CategoryEntity entity = categoryMapper.toEntity(request);
@@ -56,21 +61,21 @@ public class CategoryService {
     }
 
     /**
-     * Elimina una categoría por su ID.
-     * 
-     * @param id ID de la categoría a eliminar
+     * Deletes a category by its ID.
+     *
+     * @param id the ID of the category to delete
      */
     public void deleteById(int id) {
         categoryRepository.deleteById(id);
     }
 
     /**
-     * Actualiza completamente una categoría existente.
-     * 
-     * @param id ID de la categoría a actualizar
-     * @param request DTO con los nuevos datos de la categoría
-     * @return DTO con los datos de la categoría actualizada
-     * @throws NotFoundException si no se encuentra ninguna categoría con el ID especificado
+     * Fully updates an existing category with the provided data.
+     *
+     * @param id      the ID of the category to update
+     * @param request DTO containing the new category data
+     * @return a DTO with the updated category data
+     * @throws NotFoundException if no category is found with the specified ID
      */
     public CategoryResponse update(int id, CategoryRequest request) {
         CategoryEntity existingCategory = findEntityById(id);
@@ -79,30 +84,28 @@ public class CategoryService {
     }
 
     /**
-     * Actualiza parcialmente una categoría existente.
-     * 
-     * @param id ID de la categoría a actualizar parcialmente
-     * @param request DTO con los datos a actualizar de la categoría
-     * @return DTO con los datos de la categoría actualizada
-     * @throws NotFoundException si no se encuentra ninguna categoría con el ID especificado
+     * Partially updates an existing category with the provided data.
+     *
+     * @param id      the ID of the category to partially update
+     * @param request DTO containing the fields to update
+     * @return a DTO with the updated category data
+     * @throws NotFoundException if no category is found with the specified ID
      */
     public CategoryResponse patch(int id, CategoryRequest request) {
         CategoryEntity existingCategory = findEntityById(id);
         categoryMapper.patchEntityFromRequest(request, existingCategory);
-       return categoryMapper.toResponse(categoryRepository.save(existingCategory));
+        return categoryMapper.toResponse(categoryRepository.save(existingCategory));
     }
 
     /**
-     * Metodo auxiliar para buscar una entidad de categoría por su ID.
-     * 
-     * @param id ID de la categoría a buscar
-     * @return La entidad de la categoría encontrada
-     * @throws NotFoundException si no se encuentra ninguna categoría con el ID especificado
+     * Helper method to find a CategoryEntity by its ID.
+     *
+     * @param id the ID of the category to find
+     * @return the found CategoryEntity
+     * @throws NotFoundException if no category is found with the specified ID
      */
     private CategoryEntity findEntityById(int id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category with ID " + id + " not found"));
     }
-
-
-    }
+}

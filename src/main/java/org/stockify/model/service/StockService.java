@@ -1,4 +1,5 @@
 package org.stockify.model.service;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,10 +25,14 @@ import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.specification.StockSpecifications;
 
 import java.util.List;
-@RequiredArgsConstructor
 
+/**
+ * Service for managing stock-related operations in the system.
+ */
 @Service
+@RequiredArgsConstructor
 public class StockService {
+
     private final StockRepository stockRepository;
     private final ProductStoreMapper productStoreMapper;
     private final StockMapper stockMapper;
@@ -37,14 +42,14 @@ public class StockService {
     private final EmailService emailService;
 
     /**
-     * Lista los productos disponibles en una tienda específica con filtros y paginación.
-     * 
-     * @param storeID ID de la tienda de la que se listarán los productos
-     * @param pageable Información de paginación
-     * @param filterRequest DTO con los filtros a aplicar (código de barras, SKU, nombre, etc.)
-     * @return Página de productos con su stock en la tienda especificada
+     * Lists products available in a specific store, applying filters and pagination.
+     *
+     * @param storeID        the store ID
+     * @param pageable       pagination information
+     * @param filterRequest  product filtering criteria
+     * @return a page of products with their corresponding stock in the specified store
      */
-    public Page<ProductStoreResponse> listProductsByStore (Long storeID, Pageable pageable, ProductFilterRequest filterRequest) {
+    public Page<ProductStoreResponse> listProductsByStore(Long storeID, Pageable pageable, ProductFilterRequest filterRequest) {
         Specification<StockEntity> spec = Specification.where(StockSpecifications.byStoreId(storeID))
                 .and(StockSpecifications.byProductBarCode(filterRequest.getBarcode()))
                 .and(StockSpecifications.byProductSku(filterRequest.getSku()))
@@ -56,12 +61,9 @@ public class StockService {
                 .and(StockSpecifications.byProductPriceLessThan(filterRequest.getPriceLess()))
                 .and(StockSpecifications.byProductPriceBetween(
                         filterRequest.getPriceBetween() != null && filterRequest.getPriceBetween().size() == 2
-                                ? filterRequest.getPriceBetween().get(0)
-                                : null,
+                                ? filterRequest.getPriceBetween().get(0) : null,
                         filterRequest.getPriceBetween() != null && filterRequest.getPriceBetween().size() == 2
-                                ? filterRequest.getPriceBetween().get(1)
-                                : null
-                ))
+                                ? filterRequest.getPriceBetween().get(1) : null))
                 .and(StockSpecifications.byProductCategory(filterRequest.getCategory()))
                 .and(StockSpecifications.byProductCategories(filterRequest.getCategories()))
                 .and(StockSpecifications.byProductProvider(filterRequest.getProvider()))
@@ -71,48 +73,45 @@ public class StockService {
                 .and(StockSpecifications.byStockQuantityGreaterThan(filterRequest.getStockGreaterThan()))
                 .and(StockSpecifications.byStockQuantityBetween(
                         filterRequest.getStockBetween() != null && filterRequest.getStockBetween().size() == 2
-                                ? filterRequest.getStockBetween().get(0)
-                                : null,
+                                ? filterRequest.getStockBetween().get(0) : null,
                         filterRequest.getStockBetween() != null && filterRequest.getStockBetween().size() == 2
-                                ? filterRequest.getStockBetween().get(1)
-                                : null
-                ));
+                                ? filterRequest.getStockBetween().get(1) : null));
+
         Page<StockEntity> stock = stockRepository.findAll(spec, pageable);
-        return stock.map(stockEntity ->
-                productStoreMapper.toResponse(stockEntity.getProduct(), stockEntity.getQuantity()));
+        return stock.map(s -> productStoreMapper.toResponse(s.getProduct(), s.getQuantity()));
     }
 
     /**
-     * Obtiene la información de un producto específico en una tienda específica.
-     * 
-     * @param storeID ID de la tienda donde se encuentra el producto
-     * @param productID ID del producto a buscar
-     * @return DTO con la información del producto y su cantidad en stock
-     * @throws NotFoundException si no se encuentra el stock para el producto y tienda especificados
+     * Retrieves a product's stock in a specific store.
+     *
+     * @param storeID    the store ID
+     * @param productID  the product ID
+     * @return product-store response
+     * @throws NotFoundException if no stock is found
      */
     public ProductStoreResponse getProductByStoreAndProductID(Long storeID, Long productID) {
-        StockEntity stock = stockRepository.findByProductIdAndStoreId(productID, storeID).orElseThrow(()->
-                new NotFoundException("Stock not found for product id: " + productID + " and store id: " + storeID));
+        StockEntity stock = stockRepository.findByProductIdAndStoreId(productID, storeID)
+                .orElseThrow(() -> new NotFoundException("Stock not found for product id: " + productID + " and store id: " + storeID));
         return productStoreMapper.toResponse(stock.getProduct(), stock.getQuantity());
     }
 
     /**
-     * Elimina el stock de un producto en una tienda específica.
-     * 
-     * @param productId ID del producto cuyo stock se eliminará
-     * @param storeId ID de la tienda donde se eliminará el stock
+     * Deletes a product's stock in a specific store.
+     *
+     * @param productId the product ID
+     * @param storeId   the store ID
      */
     public void removeStock(Long productId, Long storeId) {
         stockRepository.deleteByProductIdAndStoreId(productId, storeId);
     }
 
     /**
-     * Obtiene la informacion de stock de un producto en una tienda específica.
-     * 
-     * @param productId ID del producto del que se busca el stock
-     * @param storeId ID de la tienda donde se busca el stock
-     * @return DTO con la información del stock
-     * @throws NotFoundException si no se encuentra el producto, la tienda o el stock
+     * Retrieves the stock information of a product in a store.
+     *
+     * @param productId the product ID
+     * @param storeId   the store ID
+     * @return stock response DTO
+     * @throws NotFoundException if product, store or stock not found
      */
     public StockResponse getStock(Long productId, Long storeId) {
         StockEntity stock = findStockByProductAndStore(productId, storeId);
@@ -120,52 +119,46 @@ public class StockService {
     }
 
     /**
-     * Agrega stock de un producto a una tienda.
-     * 
-     * @param productID ID del producto al que se agregará stock
-     * @param storeID ID de la tienda donde se agregará el stock
-     * @param request DTO con la información del stock a agregar
-     * @return DTO con la información del stock agregado
-     * @throws NotFoundException si no se encuentra el producto o la tienda
+     * Adds new stock for a product in a store.
+     *
+     * @param productID the product ID
+     * @param storeID   the store ID
+     * @param request   stock request with quantity
+     * @return the created stock response
      */
-    public StockResponse addStock(Long productID, Long storeID ,StockRequest request) {
+    public StockResponse addStock(Long productID, Long storeID, StockRequest request) {
         ProductEntity product = findProduct(productID);
         StoreEntity store = findStore(storeID);
         StockEntity stock = stockMapper.toEntity(request, product, store);
-
         return stockMapper.toResponse(stockRepository.save(stock));
     }
 
     /**
-     * Actualiza la cantidad de stock de un producto en una tienda específica.
-     * 
-     * @param productID ID del producto cuyo stock se actualizará
-     * @param storeID ID de la tienda donde se actualizará el stock
-     * @param request DTO con la nueva cantidad de stock
-     * @return DTO con la información del stock actualizado
-     * @throws NotFoundException si no se encuentra el producto, la tienda o el stock
+     * Updates an existing product's stock in a store.
+     *
+     * @param productID the product ID
+     * @param storeID   the store ID
+     * @param request   stock request with new quantity
+     * @return the updated stock response
      */
     public StockResponse updateStock(Long productID, Long storeID, StockRequest request) {
-        StockEntity stock = findStockByProductAndStore(productID,storeID);
+        StockEntity stock = findStockByProductAndStore(productID, storeID);
         stock.setQuantity(request.quantity());
-
         return stockMapper.toResponse(stockRepository.save(stock));
     }
 
     /**
-     * Transfiere stock de un producto de una tienda a otra.
-     * 
-     * @param originStoreID ID de la tienda de origen
-     * @param transferRequest DTO con la información de la transferencia (producto, tienda destino, cantidad)
-     * @return Lista con dos DTOs: el stock actualizado en la tienda de origen y el stock actualizado en la tienda de destino
-     * @throws NotFoundException si no se encuentra el producto, alguna de las tiendas o el stock
-     * @throws InsufficientStockException si no hay suficiente stock en la tienda de origen o si las tiendas son la misma
+     * Transfers stock from one store to another.
+     *
+     * @param originStoreID   the ID of the origin store
+     * @param transferRequest the request containing destination store and quantity
+     * @return a list with the updated stock in both origin and destination stores
+     * @throws NotFoundException if any store or product is not found
+     * @throws InsufficientStockException if insufficient stock or same origin/destination
      */
     @Transactional
-    public List<StockResponse> transferStock(Long originStoreID,
-                                             StockTransferRequest transferRequest) {
-
-        StockEntity stockFrom = findStockByProductAndStore(transferRequest.productId(),originStoreID);
+    public List<StockResponse> transferStock(Long originStoreID, StockTransferRequest transferRequest) {
+        StockEntity stockFrom = findStockByProductAndStore(transferRequest.productId(), originStoreID);
         StockEntity stockTo = findStockByProductAndStore(transferRequest.productId(), transferRequest.destinationStoreId());
 
         Double quantityToTransfer = transferRequest.quantity();
@@ -187,20 +180,19 @@ public class StockService {
     }
 
     /**
-     * Aumenta la cantidad de stock de un producto en una tienda específica.
-     * Si la cantidad supera el umbral configurado, se resetea la bandera de alerta de stock bajo.
-     * 
-     * @param productId ID del producto cuyo stock se aumentará
-     * @param storeId ID de la tienda donde se aumentará el stock
-     * @param quantity Cantidad a aumentar
-     * @return DTO con la información del stock actualizado
-     * @throws NotFoundException si no se encuentra el producto, la tienda o el stock
+     * Increases the stock quantity of a product in a store.
+     * If the quantity surpasses the alert threshold, the low stock flag is reset.
+     *
+     * @param productId the product ID
+     * @param storeId   the store ID
+     * @param quantity  the quantity to increase
+     * @return updated stock response
      */
     public StockResponse increaseStock(Long productId, Long storeId, Double quantity) {
         StockEntity stock = findStockByProductAndStore(productId, storeId);
         stock.setQuantity(stock.getQuantity() + quantity);
 
-        if(stock.getQuantity() > globalPreferencesConfig.getStockAlertThreshold()){
+        if (stock.getQuantity() > globalPreferencesConfig.getStockAlertThreshold()) {
             stock.setLowStockAlertSent(false);
         }
 
@@ -208,52 +200,48 @@ public class StockService {
     }
 
     /**
-     * Disminuye la cantidad de stock de un producto en una tienda específica.
-     * Si la cantidad resultante es menor que el umbral configurado, se envía una alerta por correo.
-     * 
-     * @param productId ID del producto cuyo stock se disminuirá
-     * @param storeId ID de la tienda donde se disminuirá el stock
-     * @param quantity Cantidad a disminuir
-     * @return DTO con la información del stock actualizado
-     * @throws NotFoundException si no se encuentra el producto, la tienda o el stock
-     * @throws InsufficientStockException si no hay suficiente stock para disminuir la cantidad especificada
+     * Decreases the stock quantity of a product in a store.
+     * Sends an email alert if the quantity is below a threshold.
+     *
+     * @param productId the product ID
+     * @param storeId   the store ID
+     * @param quantity  the quantity to decrease
+     * @return updated stock response
+     * @throws InsufficientStockException if the quantity to decrease exceeds available stock
      */
-    public StockResponse decreaseStock(Long productId, Long storeId, Double quantity){
+    public StockResponse decreaseStock(Long productId, Long storeId, Double quantity) {
         StockEntity stock = findStockByProductAndStore(productId, storeId);
-        if(stock.getQuantity() < quantity){
+        if (stock.getQuantity() < quantity) {
             throw new InsufficientStockException("Stock not enough to decrease");
         }
+
         stock.setQuantity(stock.getQuantity() - quantity);
         emailService.sendStockAlert(stock);
         return stockMapper.toResponse(stockRepository.save(stock));
     }
 
     /**
-     * Mtodo auxiliar para buscar el stock de un producto en una tienda específica.
-     * 
-     * @param productId ID del producto
-     * @param storeId ID de la tienda
-     * @return La entidad de stock encontrada
-     * @throws NotFoundException si no se encuentra el producto, la tienda o el stock
+     * Utility method to find stock entity by product and store.
+     *
+     * @param productId the product ID
+     * @param storeId   the store ID
+     * @return found StockEntity
+     * @throws NotFoundException if product, store or stock is not found
      */
     private StockEntity findStockByProductAndStore(Long productId, Long storeId) {
         productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
-
         storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException("Store not found with id: " + storeId));
-
-
-            return stockRepository.findByProductIdAndStoreId(productId, storeId).orElseThrow(()->
-                    new NotFoundException("Stock not found for product id: " + productId + " and store id: " + storeId));
+        return stockRepository.findByProductIdAndStoreId(productId, storeId)
+                .orElseThrow(() -> new NotFoundException("Stock not found for product id: " + productId + " and store id: " + storeId));
     }
 
     /**
-     * Metodo auxiliar para buscar un producto por su ID.
-     * 
-     * @param productId ID del producto a buscar
-     * @return La entidad del producto encontrado
-     * @throws NotFoundException si no se encuentra ningún producto con el ID especificado
+     * Utility method to find a product by ID.
+     *
+     * @param productId the product ID
+     * @return found ProductEntity
      */
     private ProductEntity findProduct(Long productId) {
         return productRepository.findById(productId)
@@ -261,14 +249,13 @@ public class StockService {
     }
 
     /**
-     * Metodo auxiliar para buscar una tienda por su ID.
-     * 
-     * @param storeId ID de la tienda a buscar
-     * @return La entidad de la tienda encontrada
-     * @throws NotFoundException si no se encuentra ninguna tienda con el ID especificado
+     * Utility method to find a store by ID.
+     *
+     * @param storeId the store ID
+     * @return found StoreEntity
      */
     private StoreEntity findStore(Long storeId) {
-       return  storeRepository.findById(storeId)
+        return storeRepository.findById(storeId)
                 .orElseThrow(() -> new NotFoundException("Store not found with id: " + storeId));
     }
 }

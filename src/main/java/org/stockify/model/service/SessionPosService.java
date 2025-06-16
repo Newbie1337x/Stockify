@@ -19,22 +19,23 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service class responsible for handling business logic related to POS sessions.
+ */
 @Service
 @RequiredArgsConstructor
-
 public class SessionPosService {
 
     private final SessionPosRepository repository;
     private final SessionPosMapper sessionPosMapper;
 
-
     /**
-     * Guarda una nueva sesión POS en la base de datos a partir de un objeto de solicitud (DTO).
-     * Este méthod convierte el DTO {@link SessionPosRequest} recibido en una entidad,
-     * lo persiste usando el repositorio, y luego convierte la entidad persistida
-     * en un DTO de respuesta {@link SessionPosResponse} que se retorna.</p>
-     * @param sessionPosRequest el objeto que contiene los datos de la sesión a guardar.
-     * @return un {@link SessionPosResponse} que representa la sesión guardada.
+     * Saves a new POS session based on the provided request DTO.
+     * Converts the {@link SessionPosRequest} into an entity, persists it using the repository,
+     * and then maps the saved entity to a {@link SessionPosResponse} to return.
+     *
+     * @param sessionPosRequest the request containing the session data to be saved.
+     * @return a {@link SessionPosResponse} representing the saved session.
      */
     public SessionPosResponse save(SessionPosRequest sessionPosRequest) {
         SessionPosEntity sessionPosEntity = sessionPosMapper.toEntity(sessionPosRequest);
@@ -42,41 +43,68 @@ public class SessionPosService {
     }
 
     /**
-     * Guarda directamente una entidad de sesión POS en la base de datos.
-     * Este method recibe una entidad {@link SessionPosEntity} ya construida, la guarda
-     * en la base de datos y retorna un DTO {@link org.stockify.dto.response.SessionPosCreateResponse} que representa la sesión guardada
-     * @param sessionPosEntity la entidad de sesión POS que se desea guardar.
-     * @return un {@link SessionPosCreateResponse} que representa la sesión guardada.
+     * Saves a POS session directly using a pre-constructed entity.
+     * This method persists the provided {@link SessionPosEntity} and returns
+     * a {@link SessionPosCreateResponse} representing the saved session.
+     *
+     * @param sessionPosEntity the session entity to be saved.
+     * @return a {@link SessionPosCreateResponse} representing the saved session.
      */
     public SessionPosCreateResponse save(SessionPosEntity sessionPosEntity){
         return sessionPosMapper.toDtoCreate(repository.save(sessionPosEntity));
     }
 
-    public SessionPosResponse update(SessionPosEntity sessionPosEntity)
-    {
+    /**
+     * Updates an existing POS session entity in the database.
+     *
+     * @param sessionPosEntity the updated session entity.
+     * @return a {@link SessionPosResponse} representing the updated session.
+     */
+    public SessionPosResponse update(SessionPosEntity sessionPosEntity) {
         return sessionPosMapper.toDto(repository.save(sessionPosEntity));
     }
 
+    /**
+     * Finds a POS session by its ID.
+     *
+     * @param id the ID of the session.
+     * @return a {@link SessionPosResponse} representing the found session.
+     * @throws NotFoundException if the session does not exist.
+     */
     public SessionPosResponse findById(Long id) {
         SessionPosEntity entity = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("SessionPos with ID " + id + " not found."));
         return sessionPosMapper.toDto(entity);
     }
 
-    public SessionPosEntity findByIdPosAndCloseTime(Long id, LocalDateTime closeTime)
-    {
-        return repository.findByPosEntity_IdAndCloseTime(id,closeTime)
-                .orElseThrow(()-> new NotFoundException("SessionPos with ID " + id + " not found."));
-    }
-
-    public Boolean isOpened(Long id, LocalDateTime closeTime)
-    {
-        return repository.existsByPosEntity_IdAndCloseTime(id,closeTime);
+    /**
+     * Finds a POS session by POS ID and closing time.
+     *
+     * @param id        the ID of the POS.
+     * @param closeTime the closing time of the session.
+     * @return the matching {@link SessionPosEntity}.
+     * @throws NotFoundException if no session matches the given criteria.
+     */
+    public SessionPosEntity findByIdPosAndCloseTime(Long id, LocalDateTime closeTime) {
+        return repository.findByPosEntity_IdAndCloseTime(id, closeTime)
+                .orElseThrow(() -> new NotFoundException("SessionPos with ID " + id + " not found."));
     }
 
     /**
-     * Recupera todas las sesiones de POS.
-     * @return Lista de todas las sesiones de POS.
+     * Checks if a session is currently open based on POS ID and closing time.
+     *
+     * @param id        the POS ID.
+     * @param closeTime the closing time.
+     * @return true if the session is still open, false otherwise.
+     */
+    public Boolean isOpened(Long id, LocalDateTime closeTime) {
+        return repository.existsByPosEntity_IdAndCloseTime(id, closeTime);
+    }
+
+    /**
+     * Retrieves all POS sessions.
+     *
+     * @return a list of {@link SessionPosResponse}.
      */
     public List<SessionPosResponse> findAll() {
         List<SessionPosEntity> sessions = repository.findAll();
@@ -86,9 +114,10 @@ public class SessionPosService {
     }
 
     /**
-     * Recupera todas las sesiones de POS con paginación.
-     * @param pageable Información de paginación.
-     * @return Página de sesiones de POS.
+     * Retrieves all POS sessions with pagination support.
+     *
+     * @param pageable pagination information.
+     * @return a paginated list of {@link SessionPosResponse}.
      */
     public Page<SessionPosResponse> findAll(Pageable pageable) {
         Page<SessionPosEntity> sessions = repository.findAll(pageable);
@@ -96,10 +125,11 @@ public class SessionPosService {
     }
 
     /**
-     * Busca sesiones de POS aplicando una especificación.
-     * @param spec La especificación a aplicar.
-     * @param pageable Información de paginación.
-     * @return Página de sesiones de POS que cumplen con la especificación.
+     * Retrieves all POS sessions matching a specific {@link Specification}, with pagination.
+     *
+     * @param spec     the specification to apply.
+     * @param pageable pagination information.
+     * @return a paginated list of {@link SessionPosResponse} matching the specification.
      */
     public Page<SessionPosResponse> findAll(Specification<SessionPosEntity> spec, Pageable pageable) {
         Page<SessionPosEntity> sessions = repository.findAll(spec, pageable);
@@ -107,23 +137,21 @@ public class SessionPosService {
     }
 
     /**
-     * Busca sesiones de POS aplicando filtros:
-     * employeeId ID del empleado (opcional).
-     * posId ID del POS (opcional).
-     * openingTimeStart Fecha de inicio para filtrar por fecha de apertura (opcional).
-     * openingTimeEnd Fecha de fin para filtrar por fecha de apertura (opcional).
-     * closeTimeStart Fecha de inicio para filtrar por fecha de cierre (opcional).
-     * closeTimeEnd Fecha de fin para filtrar por fecha de cierre (opcional).
-     * openingAmountMin Monto mínimo de apertura (opcional).
-     * openingAmountMax Monto máximo de apertura (opcional).
-     * closeAmountMin Monto mínimo de cierre (opcional).
-     * closeAmountMax Monto máximo de cierre (opcional).
-     * isOpen Si es true, filtra solo sesiones abiertas; si es false, filtra solo sesiones cerradas; si es null, no filtra por estado (opcional).
-     * @param pageable Información de paginación.
-     * @return Página de sesiones de POS que cumplen con los filtros.
+     * Retrieves POS sessions based on multiple filter criteria such as:
+     * <ul>
+     *     <li>Employee ID</li>
+     *     <li>POS ID</li>
+     *     <li>Opening and closing time ranges</li>
+     *     <li>Opening and closing amount ranges</li>
+     *     <li>Cash difference limits</li>
+     *     <li>Whether the session is currently open</li>
+     * </ul>
+     *
+     * @param filtersRequest filter criteria provided in {@link SessionPosFiltersRequest}.
+     * @param pageable       pagination information.
+     * @return a paginated list of {@link SessionPosResponse} matching the filters.
      */
     public Page<SessionPosResponse> findAllWithFilters(SessionPosFiltersRequest filtersRequest, Pageable pageable) {
-
         Specification<SessionPosEntity> spec = Specification.where(SessionPosSpecifications.hasPosId(filtersRequest.getPosId()))
                 .and(SessionPosSpecifications.hasEmployeeId(filtersRequest.getEmployeeId()))
                 .and(SessionPosSpecifications.hasOpeningTimeAfter(filtersRequest.getOpeningTimeStart()))
@@ -139,5 +167,4 @@ public class SessionPosService {
                 .and(SessionPosSpecifications.isOpen(filtersRequest.getIsOpen()));
         return findAll(spec, pageable);
     }
-    
 }

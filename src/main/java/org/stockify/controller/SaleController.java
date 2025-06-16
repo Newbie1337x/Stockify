@@ -75,7 +75,7 @@ public class SaleController {
     public ResponseEntity<EntityModel<SaleResponse>> getSaleById(
             @Parameter(description = "Sale ID", required = true, example = "1")
             @PathVariable Long saleID) {
-        SaleResponse saleResponse = saleService.findbyId(saleID);
+        SaleResponse saleResponse = saleService.findById(saleID);
         return ResponseEntity.ok(saleModelAssembler.toModel(saleResponse));
     }
 

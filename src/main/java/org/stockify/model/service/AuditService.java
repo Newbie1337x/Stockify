@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.audit.PurchaseAuditDTO;
 import org.stockify.dto.request.audit.SaleAuditDTO;
@@ -19,20 +18,38 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+/**
+ * Service responsible for retrieving audit revisions of Purchase, Sale,
+ * and Transaction entities using Hibernate Envers.
+ * <p>
+ * It fetches all revisions of these entities, loads related transaction details
+ * where applicable, and maps the results into audit DTOs for external use.
+ */
 @Service
 public class AuditService {
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    private TransactionMapper transactionMapper;
-
+    private final TransactionMapper transactionMapper;
 
     /**
-     * Obtiene todas las auditorías de compras.
+     * Constructs the AuditService with the required TransactionMapper dependency.
      *
-     * @return Lista de auditorías de compras.
+     * @param transactionMapper Mapper to convert TransactionEntity to DTO.
+     */
+    public AuditService(TransactionMapper transactionMapper) {
+        this.transactionMapper = transactionMapper;
+    }
+
+    /**
+     * Retrieves all audit revisions for Purchase entities.
+     * <p>
+     * For each Purchase entity, this method fetches all its audit revisions,
+     * loads associated transaction details manually if present,
+     * and converts the data into a list of PurchaseAuditDTOs.
+     *
+     * @return List of PurchaseAuditDTO containing revision data and transaction details.
      */
     public List<PurchaseAuditDTO> getAllPurchaseAudits() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
@@ -43,16 +60,17 @@ public class AuditService {
             List<Number> revisions = auditReader.getRevisions(PurchaseEntity.class, purchase.getId());
             for (Number rev : revisions) {
                 PurchaseEntity auditedPurchase = auditReader.find(PurchaseEntity.class, purchase.getId(), rev);
+
+                // Determine a revision type: "ADD" for the first revision, else "MOD"
                 String revisionTypeStr = rev.equals(revisions.getFirst()) ? "ADD" : "MOD";
 
                 TransactionEntity transaction = auditedPurchase.getTransaction();
 
-                // 🟡 Cargar detalles de la transacción manualmente si existe
+                // Load transaction details manually if transaction exists
                 if (transaction != null) {
-                    List<DetailTransactionEntity> details = entityManager.createQuery("""
-                    SELECT d FROM DetailTransactionEntity d
-                    WHERE d.transaction.id = :txId
-                """, DetailTransactionEntity.class)
+                    List<DetailTransactionEntity> details = entityManager.createQuery(
+                                    "SELECT d FROM DetailTransactionEntity d WHERE d.transaction.id = :txId",
+                                    DetailTransactionEntity.class)
                             .setParameter("txId", transaction.getId())
                             .getResultList();
 
@@ -72,11 +90,14 @@ public class AuditService {
         return auditList;
     }
 
-
     /**
-     * Obtiene todas las auditorías de ventas.
+     * Retrieves all audit revisions for Sale entities.
+     * <p>
+     * For each Sale entity, this method fetches all its audit revisions,
+     * loads associated transaction details manually if present,
+     * and converts the data into a list of SaleAuditDTOs including client information.
      *
-     * @return Lista de auditorías de ventas.
+     * @return List of SaleAuditDTO containing revision data, transaction details, and client ID.
      */
     public List<SaleAuditDTO> getAllSaleAudits() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
@@ -87,15 +108,17 @@ public class AuditService {
             List<Number> revisions = auditReader.getRevisions(SaleEntity.class, sale.getId());
             for (Number rev : revisions) {
                 SaleEntity auditedSale = auditReader.find(SaleEntity.class, sale.getId(), rev);
+
+                // Determine a revision type: "ADD" for the first revision, else "MOD"
                 String revisionTypeStr = rev.equals(revisions.getFirst()) ? "ADD" : "MOD";
 
                 TransactionEntity transaction = auditedSale.getTransaction();
 
+                // Load transaction details manually if transaction exists
                 if (transaction != null) {
-                    List<DetailTransactionEntity> details = entityManager.createQuery("""
-                    SELECT d FROM DetailTransactionEntity d
-                    WHERE d.transaction.id = :txId
-                """, DetailTransactionEntity.class)
+                    List<DetailTransactionEntity> details = entityManager.createQuery(
+                                    "SELECT d FROM DetailTransactionEntity d WHERE d.transaction.id = :txId",
+                                    DetailTransactionEntity.class)
                             .setParameter("txId", transaction.getId())
                             .getResultList();
 
@@ -116,11 +139,14 @@ public class AuditService {
         return auditList;
     }
 
-
     /**
-     * Obtiene todas las auditorías de transacciones.
+     * Retrieves all audit revisions for Transaction entities.
+     * <p>
+     * For each Transaction entity, this method fetches all its audit revisions
+     * and converts them into a list of TransactionAuditDTOs containing
+     * revision metadata and key transaction properties.
      *
-     * @return Lista de auditorías de transacciones.
+     * @return List of TransactionAuditDTO containing transaction audit information.
      */
     public List<TransactionAuditDTO> getAllTransactionAudits() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
@@ -131,6 +157,8 @@ public class AuditService {
             List<Number> revisions = auditReader.getRevisions(TransactionEntity.class, transaction.getId());
             for (Number rev : revisions) {
                 TransactionEntity auditedTransaction = auditReader.find(TransactionEntity.class, transaction.getId(), rev);
+
+                // Determine a revision type: "ADD" for the first revision, else "MOD"
                 String revisionTypeStr = rev.equals(revisions.getFirst()) ? "ADD" : "MOD";
 
                 TransactionAuditDTO auditDTO = TransactionAuditDTO.builder()
