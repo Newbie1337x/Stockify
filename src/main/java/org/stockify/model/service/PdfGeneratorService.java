@@ -9,6 +9,7 @@ import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.NotFoundException;
+import org.stockify.model.exception.TypeNotAcceptedException;
 import org.stockify.model.mapper.TransactionMapper;
 import org.stockify.model.repository.TransactionRepository;
 import org.thymeleaf.TemplateEngine;
