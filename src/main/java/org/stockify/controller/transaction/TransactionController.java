@@ -1,4 +1,5 @@
 package org.stockify.controller.transaction;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import org.stockify.model.service.TransactionService;
 @RequestMapping
 @RequiredArgsConstructor
 @Tag(name = "Transactions", description = "Operations related to generic transactions")
+@SecurityRequirement(name = "bearerAuth")
 public class TransactionController {
 
     private final TransactionService transactionService;

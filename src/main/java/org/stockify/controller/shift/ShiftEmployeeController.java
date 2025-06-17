@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/shifts/{shiftId}/employees")
 @Tag(name = "Shift Employees", description = "Endpoints for managing employees assigned to a shift")
+@SecurityRequirement(name = "bearerAuth")
 public class ShiftEmployeeController {
     private final ShiftModelAssembler shiftModelAssembler;
     private final ShiftService shiftService;

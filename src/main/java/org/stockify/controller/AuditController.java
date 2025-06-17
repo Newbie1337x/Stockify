@@ -2,6 +2,7 @@ package org.stockify.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -32,6 +33,7 @@ import org.stockify.model.service.AuditService;
 @RequiredArgsConstructor
 @RequestMapping("/audit")
 @Tag(name = "Audits", description = "Endpoints for viewing audit records of transactions, sales, and purchases")
+@SecurityRequirement(name = "bearerAuth")
 public class AuditController {
 
     private final AuditService auditService;

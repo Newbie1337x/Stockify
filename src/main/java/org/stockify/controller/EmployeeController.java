@@ -2,6 +2,7 @@ package org.stockify.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,24 +13,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.model.assembler.EmployeeModelAssembler;
 import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.service.EmployeeService;
-import org.stockify.security.model.entity.CredentialsEntity;
 
 @RestController
 @RequestMapping("/employees")
 @RequiredArgsConstructor
 @Tag(name = "Employees", description = "Operations for managing employees")
+@SecurityRequirement(name = "bearerAuth")
 public class EmployeeController {
 
     private final EmployeeService employeeService;

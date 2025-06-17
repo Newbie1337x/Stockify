@@ -2,6 +2,7 @@ package org.stockify.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,6 +35,7 @@ import org.stockify.security.service.JwtService;
 @RequestMapping("/pos")
 @RequiredArgsConstructor
 @Tag(name = "POS", description = "API REST for POS management (Point of Sale)")
+@SecurityRequirement(name = "bearerAuth")
 public class PosController {
 
     private final PosService posService;
