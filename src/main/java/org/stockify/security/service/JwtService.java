@@ -123,7 +123,7 @@ public class JwtService {
 
     /**
      * Invalidates a JWT token so it can no longer be used for authentication
-     * Removes the "Bearer " prefix if present
+     * Removes the "Bearer" prefix if present
      *
      * @param token The JWT token to invalidate
      */

@@ -99,25 +99,7 @@ public class ProviderController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(providerService.saveAll(providers));
     }
-
-    @PostMapping(value = "/import", consumes = "multipart/form-data")
-    @Operation(summary = "Import products from CSV file")
-    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
-            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
-    @ApiResponse(responseCode = "200", description = "Successful import")
-    public ResponseEntity<BulkProviderResponse> importProviders(
-            @Parameter(description = "CSV file with products", required = true,
-                    content = @Content(mediaType = "multipart/form-data",
-                            schema = @Schema(type = "string", format = "binary")))
-            @RequestParam("file") MultipartFile archivo) {
-
-        try {
-            BulkProviderResponse response = providerService.importProvidersCsv(archivo);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+        
 
     @Operation(summary = "Logically delete a provider")
     @ApiResponses(value = {
