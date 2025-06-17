@@ -32,7 +32,7 @@ public class EmployeeRequest{
     @Schema(description = "Employee's last name", example = "Pérez")
     private String lastName;
 
-//
+
 //    @NotNull
 //    @Schema(description = "Current status of the employee", example = "ONLINE")
 //    private Status status;

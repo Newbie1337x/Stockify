@@ -13,6 +13,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.product.ProductFilterRequest;
 import org.stockify.dto.response.ProductStoreResponse;
@@ -34,6 +35,8 @@ public class StoreProductController {
             @ApiResponse(responseCode = "404", description = "Store not found")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<ProductStoreResponse>>> getProductsFromStore(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Parameter(hidden = true) Pageable pageable,
@@ -50,6 +53,8 @@ public class StoreProductController {
             @ApiResponse(responseCode = "404", description = "Product or store not found")
     })
     @GetMapping("{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<ProductStoreResponse>> getProductFromStore(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Parameter(description = "ID of the product") @PathVariable Long productID) {

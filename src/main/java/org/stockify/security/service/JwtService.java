@@ -10,9 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 @Service
@@ -22,6 +21,8 @@ public class JwtService {
     private String jwtSecretKey;
     @Value("${jwt.expiration}")
     private Long jwtExpiration;
+
+    private Set<String> invalidatedToken  = ConcurrentHashMap.newKeySet();
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -75,5 +76,16 @@ public class JwtService {
     private boolean isTokenExpired(String token) {
         Date expiration = extractClaim(token, Claims::getExpiration);
         return expiration.before(new Date());
+    }
+
+    public void invalidateToken(String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        invalidatedToken.add(token);
+    }
+
+    public boolean isTokenInvalidated(String token) {
+        return invalidatedToken.contains(token);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.response.ProductResponse;
 import org.stockify.dto.response.ProviderResponse;
@@ -39,6 +40,8 @@ public class ProviderProductController {
             @ApiResponse(responseCode = "404", description = "Provider not found")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
             @Parameter(description = "ID of the provider") @PathVariable Long providerID,
             @Parameter(hidden = true)
@@ -56,6 +59,8 @@ public class ProviderProductController {
             @ApiResponse(responseCode = "409", description = "Product already assigned to provider")
     })
     @PutMapping("/{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ProviderResponse>> assignProduct(
             @Parameter(description = "ID of the provider") @PathVariable Long providerID,
             @Parameter(description = "ID of the product") @PathVariable Long productID
@@ -70,6 +75,8 @@ public class ProviderProductController {
             @ApiResponse(responseCode = "404", description = "Product or Provider not found")
     })
     @PatchMapping("/{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ProviderResponse>> unassignProducts(
             @Parameter(description = "ID of the provider") @PathVariable Long providerID,
             @Parameter(description = "ID of the product") @PathVariable Long productID

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
@@ -37,6 +38,7 @@ public class TransactionSaleController {
             @ApiResponse(responseCode = "404", description = "Store or POS not found", content = @Content)
     })
     @PostMapping
+    @PreAuthorize("hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<SaleResponse>> create(
             @Parameter(description = "Sale request body", required = true)
             @Valid @RequestBody SaleRequest request,

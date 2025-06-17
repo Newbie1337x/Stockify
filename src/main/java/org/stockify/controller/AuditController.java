@@ -13,6 +13,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,6 +48,8 @@ public class AuditController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Transaction audit logs retrieved successfully")
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     @GetMapping("/transactions")
     public ResponseEntity<PagedModel<EntityModel<TransactionAuditDTO>>> getAllTransactionAudit(
             @Parameter(hidden = true) Pageable pageable,
@@ -66,6 +69,10 @@ public class AuditController {
             @ApiResponse(responseCode = "200", description = "Purchase audit logs retrieved successfully")
     })
     @GetMapping("/purchases")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
+    public ResponseEntity<List<PurchaseAuditDTO>> getAllPurchaseAudit() {
+        return ResponseEntity.ok(auditService.getAllPurchaseAudits());
     public ResponseEntity<PagedModel<EntityModel<PurchaseAuditDTO>>> getAllPurchaseAudit(
             @Parameter(hidden = true) Pageable pageable,
             @ParameterObject PurchaseAuditFilterRequest filter,
@@ -92,5 +99,8 @@ public class AuditController {
         Page<SaleAuditDTO> page = auditService.getAllSaleAudits(pageable, filter);
         PagedModel<EntityModel<SaleAuditDTO>> pagedModel = assembler.toModel(page, saleAuditModelAssembler);
         return ResponseEntity.ok(pagedModel);
+    @PreAuthorize("hasAuthority('READ')")
+    public ResponseEntity<List<SaleAuditDTO>> getAllSaleAudit() {
+        return ResponseEntity.ok(auditService.getAllSaleAudits());
     }
 }

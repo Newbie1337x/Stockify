@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,8 @@ public class PdfGeneratorController {
             @ApiResponse(responseCode = "400", description = "Transaction type not supported for PDF generation")
     })
     @GetMapping("/transaction/pdf/{idTransaction}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<TransactionPDFResponse>> generatePdf(
             @Parameter(description = "ID of the transaction") @PathVariable Long idTransaction) throws Exception {
 

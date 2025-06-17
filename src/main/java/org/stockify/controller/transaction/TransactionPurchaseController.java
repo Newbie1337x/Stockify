@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.purchase.PurchaseRequest;
 import org.stockify.dto.response.PurchaseResponse;
@@ -30,6 +31,8 @@ public class TransactionPurchaseController {
             @ApiResponse(responseCode = "404", description = "Store or POS not found")
     })
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     @Transactional
     public ResponseEntity<PurchaseResponse> create(
             @Parameter(description = "Purchase request body") @Valid @RequestBody PurchaseRequest request,

@@ -17,16 +17,25 @@ import org.stockify.model.mapper.TransactionMapper;
 import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.repository.TransactionRepository;
-import org.stockify.model.repository.*;
+import org.stockify.model.repository.PosRepository;
+import org.stockify.model.repository.SessionPosRepository;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Service responsible for handling transaction-related operations.
+ * Supports creating monetary transactions (e.g., cash movements) and detailed transactions
+ * (e.g., purchases and sales that involve products).
+ * All operations are transactional to ensure data consistency.
+ */
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class TransactionService {
+
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
     private final StoreRepository storeRepository;
@@ -36,49 +45,49 @@ public class TransactionService {
 
     /**
      * Creates and saves a monetary transaction without product details.
-     * This is typically used for simple financial operations such as cash withdrawals,
-     * paying external services (e.g., taxis), or recording generic money movements.
+     * Typically used for financial operations such as cash withdrawals,
+     * payments to third-party services (e.g., taxis), or other money movements.
      *
-     * @param request the basic transaction data
-     * @param idLocal the ID of the store where the transaction occurs
-     * @param idPos the ID of the POS terminal used
-     * @param type the type of transaction (e.g., CASH_OUT, TRANSFER)
-     * @return a response summarizing the created transaction
+     * @param request the basic transaction data including amount and description
+     * @param idLocal the ID of the store where the transaction takes place
+     * @param idPos   the ID of the POS (Point of Sale) terminal involved
+     * @param type    the type of transaction (e.g., CASH_OUT, TRANSFER)
+     * @return a response containing details of the created transaction
+     * @throws NotFoundException if the POS or store is not found
      */
     public TransactionCreatedResponse saveTransaction(TransactionCreatedRequest request, Long idLocal, Long idPos, TransactionType type) {
         if (!posRepository.existsById(idPos)) {
             throw new NotFoundException("POS with ID " + idPos + " not found.");
         }
+
         TransactionEntity transactionEntity = transactionMapper.toEntity(request);
         transactionEntity.setTotal(request.getTotalAmount());
 
-        // Setear la sesión del POS
         transactionEntity.setSessionPosEntity(
-                sessionPosRepository.findByPosEntity_IdAndCloseTime
-                        (idPos, null).orElseThrow
-                        (() -> new NotFoundException("POS with ID " + idPos + " not found."))
+                sessionPosRepository.findByPosEntity_IdAndCloseTime(idPos, null)
+                        .orElseThrow(() -> new NotFoundException("POS with ID " + idPos + " not found."))
         );
-        // Buscar y setear el local
+
         StoreEntity store = storeRepository.findById(idLocal)
                 .orElseThrow(() -> new NotFoundException("Store with ID " + idLocal + " not found."));
         transactionEntity.setStore(store);
         transactionEntity.setDescription(request.getDescription());
         transactionEntity.setType(type);
 
-        return transactionMapper.toDtoCreated(transactionRepository
-                .save(transactionEntity));
+        return transactionMapper.toDtoCreated(transactionRepository.save(transactionEntity));
     }
 
     /**
-     * Creates and persists a complete transaction with product details.
-     * This is used specifically by sales and purchase services to register operations
-     * that involve specific products, their quantities, and prices.
+     * Creates and saves a transaction that includes product details.
+     * Used in sale and purchase operations, this method builds a transaction entity
+     * with all the associated product quantities, prices, and subtotals.
      *
-     * @param request the detailed transaction request including products and quantities
-     * @param idLocal the ID of the store associated with the transaction
-     * @param idPos the ID of the POS terminal involved
-     * @param type the type of transaction (SALE or PURCHASE)
-     * @return the persisted TransactionEntity
+     * @param request the detailed transaction data including a product list and quantities
+     * @param idLocal the ID of the store where the transaction occurs
+     * @param idPos   the ID of the POS terminal involved
+     * @param type    the type of transaction (SALE or PURCHASE)
+     * @return the saved TransactionEntity with all details persisted
+     * @throws NotFoundException if any required entity (product, store, or POS) is not found
      */
     public TransactionEntity createTransaction(TransactionRequest request, Long idLocal, Long idPos, TransactionType type) {
 
@@ -86,7 +95,7 @@ public class TransactionService {
             throw new NotFoundException("POS with ID " + idPos + " not found.");
         }
 
-        // Convertir cada detalle a entidad, seteando producto, cantidad, subtotal
+        // Convert each detail to an entity, linking the product and calculating subtotal
         Set<DetailTransactionEntity> detailTransactions = request
                 .getDetailTransactions()
                 .stream()
@@ -106,30 +115,24 @@ public class TransactionService {
                 })
                 .collect(Collectors.toSet());
 
-        // Crear la transacción base
         TransactionEntity transactionEntity = transactionMapper.toEntity(request);
         transactionEntity.setDetailTransactions(detailTransactions);
 
+        // Link each detail to the parent transaction
+        detailTransactions.forEach(detail -> detail.setTransaction(transactionEntity));
 
-        detailTransactions.forEach
-                (detail -> detail.setTransaction(transactionEntity));
-
-        // Setear la sesión del POS
         transactionEntity.setSessionPosEntity(
-                sessionPosRepository.findByPosEntity_IdAndCloseTime
-                        (idPos, null).orElseThrow
-                        (() -> new NotFoundException("POS with ID " + idPos + " not found."))
+                sessionPosRepository.findByPosEntity_IdAndCloseTime(idPos, null)
+                        .orElseThrow(() -> new NotFoundException("POS with ID " + idPos + " not found."))
         );
 
-        // Buscar y setear el local
         StoreEntity store = storeRepository.findById(idLocal)
                 .orElseThrow(() -> new NotFoundException("Store with ID " + idLocal + " not found."));
         transactionEntity.setStore(store);
 
-        // Calcular el total
+        // Calculate the total amount from all subtotals
         transactionEntity.setTotal(
-                detailTransactions
-                        .stream()
+                detailTransactions.stream()
                         .map(DetailTransactionEntity::getSubtotal)
                         .reduce(BigDecimal::add)
                         .orElse(BigDecimal.ZERO)
@@ -138,23 +141,18 @@ public class TransactionService {
         transactionEntity.setDescription(request.getDescription());
         transactionEntity.setType(type);
 
-        // Guardar y devolver el response
         return transactionRepository.save(transactionEntity);
     }
 
-
     /**
-     * Retrieves all transactions from the repository.
+     * Retrieves all transactions stored in the system.
      *
-     * @return a list of TransactionResponse objects representing all transactions
+     * @return a list of TransactionResponse objects representing all registered transactions
      */
-    public List<TransactionResponse> findAll()
-    {
-        return transactionRepository
-                .findAll()
+    public List<TransactionResponse> findAll() {
+        return transactionRepository.findAll()
                 .stream()
-                .map(transactionMapper::toDto).toList();
+                .map(transactionMapper::toDto)
+                .toList();
     }
-
-
 }

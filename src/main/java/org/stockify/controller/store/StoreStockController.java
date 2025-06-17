@@ -11,6 +11,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.stock.StockRequest;
 import org.stockify.dto.request.stock.StockTransferRequest;
@@ -36,6 +37,8 @@ public class StoreStockController {
             @ApiResponse(responseCode = "404", description = "Product or Store not found")
     })
     @PostMapping("{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<StockResponse>> addStock(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Parameter(description = "ID of the product") @PathVariable Long productID,
@@ -52,6 +55,8 @@ public class StoreStockController {
             @ApiResponse(responseCode = "404", description = "Stock not found")
     })
     @PutMapping("/{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<StockResponse>> updateStock(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Parameter(description = "ID of the product") @PathVariable Long productID,
@@ -67,6 +72,8 @@ public class StoreStockController {
             @ApiResponse(responseCode = "404", description = "Stock not found")
     })
     @GetMapping("/{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<StockResponse>> getStock(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Parameter(description = "ID of the product") @PathVariable Long productID) {
@@ -81,6 +88,8 @@ public class StoreStockController {
             @ApiResponse(responseCode = "404", description = "Stock not found")
     })
     @DeleteMapping("/{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('DELETE')")
     public ResponseEntity<Void> removeStock(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Parameter(description = "ID of the product") @PathVariable Long productID) {
@@ -96,6 +105,8 @@ public class StoreStockController {
             @ApiResponse(responseCode = "404", description = "One or more stores/products not found")
     })
     @PostMapping("/transfer")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<CollectionModel<StockResponse>> transferStock(
             @Parameter(description = "ID of the origin store") @PathVariable Long storeID,
             @Valid @RequestBody StockTransferRequest stockTransferRequest) {

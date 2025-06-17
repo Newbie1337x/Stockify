@@ -30,4 +30,8 @@ public class TimeLogEntity {
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
     private EmployeeEntity employee;
+
+    @ManyToOne
+    @JoinColumn(name = "store_id", nullable = false)
+    private StoreEntity store;
 }

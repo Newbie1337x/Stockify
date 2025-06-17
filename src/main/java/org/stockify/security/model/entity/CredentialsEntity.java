@@ -24,8 +24,8 @@ public class CredentialsEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
     private String username;
+    @Column(unique = true)
     private String email;
     private String password;
 
@@ -45,8 +45,18 @@ public class CredentialsEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
-        roles.forEach(rol -> authorities.add(
-                new SimpleGrantedAuthority(rol.getRole().name())));
+
+        // Roles como: ROLE_ADMIN, ROLE_MANAGER...
+        roles.forEach(role -> authorities.add(
+                new SimpleGrantedAuthority("ROLE_" + role.getRole().name())));
+
+        // Permisos que vienen del rol
+        roles.forEach(role -> {
+            role.getPermits().forEach(permit ->
+                    authorities.add(new SimpleGrantedAuthority(permit.getPermit().name()))
+            );
+        });
+
         return authorities;
     }
 
@@ -57,7 +67,7 @@ public class CredentialsEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.email;
     }
 
     @Override

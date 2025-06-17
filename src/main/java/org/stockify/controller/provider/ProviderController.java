@@ -16,6 +16,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.provider.ProviderFilterRequest;
 import org.stockify.dto.request.provider.ProviderRequest;
@@ -40,6 +41,8 @@ public class ProviderController {
             @ApiResponse(responseCode = "200", description = "Paged list of providers returned successfully")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<ProviderResponse>>> listProviders(
             @ParameterObject @Valid ProviderFilterRequest filters,
             @Parameter(hidden = true)
@@ -56,6 +59,8 @@ public class ProviderController {
             @ApiResponse(responseCode = "404", description = "Provider not found")
     })
     @GetMapping("/{providerID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<ProviderResponse>> getProviderById(
             @Parameter(description = "ID of the provider") @PathVariable Long providerID) {
 
@@ -69,6 +74,8 @@ public class ProviderController {
             @ApiResponse(responseCode = "400", description = "Validation failed")
     })
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ProviderResponse>> createProvider(
             @Valid @RequestBody ProviderRequest request) {
 
@@ -80,6 +87,8 @@ public class ProviderController {
             @ApiResponse(responseCode = "201", description = "Bulk provider creation completed")
     })
     @PostMapping("/bulk")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<BulkProviderResponse> bulkSaveProviders(
             @Valid @RequestBody List<@Valid ProviderRequest> providers) {
 
@@ -92,6 +101,8 @@ public class ProviderController {
             @ApiResponse(responseCode = "404", description = "Provider not found")
     })
     @PatchMapping("/{providerID}/disable")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ProviderResponse>> logicalDeleteProvider(
             @Parameter(description = "ID of the provider") @PathVariable Long providerID) {
 
@@ -104,6 +115,8 @@ public class ProviderController {
             @ApiResponse(responseCode = "404", description = "Provider not found")
     })
     @DeleteMapping("/{providerID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('DELETE')")
     public ResponseEntity<EntityModel<ProviderResponse>> deleteProvider(
             @Parameter(description = "ID of the provider") @PathVariable Long providerID) {
 

@@ -7,20 +7,25 @@ import org.springframework.stereotype.Service;
 import org.stockify.config.GlobalPreferencesConfig;
 import org.stockify.model.entity.StockEntity;
 
+/**
+ * Service responsible for sending email notifications.
+ * <p>
+ * Provides methods to send general emails and specific stock alert emails based on configured global preferences.
+ * </p>
+ */
 @RequiredArgsConstructor
-
 @Service
 public class EmailService {
     private final JavaMailSender mailSender;
     private final GlobalPreferencesConfig globalPreferencesConfig;
 
     /**
-     * Envia un correo electrónico con la información proporcionada.
-     * 
-     * @param cause Asunto del correo electrónico
-     * @param description Cuerpo del correo electrónico
+     * Sends an email with the specified subject and body.
+     *
+     * @param cause       The subject of the email.
+     * @param description The body content of the email.
      */
-    public void sendEmail(String cause, String description){
+    public void sendEmail(String cause, String description) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(globalPreferencesConfig.getEmailAddress());
         message.setSubject(cause);
@@ -29,22 +34,25 @@ public class EmailService {
     }
 
     /**
-     * Envia una alerta por correo electrónico cuando el stock de un producto está por debajo del umbral configurado.
-     * Solo envía la alerta si se cumplen las condiciones configuradas en las preferencias globales
-     * y si no se ha enviado una alerta previamente para este stock.
-     * 
-     * @param stock Entidad de stock que contiene la información del producto y su cantidad actual
+     * Sends a low-stock alert email if the stock quantity is below the configured threshold,
+     * and an alert has not been sent previously for this stock.
+     * <p>
+     * This method checks global preferences to determine whether the alert should be sent.
+     * Once sent, it marks the stock entity to prevent duplicate alerts.
+     * </p>
+     *
+     * @param stock The StockEntity containing product and current quantity information.
      */
     public void sendStockAlert(StockEntity stock) {
-        if (globalPreferencesConfig.shouldSendStockAlert(stock.getQuantity(),stock.isLowStockAlertSent())) {
+        if (globalPreferencesConfig.shouldSendStockAlert(stock.getQuantity(), stock.isLowStockAlertSent())) {
             String subject = "Low stock alert: " + stock.getProduct().getName();
             String body = String.format("""
-        Product: %s
-        Store: %s
-        %s
-        Current quantity: %.2f
-        Minimum expected: %.2f
-        """,
+                    Product: %s
+                    Store: %s
+                    %s
+                    Current quantity: %.2f
+                    Minimum expected: %.2f
+                    """,
                     stock.getProduct().getName(),
                     stock.getStore().getStoreName(),
                     stock.getStore().getAddress(),
@@ -54,7 +62,5 @@ public class EmailService {
             stock.setLowStockAlertSent(true);
             sendEmail(subject, body);
         }
-
     }
-
 }

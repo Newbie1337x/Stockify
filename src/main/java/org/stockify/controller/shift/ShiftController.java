@@ -17,6 +17,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.shift.ShiftFilterRequest;
 import org.stockify.dto.request.shift.ShiftRequest;
@@ -48,6 +49,8 @@ public class ShiftController {
         @ApiResponse(responseCode = "404", description = "Referenced entity not found")
     })
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ShiftResponse>> createShift(
             @Parameter(description = "Shift data to create", required = true)
             @Valid @RequestBody ShiftRequest shiftRequest) {
@@ -72,6 +75,8 @@ public class ShiftController {
         @ApiResponse(responseCode = "400", description = "Filter parameters are invalid")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('READ') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<ShiftResponse>>> getAllShifts(
             @Parameter(description = "Filter criteria for shifts")
             @ModelAttribute ShiftFilterRequest filterRequest,
@@ -103,6 +108,8 @@ public class ShiftController {
         @ApiResponse(responseCode = "404", description = "Shift not found")
     })
     @GetMapping("/{shiftID}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('READ') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<ShiftResponse>> getShiftById(
             @Parameter(description = "ID of the shift to retrieve", required = true)
             @PathVariable Long shiftID) {
@@ -124,6 +131,8 @@ public class ShiftController {
         @ApiResponse(responseCode = "409", description = "Shift cannot be deleted due to dependencies")
     })
     @DeleteMapping("/{shiftID}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('DELETE')")
     public ResponseEntity<Void> deleteShiftById(
             @Parameter(description = "ID of the shift to delete", required = true)
             @PathVariable Long shiftID) {
@@ -146,6 +155,8 @@ public class ShiftController {
         @ApiResponse(responseCode = "404", description = "Shift not found")
     })
     @PutMapping("/{shiftID}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ShiftResponse>> putShift(
             @Parameter(description = "ID of the shift to update", required = true)
             @PathVariable Long shiftID, 
@@ -172,6 +183,8 @@ public class ShiftController {
         @ApiResponse(responseCode = "404", description = "Shift not found")
     })
     @PatchMapping("/{shiftID}")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ShiftResponse>> patchShift(
             @Parameter(description = "ID of the shift to partially update", required = true)
             @PathVariable Long shiftID, 

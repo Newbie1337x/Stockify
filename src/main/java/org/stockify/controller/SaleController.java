@@ -13,6 +13,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.sale.SaleFilterRequest;
@@ -46,6 +47,7 @@ public class SaleController {
             }
     )
     @GetMapping
+    @PreAuthorize("hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<SaleResponse>>> getAll(
             @Parameter(description = "Filter request object")
             @ParameterObject SaleFilterRequest filterRequest,
@@ -72,10 +74,11 @@ public class SaleController {
             }
     )
     @GetMapping("/{saleID}")
+    @PreAuthorize("hasAuthority('READ')")
     public ResponseEntity<EntityModel<SaleResponse>> getSaleById(
             @Parameter(description = "Sale ID", required = true, example = "1")
             @PathVariable Long saleID) {
-        SaleResponse saleResponse = saleService.findbyId(saleID);
+        SaleResponse saleResponse = saleService.findById(saleID);
         return ResponseEntity.ok(saleModelAssembler.toModel(saleResponse));
     }
 
@@ -90,6 +93,7 @@ public class SaleController {
     //Sale ya devuelve la transaccion por defecto.
     @Deprecated
     @GetMapping("{saleID}/transactions")
+    @PreAuthorize("hasAuthority('READ')")
     public ResponseEntity<TransactionResponse> getSaleTransactionById(
             @Parameter(description = "Sale ID", required = true, example = "1")
             @PathVariable Long saleID) {
@@ -106,6 +110,8 @@ public class SaleController {
             }
     )
     @DeleteMapping("/{saleID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('DELETE')")
     public ResponseEntity<Void> deleteSaleById(
             @Parameter(description = "Sale ID", required = true, example = "1")
             @PathVariable Long saleID) {
@@ -127,6 +133,8 @@ public class SaleController {
             }
     )
     @PutMapping("/{saleID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<SaleResponse>> putSale(
             @Parameter(description = "Sale ID", required = true, example = "1")
             @PathVariable Long saleID,
@@ -152,6 +160,8 @@ public class SaleController {
             }
     )
     @PatchMapping("/{saleID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<SaleResponse>> patchSale(
             @Parameter(description = "Sale ID", required = true, example = "1")
             @PathVariable Long saleID,
