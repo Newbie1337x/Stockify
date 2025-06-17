@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.pos.PosAmountRequest;
 import org.stockify.dto.request.pos.PosFilterRequest;
@@ -18,7 +19,6 @@ import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.entity.SessionPosEntity;
 import org.stockify.model.enums.Status;
-import org.stockify.model.exception.EmployeeNotFoundException;
 import org.stockify.model.exception.InvalidSessionStatusException;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.PosMapper;
@@ -26,6 +26,9 @@ import org.stockify.model.mapper.SessionPosMapper;
 import org.stockify.model.repository.PosRepository;
 import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.specification.PosSpecification;
+import org.stockify.security.model.entity.CredentialsEntity;
+import org.stockify.security.repository.CredentialRepository;
+import org.stockify.security.service.JwtService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -49,6 +52,8 @@ public class PosService {
     private final EmployeeService employeeService;
     private final SessionPosMapper sessionPosMapper;
     private final StoreRepository storeRepository;
+    private final JwtService jwtService;
+    private final CredentialRepository credentialsRepository;
 
     /**
      * Creates and saves a new POS terminal associated with a store.
@@ -180,27 +185,58 @@ public class PosService {
             posRepository.save(posEntity);
         });
     }
+    /**
+     * Checks if a POS terminal associated with the given employee ID is currently open (ONLINE).
+     *
+     * @param employeeId ID of the employee to check
+     * @return true if the POS is open (ONLINE), false otherwise
+     * @throws NotFoundException if no POS is associated with the given employee ID
+     */
+    public Boolean itOpenedByEmployeeId(Long employeeId) {
+        if (posRepository.findByEmployeeId(employeeId)
+                .orElseThrow(()-> new NotFoundException("This pos is not found"))
+                .getStatus() == Status.ONLINE) {
+            return true;
+        }
+        return false;
+    }
 
     /**
-     * Opens a POS terminal if it is currently OFFLINE and no session is active.
+     *
+     * Opens a POS (Point of Sale) terminal if it is currently in {@link Status#OFFLINE} state
+     * and no active session exists for it.
      * <p>
-     * This method verifies that the employee exists, the POS is offline, and that
-     * no session is currently opened. Then it sets the POS status to ONLINE,
-     * links the employee to the POS, and registers a new session with the opening time.
+     * This method performs the following steps:
+     * <ul>
+     *     <li>Extracts the authenticated employee's information from the JWT in the security context.</li>
+     *     <li>Verifies that the specified POS terminal exists and is currently OFFLINE.</li>
+     *     <li>Checks that there is no open session associated with the POS.</li>
+     *     <li>Retrieves the employee by their DNI and links them to the POS.</li>
+     *     <li>Updates the POS status to ONLINE and sets the initial cash amount.</li>
+     *     <li>Creates and persists a new session associated with the POS and employee.</li>
+     * </ul>
      * </p>
      *
-     * @param id                ID of the POS terminal to open.
-     * @param sessionPosRequest Request data to open the session, including employee DNI and opening amount.
-     * @return {@link SessionPosCreateResponse} DTO containing data of the newly created session.
-     * @throws NotFoundException              If the POS or employee is not found.
-     * @throws InvalidSessionStatusException If the POS is not OFFLINE or already has an open session.
+     * @param id                The ID of the POS terminal to be opened.
+     * @param sessionPosRequest A {@link SessionPosRequest} containing the employee's DNI and the opening amount.
+     * @return A {@link SessionPosCreateResponse} DTO with the information of the created session.
+     * @throws NotFoundException              If the POS terminal or employee cannot be found.
+     * @throws InvalidSessionStatusException If the POS is not in OFFLINE state or already has an active session.
      */
     @Transactional
     public SessionPosCreateResponse openPos(Long id, SessionPosRequest sessionPosRequest) {
-        String employeeDni = sessionPosRequest.getEmployeeDni();
 
+        String token = jwtService.extractTokenFromSecurityContext();
+        // Extraer el email del usuario del token
+        String userEmail = jwtService.extractUsername(token);
+        // Cargar los detalles del usuario (CredentialsEntity)
+        CredentialsEntity credentials = credentialsRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        // Obtener el empleado asociado a las credenciales
+        EmployeeEntity authenticatedEmployee = credentials.getEmployee();
         PosEntity pos = posRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("POS with ID " + id + " was not found."));
+        String employeeDni = authenticatedEmployee.getDni();
 
         boolean isOffline = pos.getStatus() == Status.OFFLINE;
         boolean isSessionClosed = !sessionPosService.isOpened(pos.getId(), null);
@@ -227,6 +263,7 @@ public class PosService {
     }
 
     /**
+     *
      * Closes a POS terminal if it is currently ONLINE and has an open session.
      * Updates the session close time, close amount, expected amount,
      * and calculates cash difference. Also sets the POS status to OFFLINE,
@@ -260,6 +297,9 @@ public class PosService {
         pos.setEmployee(null);
         pos.setCurrentAmount(BigDecimal.ZERO);
         posRepository.save(pos);
+
+        String token = jwtService.extractTokenFromSecurityContext();
+        jwtService.invalidateToken(token);
 
         return sessionPosService.update(session);
     }

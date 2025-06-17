@@ -31,6 +31,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class StockService {
 
     private final StockRepository stockRepository;

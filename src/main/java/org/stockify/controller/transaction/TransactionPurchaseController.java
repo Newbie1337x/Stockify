@@ -2,6 +2,7 @@ package org.stockify.controller.transaction;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,8 +19,9 @@ import org.stockify.model.service.PurchaseService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/stores/{storeID}/pos/{posID}/transactions/purchases")
+@RequestMapping("/stores/pos/{posID}/transactions/purchases")
 @Tag(name = "Purchases", description = "Endpoints for managing purchase transactions")
+@SecurityRequirement(name = "bearerAuth")
 public class TransactionPurchaseController {
 
     private final PurchaseService purchaseService;
@@ -36,10 +38,9 @@ public class TransactionPurchaseController {
     @Transactional
     public ResponseEntity<PurchaseResponse> create(
             @Parameter(description = "Purchase request body") @Valid @RequestBody PurchaseRequest request,
-            @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Parameter(description = "ID of the POS") @PathVariable Long posID) {
 
-        PurchaseResponse response = purchaseService.createPurchase(request, storeID, posID);
+        PurchaseResponse response = purchaseService.createPurchase(request,posID);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

@@ -6,9 +6,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.stockify.dto.response.ErrorResponse;
+import org.stockify.security.exception.AuthenticationException;
 import org.zalando.problem.spring.web.advice.ProblemHandling;
 import java.time.LocalDateTime;
 
@@ -53,12 +56,10 @@ public class GlobalExceptionHandler implements ProblemHandling {
     }
 
     @ExceptionHandler(InsufficientStockException.class)
-    public ResponseEntity<ErrorResponse> handleNotEnough
-            ( InsufficientStockException ex,
-              HttpServletRequest request){
-        {
-            return buildErrorResponse(HttpStatus.CONFLICT, ex,request);
-        }
+    public ResponseEntity<ErrorResponse> handleNotEnough(
+            InsufficientStockException ex,
+            HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex, request);
     }
 
     @ExceptionHandler(TypeNotAcceptedException.class)
@@ -68,7 +69,28 @@ public class GlobalExceptionHandler implements ProblemHandling {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex, request);
     }
 
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(
+            UsernameNotFoundException ex,
+            HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex, request);
+    }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(
+            BadCredentialsException ex,
+            HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, 
+                new BadCredentialsException("The username or password is incorrect"), 
+                request);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(
+            AuthenticationException ex,
+            HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex, request);
+    }
 
 
     private <T extends Throwable> ResponseEntity<ErrorResponse> buildErrorResponse(

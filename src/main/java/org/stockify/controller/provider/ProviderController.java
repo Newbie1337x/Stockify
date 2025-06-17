@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -34,6 +35,7 @@ import java.util.List;
 @RequestMapping("/providers")
 @RequiredArgsConstructor
 @Tag(name = "Providers", description = "Operations related to managing providers")
+@SecurityRequirement(name = "bearerAuth")
 public class ProviderController {
 
     private final ProviderService providerService;
@@ -131,17 +133,47 @@ public class ProviderController {
         return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(providerID)));
     }
 
-    @Operation(summary = "Delete a provider from the system")
+    @Operation(summary = "Logically reactivate a provider")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Provider deleted permanently"),
+            @ApiResponse(responseCode = "200", description = "Provider logically reactivated"),
             @ApiResponse(responseCode = "404", description = "Provider not found")
     })
-    @DeleteMapping("/{providerID}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE') or " +
-            "hasRole('ROLE_MANAGER') and hasAuthority('DELETE')")
-    public ResponseEntity<EntityModel<ProviderResponse>> deleteProvider(
+    @PatchMapping("/{providerID}/enable")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
+    public ResponseEntity<EntityModel<ProviderResponse>> logicalReactivateProvider(
             @Parameter(description = "ID of the provider") @PathVariable Long providerID) {
 
-        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalDelete(providerID)));
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.logicalReactivate(providerID)));
+    }
+
+    @Operation(summary = "Update a provider")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provider updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Provider not found or inactive")
+    })
+    @PutMapping("/{providerID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
+    public ResponseEntity<EntityModel<ProviderResponse>> updateProvider(
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID,
+            @Valid @RequestBody ProviderRequest request) {
+
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.update(providerID, request)));
+    }
+
+    @Operation(summary = "Partially update a provider")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provider updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Provider not found or inactive")
+    })
+    @PatchMapping("/{providerID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
+    public ResponseEntity<EntityModel<ProviderResponse>> partialUpdateProvider(
+            @Parameter(description = "ID of the provider") @PathVariable Long providerID,
+            @Valid @RequestBody ProviderRequest request) {
+
+        return ResponseEntity.ok(providerModelAssembler.toModel(providerService.update(providerID, request)));
     }
 }

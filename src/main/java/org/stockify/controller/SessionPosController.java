@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.sessionpos.SessionPosFiltersRequest;
 import org.stockify.dto.response.SessionPosResponse;
 import org.stockify.model.assembler.SessionPosModelAssembler;
-import org.stockify.model.entity.SessionPosEntity;
 import org.stockify.model.mapper.SessionPosMapper;
 import org.stockify.model.service.SessionPosService;
 
@@ -29,6 +29,7 @@ import org.stockify.model.service.SessionPosService;
 @RequestMapping("/sessions")
 @Tag(name = "POS Sessions", description = "API REST para gestionar las sesiones de POS (Point of Sale)")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class SessionPosController {
 
     private final SessionPosService sessionPosService;

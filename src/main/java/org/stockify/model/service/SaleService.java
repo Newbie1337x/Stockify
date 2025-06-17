@@ -5,13 +5,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.sale.SaleFilterRequest;
 import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
 import org.stockify.dto.response.TransactionResponse;
+import org.stockify.model.entity.EmployeeEntity;
+import org.stockify.model.entity.PosEntity;
 import org.stockify.model.entity.SaleEntity;
 import org.stockify.model.entity.TransactionEntity;
+import org.stockify.model.enums.Status;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.InvalidSessionStatusException;
 import org.stockify.model.exception.NotFoundException;
@@ -21,6 +25,9 @@ import org.stockify.model.repository.ClientRepository;
 import org.stockify.model.repository.PosRepository;
 import org.stockify.model.repository.SaleRepository;
 import org.stockify.model.specification.SaleSpecification;
+import org.stockify.security.model.entity.CredentialsEntity;
+import org.stockify.security.repository.CredentialRepository;
+import org.stockify.security.service.JwtService;
 
 /**
  * Service class that handles the business logic related to sales.
@@ -41,6 +48,8 @@ public class SaleService {
     private final PosService posService;
     private final PosRepository posRepository;
     private final SessionPosService sessionPosService;
+    private final  JwtService jwtService;
+    private final CredentialRepository credentialsRepository;
 
     /**
      * Creates a new sale in the system and updates stock accordingly.
@@ -50,38 +59,33 @@ public class SaleService {
      * updates the POS session amount, and saves the sale.
      *
      * @param request DTO containing the sale data to be created
-     * @param storeID ID of the store where the sale is taking place
      * @param posID   ID of the POS where the sale is taking place
      * @return {@link SaleResponse} containing the saved sale information
      * @throws NotFoundException              if the POS or client is not found
      * @throws InvalidSessionStatusException if the POS session is not open
      */
-    public SaleResponse createSale(SaleRequest request, long storeID, long posID) {
-        if (!posRepository.existsById(posID)) {
-            throw new NotFoundException("POS with ID " + posID + " not found.");
-        }
-
-        if (!sessionPosService.isOpened(posID, null)) {
-            throw new InvalidSessionStatusException("POS with ID " + posID + " is closed. Please open it before creating a sale.");
-        }
+    public SaleResponse createSale(SaleRequest request, long posID) {
+        // Use the centralized validation method from TransactionService
+        PosEntity posEntity = transactionService.validatePosAndEmployee(posID);
+        Long localId = posEntity.getStore().getId();
 
         // Decrease stock for each product in the sale
         request.getTransaction()
                 .getDetailTransactions()
                 .forEach(detail ->
-                        stockService.decreaseStock(detail.getProductID(), storeID, detail.getQuantity()));
+                        stockService.decreaseStock(detail.getProductID(), localId, detail.getQuantity()));
 
         // Map sale request to entity and create associated transaction
         SaleEntity sale = saleMapper.toEntity(request);
         sale.setTransaction(
-                transactionService.createTransaction(request.getTransaction(), storeID, posID, TransactionType.SALE)
+                transactionService.createTransaction(request.getTransaction(), localId, posID, TransactionType.SALE)
         );
 
         // Associate client if provided
-        if (request.getClientId() != null) {
-            sale.setClient(clientRepository.findById(request.getClientId())
-                    .orElseThrow(() ->
-                            new NotFoundException("Client not found with ID " + request.getClientId())));
+            if (request.getClientId() != null) {
+                sale.setClient(clientRepository.findById(request.getClientId())
+                        .orElseThrow(() ->
+                                new NotFoundException("Client not found with ID " + request.getClientId())));
         }
 
         // Update the POS session with the sale total

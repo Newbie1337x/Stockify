@@ -2,6 +2,8 @@ package org.stockify.model.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.stockify.model.entity.EmployeeEntity;
 
@@ -14,5 +16,15 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long>,
 
    Optional<EmployeeEntity> getEmployeeEntityByDni(String dni);
    Optional<EmployeeEntity> findByDni(String dni);
+
+   /**
+    * Find an employee by ID regardless of its active status.
+    * This method bypasses the @Where clause by using a native SQL query.
+    *
+    * @param id the ID of the employee to find
+    * @return an Optional containing the employee if found, or empty if not found
+    */
+   @Query(value = "SELECT * FROM employee WHERE employee_id = :id", nativeQuery = true)
+   Optional<EmployeeEntity> findByIdIncludingInactive(@Param("id") Long id);
 
 }

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import org.stockify.model.service.TimeLogService;
 @RequestMapping("/timelogs")
 @Tag(name = "Time Logs", description = "API REST for managing employee time logs (clock-in and clock-out records)")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class TimeLogController {
     private final TimeLogService timeLogService;
 

@@ -43,11 +43,10 @@ public class SecurityConfig {
             Exception {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-//                        .requestMatchers("/api/**").hasRole("USER")
-//                        .requestMatchers(HttpMethod.GET, "/admin/users").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.POST, "/admin/users").hasAuthority("ADMIN_CREATE_USER")
-                        .anyRequest().permitAll()
-
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)

@@ -1,6 +1,7 @@
 package org.stockify.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.sale.SaleFilterRequest;
 import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
-import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.assembler.SaleModelAssembler;
 import org.stockify.model.service.SaleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +35,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Validated
 @Tag(name = "Sale", description = "Endpoints for managing sales")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class SaleController {
     private final SaleService saleService;
     private final SaleModelAssembler saleModelAssembler;
@@ -82,24 +83,8 @@ public class SaleController {
         return ResponseEntity.ok(saleModelAssembler.toModel(saleResponse));
     }
 
-    @Operation(
-            summary = "Get transaction details of a sale",
-            description = "Returns transaction details related to a sale by sale ID",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Transaction details found", content = @Content(schema = @Schema(implementation = TransactionResponse.class))),
-                    @ApiResponse(responseCode = "404", description = "Sale or transaction not found", content = @Content)
-            }
-    )
-    //Sale ya devuelve la transaccion por defecto.
-    @Deprecated
-    @GetMapping("{saleID}/transactions")
-    @PreAuthorize("hasAuthority('READ')")
-    public ResponseEntity<TransactionResponse> getSaleTransactionById(
-            @Parameter(description = "Sale ID", required = true, example = "1")
-            @PathVariable Long saleID) {
-        TransactionResponse transactionResponse = saleService.findTransactionBySaleId(saleID);
-        return ResponseEntity.ok(transactionResponse);
-    }
+
+
 
     @Operation(
             summary = "Delete a sale by ID",

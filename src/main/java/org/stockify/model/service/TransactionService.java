@@ -2,16 +2,20 @@ package org.stockify.model.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.transaction.TransactionCreatedRequest;
 import org.stockify.dto.request.transaction.TransactionRequest;
 import org.stockify.dto.response.TransactionCreatedResponse;
 import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.DetailTransactionEntity;
+import org.stockify.model.entity.EmployeeEntity;
+import org.stockify.model.entity.PosEntity;
 import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.StoreEntity;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
+import org.stockify.model.exception.InvalidSessionStatusException;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.TransactionMapper;
 import org.stockify.model.repository.ProductRepository;
@@ -19,6 +23,9 @@ import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.repository.TransactionRepository;
 import org.stockify.model.repository.PosRepository;
 import org.stockify.model.repository.SessionPosRepository;
+import org.stockify.security.model.entity.CredentialsEntity;
+import org.stockify.security.repository.CredentialRepository;
+import org.stockify.security.service.JwtService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -42,6 +49,9 @@ public class TransactionService {
     private final ProductRepository productRepository;
     private final PosRepository posRepository;
     private final SessionPosRepository sessionPosRepository;
+    private final SessionPosService sessionPosService;
+    private final JwtService jwtService;
+    private final CredentialRepository credentialRepository;
 
     /**
      * Creates and saves a monetary transaction without product details.
@@ -78,6 +88,36 @@ public class TransactionService {
     }
 
     /**
+     * Validates the POS and authenticated employee before creating a transaction.
+     * This method centralizes common validation logic used in both purchase and sale operations.
+     *
+     * @param posID the ID of the POS to validate
+     * @return the validated POS entity
+     * @throws InvalidSessionStatusException if the POS is closed or the authenticated employee doesn't match
+     * @throws NotFoundException if the POS is not found
+     */
+    public PosEntity validatePosAndEmployee(Long posID) {
+        if (!sessionPosService.isOpened(posID, null)) {
+            throw new InvalidSessionStatusException("POS with ID " + posID + " is closed. Please open it before creating a transaction.");
+        }
+
+        String token = jwtService.extractTokenFromSecurityContext();
+        String userEmail = jwtService.extractUsername(token);
+        CredentialsEntity credentials = credentialRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        EmployeeEntity authenticatedEmployee = credentials.getEmployee();
+
+        PosEntity posEntity = posRepository.findById(posID)
+                .orElseThrow(() -> new NotFoundException("POS with ID " + posID + " not found."));
+
+        if (posEntity.getEmployee().getId() != authenticatedEmployee.getId()) {
+            throw new InvalidSessionStatusException("The employee associated with the POS is not the same as the authenticated employee.");
+        }
+
+        return posEntity;
+    }
+
+    /**
      * Creates and saves a transaction that includes product details.
      * Used in sale and purchase operations, this method builds a transaction entity
      * with all the associated product quantities, prices, and subtotals.
@@ -90,7 +130,8 @@ public class TransactionService {
      * @throws NotFoundException if any required entity (product, store, or POS) is not found
      */
     public TransactionEntity createTransaction(TransactionRequest request, Long idLocal, Long idPos, TransactionType type) {
-
+        // The POS existence check is now handled by validatePosAndEmployee
+        // We still need to check if the POS exists for backward compatibility
         if (!posRepository.existsById(idPos)) {
             throw new NotFoundException("POS with ID " + idPos + " not found.");
         }

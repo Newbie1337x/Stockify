@@ -2,6 +2,7 @@ package org.stockify.controller.product;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -25,6 +26,7 @@ import org.stockify.model.service.ProductService;
 @RequestMapping("/products/{productId}/categories")
 @RequiredArgsConstructor
 @Tag(name = "ProductCategory", description = "Operations related to product-category relationships")
+@SecurityRequirement(name = "bearerAuth")
 public class ProductCategoryController {
 
     private final ProductService productService;

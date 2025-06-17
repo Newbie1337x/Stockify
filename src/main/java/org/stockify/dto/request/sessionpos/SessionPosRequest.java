@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Builder
+@Schema(name = "SessionPosRequest", description = "Request object for opening a new POS session with initial cash amount.")
 public class SessionPosRequest {
 
     @Schema(description = "Initial amount when opening the POS session, must be zero or positive.", example = "1000.00")
@@ -18,8 +19,4 @@ public class SessionPosRequest {
     @PositiveOrZero(message = "Opening amount must be zero or positive")
     private BigDecimal openingAmount;
 
-    @Schema(description = "Employee DNI (National Identity Document), digits only, length 7 to 8.", example = "12345678")
-    @NotBlank(message = "Employee DNI must not be blank")
-    @Pattern(regexp = "^\\d{7,8}$", message = "DNI must consist of digits only and have a length of 7 to 8 digits")
-    private String employeeDni;
 }

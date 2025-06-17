@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.stockify.model.service.SaleService;
 @RequestMapping("/stores/{storeID}/pos/{posID}/transactions/sales")
 @RequiredArgsConstructor
 @Tag(name = "Sales", description = "Endpoints for managing sales transactions")
+@SecurityRequirement(name = "bearerAuth")
 public class TransactionSaleController {
 
     private final SaleService saleService;
@@ -43,13 +45,10 @@ public class TransactionSaleController {
             @Parameter(description = "Sale request body", required = true)
             @Valid @RequestBody SaleRequest request,
 
-            @Parameter(description = "ID of the store", required = true, example = "1")
-            @PathVariable Long storeID,
-
             @Parameter(description = "ID of the POS", required = true, example = "10")
             @PathVariable Long posID) {
 
-        SaleResponse saleResponse = saleService.createSale(request, storeID, posID);
+        SaleResponse saleResponse = saleService.createSale(request,posID);
         EntityModel<SaleResponse> entityModel = saleModelAssembler.toModel(saleResponse);
 
         return ResponseEntity

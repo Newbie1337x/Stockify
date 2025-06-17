@@ -4,11 +4,16 @@ import lombok.*;
 import org.stockify.model.enums.Status;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+/**
+ * Data Transfer Object for employee response information.
+ * Contains all the employee details returned to clients.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
+@Schema(name = "EmployeeResponse", description = "Contains employee information returned in API responses")
 public class EmployeeResponse {
 
     @Schema(description = "Unique identifier of the employee", example = "42")
