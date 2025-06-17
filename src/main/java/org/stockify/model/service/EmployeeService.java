@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.stockify.model.enums.Status;
 import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.dto.response.EmployeeResponse;
@@ -74,13 +75,15 @@ public class EmployeeService {
         return entities.map(employeeMapper::toResponseDto);
     }
 
+    /**
+     * Retrieves the employee profile associated with the current authentication context.
+     *
+     * @param authentication The Spring Security authentication object containing the user's credentials
+     * @return The EmployeeEntity associated with the authenticated user
+     */
     public EmployeeEntity getProfile(Authentication authentication){
         CredentialsEntity credentials = (CredentialsEntity) authentication.getPrincipal();
-
-        // Accedés al empleado autenticado
-        EmployeeEntity authenticatedEmployee = credentials.getEmployee();
-
-        return authenticatedEmployee;
+        return credentials.getEmployee();
     }
 
     /**
@@ -112,20 +115,45 @@ public class EmployeeService {
 
     /**
      *
+     * Performs a logical reactivation of an employee by marking it as active.
+     *
+     * @param id the unique ID of the employee to reactivate
+     * @return EmployeeResponse DTO containing the reactivated employee data
+     * @throws NotFoundException if no employee with the specified ID exists
+     */
+    public EmployeeResponse reactivate(Long id) {
+        // Use the custom method that bypasses the @Where clause to find inactive employees
+        EmployeeEntity employee = employeeRepository.findByIdIncludingInactive(id)
+                .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
+        employee.setActive(true);
+        return employeeMapper.toResponseDto(employeeRepository.save(employee));
+    }
+
+    /**
+     *
      * Updates an existing employee's data.
      * <p>
      * Converts the provided EmployeeRequest DTO into an entity and sets its ID before saving.
+     * Only allows updating active employees.
      * </p>
      *
      * @param employeeRequest DTO containing the new employee data
      * @param id              the unique ID of the employee to update
      * @return The updated EmployeeEntity after persistence
+     * @throws NotFoundException if no active employee with the specified ID exists
      */
     public EmployeeEntity updateEmployee(EmployeeRequest employeeRequest, Long id) {
+        EmployeeEntity existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
+
+        if (!existingEmployee.getActive()) {
+            throw new NotFoundException("Cannot update inactive employee with ID: " + id);
+        }
+
         EmployeeEntity employee = employeeMapper.toEntity(employeeRequest);
         employee.setId(id);
-        employeeRepository.save(employee);
-        return employee;
+        employee.setActive(true); // Ensure active status is preserved
+        return employeeRepository.save(employee);
     }
 
     /**
@@ -137,5 +165,18 @@ public class EmployeeService {
      */
     public Optional<EmployeeEntity> getEmployeeEntityByDni(String dni) {
         return employeeRepository.getEmployeeEntityByDni(dni);
+    }
+
+    /**
+     * Sets all employees to OFFLINE status.
+     * This method is intended to be called on application startup.
+     */
+    @Transactional
+    public void setAllEmployeesToOffline() {
+        List<EmployeeEntity> employees = employeeRepository.findAll();
+        for (EmployeeEntity employee : employees) {
+            employee.setStatus(Status.OFFLINE);
+        }
+        employeeRepository.saveAll(employees);
     }
 }

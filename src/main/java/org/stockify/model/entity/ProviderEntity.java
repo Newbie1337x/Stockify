@@ -2,6 +2,7 @@ package org.stockify.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Where;
 import java.util.Set;
 
 
@@ -11,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "providers")
-
+@Where(clause = "active = true")
 
 public class ProviderEntity {
 
