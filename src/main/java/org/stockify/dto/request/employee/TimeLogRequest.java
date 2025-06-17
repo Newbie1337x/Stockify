@@ -20,6 +20,10 @@ public class TimeLogRequest {
     private Long employeeId;
 
     @NotNull
+    @Schema(description = "Identifier of the store", example = "456")
+    private Long storeId;
+
+    @NotNull
     @Schema(description = "Date of the time log entry", example = "2025-06-15", type = "string", format = "date")
     private LocalDate date;
 

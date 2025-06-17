@@ -30,4 +30,7 @@ public class TimeLogResponse {
 
     @Schema(description = "Full name of the employee", example = "John Doe")
     private String employeeFullName;
+
+    @Schema(description = "Identifier of the store associated with this time log", example = "789")
+    private Long storeId;
 }
