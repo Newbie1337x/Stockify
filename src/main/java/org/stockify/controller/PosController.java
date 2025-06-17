@@ -33,7 +33,7 @@ import org.stockify.security.service.JwtService;
 @RestController
 @RequestMapping("/pos")
 @RequiredArgsConstructor
-@Tag(name = "POS", description = "API REST para gestionar los POS (Point of Sale)")
+@Tag(name = "POS", description = "API REST for POS management (Point of Sale)")
 public class PosController {
 
     private final PosService posService;
