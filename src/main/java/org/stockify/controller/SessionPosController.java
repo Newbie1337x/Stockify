@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,14 +28,13 @@ import org.stockify.model.service.SessionPosService;
 @RestController
 @RequestMapping("/sessions")
 @Tag(name = "POS Sessions", description = "API REST para gestionar las sesiones de POS (Point of Sale)")
-@RequiredArgsConstructor
+@AllArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 public class SessionPosController {
 
     private final SessionPosService sessionPosService;
     private final SessionPosModelAssembler sessionPosModelAssembler;
-    private SessionPosMapper sessionPosMapper;
-
+    private final SessionPosMapper sessionPosMapper;
 
 
     @Operation(

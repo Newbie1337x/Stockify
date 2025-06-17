@@ -28,7 +28,6 @@ import org.stockify.model.assembler.PosModelAssembler;
 import org.stockify.model.assembler.SessionPosCreateModelAssembler;
 import org.stockify.model.assembler.SessionPosModelAssembler;
 import org.stockify.model.service.PosService;
-import org.stockify.security.service.JwtService;
 
 
 @RestController
@@ -42,7 +41,6 @@ public class PosController {
     private final PosModelAssembler posModelAssembler;
     private final SessionPosModelAssembler sessionPosModelAssembler;
     private final SessionPosCreateModelAssembler sessionPosCreateModelAssembler;
-    private final JwtService jwtService;
 
     @Operation(summary = "Create a new POS")
     @ApiResponses({
