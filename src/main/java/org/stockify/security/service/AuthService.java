@@ -1,5 +1,6 @@
 package org.stockify.security.service;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -7,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.employee.EmployeeRequest;
+import org.stockify.dto.response.EmployeeResponse;
 import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.enums.Status;
 import org.stockify.model.exception.DuplicatedUniqueConstraintException;
@@ -15,6 +17,7 @@ import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
 import org.stockify.security.model.dto.request.CredentialRequest;
 import org.stockify.security.model.dto.request.RegisterEmployeeRequest;
+import org.stockify.security.model.dto.request.RoleAndPermitsDTO;
 import org.stockify.security.model.dto.response.AuthResponse;
 import org.stockify.security.model.entity.CredentialsEntity;
 import org.stockify.security.model.entity.PermitEntity;
@@ -120,6 +123,54 @@ public class AuthService {
         return new AuthResponse(jwtService.generateToken(credentials));
     }
 
+    public ResponseEntity<EmployeeResponse> setPermitsAndRole(String email, RoleAndPermitsDTO roleAndPermitsDTO) {
+
+        CredentialsEntity credentials = credentialsRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found with email: " + email));
+
+        Set<Permit> requestedPermits = roleAndPermitsDTO.getPermits();
+        Set<PermitEntity> permitEntities = new HashSet<>();
+
+        for (Permit permit : requestedPermits) {
+            PermitEntity permitEntity = permitRepository.findByPermit(permit)
+                    .orElseGet(() -> permitRepository.save(
+                            PermitEntity.builder().permit(permit).build()
+                    ));
+            permitEntities.add(permitEntity);
+        }
+
+        Role requestedRole = roleAndPermitsDTO.getRoles();
+        RoleEntity roleEntity = rolRepository.findByRole(requestedRole)
+                .orElseGet(() -> rolRepository.save(
+                        RoleEntity.builder()
+                                .role(requestedRole)
+                                .permits(permitEntities)
+                                .build()
+                ));
+
+        // Si el rol ya existía pero no tiene estos permisos, actualizarlos:
+        if (!roleEntity.getPermits().containsAll(permitEntities)) {
+            roleEntity.getPermits().addAll(permitEntities);
+            rolRepository.save(roleEntity);
+        }
+
+        Set<RoleEntity> rolesActuales = credentials.getRoles();
+
+        if (rolesActuales == null) {
+            rolesActuales = new HashSet<>();
+        } else {
+            // En caso que sea un Set inmutable, lo hacemos mutable
+            rolesActuales = new HashSet<>(rolesActuales);
+        }
+
+        rolesActuales.add(roleEntity);
+        credentials.setRoles(rolesActuales);
+        credentialsRepository.save(credentials);
+
+        // 5. Devolver la respuesta del empleado
+        EmployeeResponse response = employeeMapper.toResponseDto(credentials.getEmployee());
+        return ResponseEntity.ok(response);
+    }
 
     private List<PermitEntity> permitEmployee(){
         List<PermitEntity> permits = new ArrayList<>();
