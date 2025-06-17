@@ -90,7 +90,6 @@ public class SaleController {
                     @ApiResponse(responseCode = "404", description = "Sale or transaction not found", content = @Content)
             }
     )
-
     //Sale ya devuelve la transaccion por defecto.
     @Deprecated
     @GetMapping("{saleID}/transactions")

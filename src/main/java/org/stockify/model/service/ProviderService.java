@@ -1,10 +1,13 @@
 package org.stockify.model.service;
 
+import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.stockify.dto.request.provider.ProviderCsvRequest;
 import org.stockify.dto.request.provider.ProviderFilterRequest;
 import org.stockify.dto.request.provider.ProviderRequest;
 import org.stockify.dto.response.BulkProviderResponse;
@@ -17,6 +20,7 @@ import org.stockify.model.repository.ProductRepository;
 import org.stockify.model.repository.ProviderRepository;
 import org.stockify.model.specification.ProviderSpecification;
 
+import java.io.InputStreamReader;
 import java.util.List;
 
 /**
@@ -70,6 +74,29 @@ public class ProviderService {
         }
 
         return new BulkProviderResponse(responses, errors);
+    }
+
+    /**
+     * Import providers from a CSV file.
+     *
+     * @param file CSV file containing provider data
+     * @return BulkProviderResponse containing created providers and errors
+     * @throws Exception if there is an error reading the file or processing the data
+     */
+    public BulkProviderResponse importProvidersCsv(MultipartFile file) throws Exception {
+        InputStreamReader reader = new InputStreamReader(file.getInputStream());
+
+        List<ProviderCsvRequest> csvDto = new CsvToBeanBuilder<ProviderCsvRequest>(reader)
+                .withType(ProviderCsvRequest.class)
+                .withIgnoreLeadingWhiteSpace(true)
+                .build()
+                .parse();
+
+        List<ProviderRequest> providers = csvDto.stream()
+                .map(providerMapper::toRequestDTO)
+                .toList();
+
+        return saveAll(providers);
     }
 
     /**
