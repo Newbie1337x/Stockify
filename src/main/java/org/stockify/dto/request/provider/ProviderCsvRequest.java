@@ -33,12 +33,13 @@ public class ProviderCsvRequest {
     private String taxId;
 
     @Schema(description = "Tax address", example = "123 Supplier St, City")
-    @CsvBindByName(column = "taxAddres")
+    @NotBlank(message = "Tax address is required")
+    @CsvBindByName(column = "taxAddress")
     private String taxAddress;
 
     @Schema(description = "Registered business name", example = "Supplier Inc.")
     @NotBlank(message = "Business name is required")
     @CsvBindByName(column = "businessName")
     private String businessName;
-
 }
+
