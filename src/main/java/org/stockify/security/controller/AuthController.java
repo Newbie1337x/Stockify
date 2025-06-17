@@ -3,9 +3,7 @@ package org.stockify.security.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.security.model.dto.request.AuthRequest;
-import org.stockify.security.model.dto.request.CredentialRequest;
 import org.stockify.security.model.dto.request.RegisterEmployeeRequest;
 import org.stockify.security.model.dto.response.AuthResponse;
 import org.stockify.security.service.AuthService;
@@ -32,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/cerrar_sesion")
-    public ResponseEntity<String> cerrarSesion(@RequestHeader("Authorization") String token){
+    public ResponseEntity<String> cerrarSesion(@RequestHeader String token){
         jwtService.invalidateToken(token);
         return ResponseEntity.ok("Se ha cerrado el sesion");
     }
