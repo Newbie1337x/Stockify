@@ -8,9 +8,13 @@ import org.springframework.stereotype.Repository;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.enums.Status;
 
+import java.util.Optional;
+
 @Repository
 public interface PosRepository extends JpaRepository<PosEntity,Long>, JpaSpecificationExecutor<PosEntity> {
 
     Page<PosEntity> findByStatus(Status status, Pageable pageable);
     boolean existsById(Long posId);
+
+    Optional<PosEntity> findByEmployeeId(Long employeeId);
 }

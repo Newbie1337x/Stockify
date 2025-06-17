@@ -26,14 +26,29 @@ import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.service.EmployeeService;
 import org.stockify.security.model.entity.CredentialsEntity;
 
+/**
+ * REST controller for managing employees.
+ * Provides endpoints for CRUD operations on employees.
+ */
 @RestController
 @RequestMapping("/employees")
 @RequiredArgsConstructor
 @Tag(name = "Employees", description = "Operations for managing employees")
 public class EmployeeController {
 
+    /**
+     * Service for employee operations
+     */
     private final EmployeeService employeeService;
+
+    /**
+     * Assembler for converting employee entities to HATEOAS models
+     */
     private final EmployeeModelAssembler employeeModelAssembler;
+
+    /**
+     * Mapper for converting between employee entities and DTOs
+     */
     private final EmployeeMapper employeeMapper;
 
     @Operation(summary = "List all employees with optional filters")
@@ -69,28 +84,28 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeModelAssembler.toModel(employee));
     }
 
+    /**
+     * Retrieves the profile of the currently authenticated employee
+     *
+     * @param authentication The authentication object containing the current user's credentials
+     * @return The employee profile information
+     */
+    @Operation(summary = "Get current employee profile")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Profile retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+            @ApiResponse(responseCode = "404", description = "Employee profile not found")
+    })
     @GetMapping("/profile")
     @PreAuthorize("hasAuthority('READ')")
-    public ResponseEntity<EntityModel<EmployeeResponse>> getProfile(Authentication authentication) {
+    public ResponseEntity<EntityModel<EmployeeResponse>> getProfile(
+            @Parameter(description = "Authentication object with user credentials", hidden = true) Authentication authentication) {
 
         EmployeeEntity employee = employeeService.getProfile(authentication);
 
-        // Si todo bien, devolvés el perfil
         return ResponseEntity.ok(employeeModelAssembler.toModel(employeeMapper.toResponseDto(employee)));
     }
 
-    @Operation(summary = "Create a new employee")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Employee created successfully"),
-            @ApiResponse(responseCode = "400", description = "Validation error")
-    })
-    @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
-            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
-    public ResponseEntity<EmployeeResponse> createEmployee(
-            @Valid @RequestBody EmployeeRequest employeeRequest) {
-        return ResponseEntity.status(201).body(employeeService.createEmployee(employeeRequest));
-    }
 
     @Operation(summary = "Logically disable an employee by ID")
     @ApiResponses({
@@ -120,6 +135,13 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeModelAssembler.toModel(employee));
     }
 
+    /**
+     * Fully updates an employee with the provided information
+     *
+     * @param employeeID ID of the employee to update
+     * @param employeeRequest Request body containing the updated employee information
+     * @return The updated employee entity
+     */
     @Operation(summary = "Fully update an employee")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Employee updated successfully"),
@@ -130,11 +152,18 @@ public class EmployeeController {
             "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EmployeeEntity> putEmployee(
             @Parameter(description = "ID of the employee") @PathVariable Long employeeID,
-            @RequestBody EmployeeRequest employeeRequest) {
+            @Parameter(description = "Updated employee information") @RequestBody EmployeeRequest employeeRequest) {
         EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, employeeID);
         return ResponseEntity.ok(employeeEntity);
     }
 
+    /**
+     * Partially updates an employee with the provided information
+     *
+     * @param employeeID ID of the employee to update
+     * @param employeeRequest Request body containing the fields to update
+     * @return The updated employee entity
+     */
     @Operation(summary = "Partially update an employee")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Employee updated successfully"),
@@ -145,7 +174,7 @@ public class EmployeeController {
             "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EmployeeEntity> patchEmployee(
             @Parameter(description = "ID of the employee") @PathVariable Long employeeID,
-            @RequestBody EmployeeRequest employeeRequest) {
+            @Parameter(description = "Fields to update in the employee") @RequestBody EmployeeRequest employeeRequest) {
         EmployeeEntity employeeEntity = employeeService.updateEmployee(employeeRequest, employeeID);
         return ResponseEntity.ok(employeeEntity);
     }

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.stockify.model.enums.Status;
 import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.dto.response.EmployeeResponse;
@@ -158,5 +159,18 @@ public class EmployeeService {
      */
     public Optional<EmployeeEntity> getEmployeeEntityByDni(String dni) {
         return employeeRepository.getEmployeeEntityByDni(dni);
+    }
+
+    /**
+     * Sets all employees to OFFLINE status.
+     * This method is intended to be called on application startup.
+     */
+    @Transactional
+    public void setAllEmployeesToOffline() {
+        List<EmployeeEntity> employees = employeeRepository.findAll();
+        for (EmployeeEntity employee : employees) {
+            employee.setStatus(Status.OFFLINE);
+        }
+        employeeRepository.saveAll(employees);
     }
 }

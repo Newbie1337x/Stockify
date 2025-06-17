@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.sale.SaleFilterRequest;
 import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
 import org.stockify.dto.response.TransactionResponse;
+import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.entity.SaleEntity;
 import org.stockify.model.entity.TransactionEntity;
@@ -23,6 +25,9 @@ import org.stockify.model.repository.ClientRepository;
 import org.stockify.model.repository.PosRepository;
 import org.stockify.model.repository.SaleRepository;
 import org.stockify.model.specification.SaleSpecification;
+import org.stockify.security.model.entity.CredentialsEntity;
+import org.stockify.security.repository.CredentialRepository;
+import org.stockify.security.service.JwtService;
 
 /**
  * Service class that handles the business logic related to sales.
@@ -43,6 +48,8 @@ public class SaleService {
     private final PosService posService;
     private final PosRepository posRepository;
     private final SessionPosService sessionPosService;
+    private final  JwtService jwtService;
+    private final CredentialRepository credentialsRepository;
 
     /**
      * Creates a new sale in the system and updates stock accordingly.
@@ -58,16 +65,9 @@ public class SaleService {
      * @throws InvalidSessionStatusException if the POS session is not open
      */
     public SaleResponse createSale(SaleRequest request, long posID) {
-
-        if (!sessionPosService.isOpened(posID, null)) {
-            throw new InvalidSessionStatusException("POS with ID " + posID + " is closed. Please open it before creating a sale.");
-        }
-
-        PosEntity posEntity = posRepository.findById(posID)
-                .orElseThrow
-                        (() -> new NotFoundException("POS with ID " + posID + " not found."));
-
-        Long localId =  posEntity.getStore().getId();
+        // Use the centralized validation method from TransactionService
+        PosEntity posEntity = transactionService.validatePosAndEmployee(posID);
+        Long localId = posEntity.getStore().getId();
 
         // Decrease stock for each product in the sale
         request.getTransaction()
