@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.transaction.TransactionCreatedRequest;
 import org.stockify.dto.response.TransactionCreatedResponse;
@@ -36,6 +37,8 @@ public class TransactionController {
             @ApiResponse(responseCode = "404", description = "Store or POS not found")
     })
     @PostMapping("/stores/{storeID}/pos/{posID}/transactions")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<TransactionCreatedResponse> createTransaction(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Parameter(description = "ID of the POS") @PathVariable Long posID,

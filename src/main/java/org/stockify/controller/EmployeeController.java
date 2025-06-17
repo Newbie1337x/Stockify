@@ -69,24 +69,14 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeModelAssembler.toModel(employee));
     }
 
-    @GetMapping("/{employeeId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
-            "hasRole('ROLE_MANAGER') and hasAuthority('READ') or " +
-            "hasRole('ROLE_EMPLOYEE') and hasAuthority('READ')")
-    public ResponseEntity<EntityModel<EmployeeResponse>> getProfile(@PathVariable Long employeeId, Authentication authentication) {
-        CredentialsEntity credentials = (CredentialsEntity) authentication.getPrincipal();
+    @GetMapping("/profile")
+    @PreAuthorize("hasAuthority('READ')")
+    public ResponseEntity<EntityModel<EmployeeResponse>> getProfile(Authentication authentication) {
 
-        // Accedés al empleado autenticado
-        EmployeeEntity authenticatedEmployee = credentials.getEmployee();
-
-        // Comprobás si el ID en la ruta es el mismo que el del empleado autenticado
-        if (!authenticatedEmployee.getId().equals(employeeId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No puedes acceder al perfil de otro empleado.");
-        }
-
+        EmployeeEntity employee = employeeService.getProfile(authentication);
 
         // Si todo bien, devolvés el perfil
-        return ResponseEntity.ok(employeeModelAssembler.toModel(employeeMapper.toResponseDto(authenticatedEmployee)));
+        return ResponseEntity.ok(employeeModelAssembler.toModel(employeeMapper.toResponseDto(employee)));
     }
 
     @Operation(summary = "Create a new employee")

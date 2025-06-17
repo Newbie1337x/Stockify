@@ -16,6 +16,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.sessionpos.SessionPosFiltersRequest;
 import org.stockify.dto.response.SessionPosResponse;
@@ -50,6 +51,8 @@ public class SessionPosController {
         @ApiResponse(responseCode = "404", description = "Session not found")
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<SessionPosResponse>> getSessionById(
             @Parameter(description = "Session Id") @PathVariable Long id) {
         SessionPosResponse sessionResponse = sessionPosService.findById(id);
@@ -71,6 +74,8 @@ public class SessionPosController {
         //@ApiResponse(responseCode = "500", description = "Error interno del servidor") TODO: Verificar si se quiere arrojar un error 500
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<SessionPosResponse>>> getAllSessions(
             @ParameterObject SessionPosFiltersRequest filters,
             @PageableDefault Pageable pageable,

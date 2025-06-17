@@ -13,6 +13,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.category.CategoryRequest;
@@ -36,6 +37,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "204", description = "No categories found")
     })
     @GetMapping
+    @PreAuthorize("hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<CategoryResponse>>> listCategories(
             @Parameter(hidden = true) Pageable pageable,
             @Parameter(description = "Filter by category name") @RequestParam(required = false) String name,
@@ -54,6 +56,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found")
     })
     @GetMapping("/{categoryID}")
+    @PreAuthorize("hasAuthority('READ')")
     public ResponseEntity<EntityModel<CategoryResponse>> getCategoryById(
             @Parameter(description = "ID of the category") @PathVariable int categoryID) {
 
@@ -66,6 +69,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "400", description = "Validation error")
     })
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<CategoryResponse>> createCategory(
             @Valid @RequestBody CategoryRequest categoryRequestDTO) {
 
@@ -80,6 +85,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found")
     })
     @PutMapping("/{categoryID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<CategoryResponse>> updateCategory(
             @Parameter(description = "ID of the category") @PathVariable int categoryID,
             @Valid @RequestBody CategoryRequest categoryRequestDTO) {
@@ -94,6 +101,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found")
     })
     @PatchMapping("/{categoryID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<CategoryResponse>> patchCategory(
             @Parameter(description = "ID of the category") @PathVariable int categoryID,
             @Valid @RequestBody CategoryRequest categoryRequestDTO) {
@@ -108,6 +117,8 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "Category not found")
     })
     @DeleteMapping("/{categoryID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('DELETE')")
     public ResponseEntity<Void> deleteCategory(
             @Parameter(description = "ID of the category") @PathVariable int categoryID) {
 

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,8 @@ public class AuditController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Transaction audit logs retrieved successfully")
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     @GetMapping("/transactions")
     public ResponseEntity<List<TransactionAuditDTO>> getAllTransactionAudit() {
         return ResponseEntity.ok(auditService.getAllTransactionAudits());
@@ -38,6 +41,8 @@ public class AuditController {
             @ApiResponse(responseCode = "200", description = "Purchase audit logs retrieved successfully")
     })
     @GetMapping("/purchases")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<List<PurchaseAuditDTO>> getAllPurchaseAudit() {
         return ResponseEntity.ok(auditService.getAllPurchaseAudits());
     }
@@ -47,6 +52,7 @@ public class AuditController {
             @ApiResponse(responseCode = "200", description = "Sale audit logs retrieved successfully")
     })
     @GetMapping("/sales")
+    @PreAuthorize("hasAuthority('READ')")
     public ResponseEntity<List<SaleAuditDTO>> getAllSaleAudit() {
         return ResponseEntity.ok(auditService.getAllSaleAudits());
     }

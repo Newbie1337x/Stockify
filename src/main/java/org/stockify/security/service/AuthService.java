@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.enums.Status;
+import org.stockify.model.exception.DuplicatedUniqueConstraintException;
 import org.stockify.model.mapper.CredentialMapper;
 import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
@@ -66,11 +67,11 @@ public class AuthService {
 
     public AuthResponse registerEmployee(RegisterEmployeeRequest registerEmployeeRequest) {
         if (credentialsRepository.existsByEmail(registerEmployeeRequest.getCredential().getEmail())) {
-            throw new IllegalArgumentException("Email address already in use");
+            throw new DuplicatedUniqueConstraintException("Email address already in use");
         }
 
         if (employeeRepository.getEmployeeEntityByDni(registerEmployeeRequest.getEmployee().getDni()).isPresent()) {
-            throw new IllegalArgumentException("DNI is already in use");
+            throw new DuplicatedUniqueConstraintException("DNI is already in use");
         }
 
         EmployeeEntity employee = employeeMapper.toEntity(registerEmployeeRequest.getEmployee());
@@ -115,7 +116,7 @@ public class AuthService {
         credentials.setRoles(Set.of(roleEntity));
 
         credentialsRepository.save(credentials);
-        
+
         return new AuthResponse(jwtService.generateToken(credentials));
     }
 

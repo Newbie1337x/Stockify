@@ -13,6 +13,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.store.StoreRequest;
 import org.stockify.dto.response.StoreResponse;
@@ -35,6 +36,7 @@ public class StoreController {
             @ApiResponse(responseCode = "200", description = "Paged list of stores returned successfully")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<StoreResponse>>> getAllStores(
             @Parameter(hidden = true) Pageable pageable,
             PagedResourcesAssembler<StoreResponse> assembler) {
@@ -48,6 +50,8 @@ public class StoreController {
             @ApiResponse(responseCode = "404", description = "Store not found")
     })
     @GetMapping("/{storeID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<StoreResponse>> getStoreById(
             @Parameter(description = "ID of the store") @PathVariable Long storeID) {
         StoreResponse store = storeService.findById(storeID);
@@ -60,6 +64,7 @@ public class StoreController {
             @ApiResponse(responseCode = "400", description = "Validation error")
     })
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<StoreResponse>> createStore(
             @Valid @RequestBody StoreRequest request) {
         StoreResponse store = storeService.save(request);
@@ -74,6 +79,7 @@ public class StoreController {
             @ApiResponse(responseCode = "400", description = "Validation error")
     })
     @PutMapping("/{storeID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<StoreResponse>> updateStore(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @Valid @RequestBody StoreRequest request) {
@@ -87,6 +93,7 @@ public class StoreController {
             @ApiResponse(responseCode = "404", description = "Store not found")
     })
     @DeleteMapping("/{storeID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE')")
     public ResponseEntity<Void> deleteStore(
             @Parameter(description = "ID of the store") @PathVariable Long storeID) {
         storeService.deleteById(storeID);
@@ -99,6 +106,7 @@ public class StoreController {
             @ApiResponse(responseCode = "404", description = "Store not found")
     })
     @PatchMapping("/{storeID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<StoreResponse>> patchStore(
             @Parameter(description = "ID of the store") @PathVariable Long storeID,
             @RequestBody StoreRequest request) {

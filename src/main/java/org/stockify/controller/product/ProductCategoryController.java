@@ -13,6 +13,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.response.CategoryResponse;
 import org.stockify.dto.response.ProductResponse;
@@ -35,6 +36,8 @@ public class ProductCategoryController {
             @ApiResponse(responseCode = "200", description = "Category removed from product successfully"),
             @ApiResponse(responseCode = "404", description = "Product or Category not found")
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('DELETE')")
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<EntityModel<ProductResponse>> removeCategoryFromProduct(
             @Parameter(description = "ID of the product") @PathVariable Long productId,
@@ -46,7 +49,8 @@ public class ProductCategoryController {
                 )
         );
     }
-
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     @Operation(summary = "Add a category to a product")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Category added to product successfully"),
@@ -69,6 +73,8 @@ public class ProductCategoryController {
             @ApiResponse(responseCode = "200", description = "All categories removed from product successfully"),
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('DELETE')")
     @DeleteMapping
     public ResponseEntity<EntityModel<ProductResponse>> removeAllCategoriesFromProduct(
             @Parameter(description = "ID of the product") @PathVariable Long productId) {
@@ -86,6 +92,8 @@ public class ProductCategoryController {
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<CategoryResponse>>> getCategoriesFromProduct(
             @Parameter(description = "ID of the product") @PathVariable Long productId,
             @Parameter(hidden = true) @PageableDefault(sort = "name") Pageable pageable,

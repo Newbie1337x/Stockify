@@ -16,6 +16,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.stockify.dto.request.purchase.PurchaseFilterRequest;
 import org.stockify.dto.request.purchase.PurchaseRequest;
@@ -45,6 +46,8 @@ public class PurchaseController {
             @ApiResponse(responseCode = "204", description = "No purchases available")
     })
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<PagedModel<EntityModel<PurchaseResponse>>> list(
             @Parameter(hidden = true) Pageable pageable,
             @ParameterObject PurchaseFilterRequest filter,
@@ -64,6 +67,8 @@ public class PurchaseController {
             @ApiResponse(responseCode = "404", description = "Purchase not found", content = @Content)
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('DELETE')")
     public ResponseEntity<Void> delete(@Parameter(description = "ID of the purchase to delete", required = true) @PathVariable Long id) {
         purchaseService.deletePurchase(id);
         return ResponseEntity.ok().build();
@@ -86,6 +91,8 @@ public class PurchaseController {
             )
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
     public ResponseEntity<EntityModel<PurchaseResponse>> getById(
             @Parameter(description = "ID of the purchase to retrieve", required = true)
             @PathVariable Long id
@@ -111,6 +118,8 @@ public class PurchaseController {
             )
     })
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<PurchaseResponse>> update(
             @Parameter(description = "ID of the purchase to update", required = true) @PathVariable Long id,
             @Valid @RequestBody PurchaseRequest request

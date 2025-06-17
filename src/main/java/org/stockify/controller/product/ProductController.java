@@ -19,6 +19,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.stockify.dto.request.product.ProductFilterRequest;
@@ -44,6 +45,7 @@ public class ProductController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Paged list of products returned successfully")
     })
+    @PreAuthorize("hasAuthority('READ')")
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> listProducts(
             @ParameterObject ProductFilterRequest filter,
@@ -61,6 +63,8 @@ public class ProductController {
             @ApiResponse(responseCode = "207", description = "Multi-status response with results of each product creation")
     })
     @PostMapping("/bulk")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<BulkProductResponse> bulkSaveProducts(
             @RequestBody List<@Valid ProductRequest> products) {
         return ResponseEntity.status(HttpStatus.MULTI_STATUS).body(productService.saveAll(products));
@@ -69,6 +73,8 @@ public class ProductController {
 
     @PostMapping(value = "/import", consumes = "multipart/form-data")
     @Operation(summary = "Import products from CSV file")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     @ApiResponse(responseCode = "200", description = "Successful import")
     public ResponseEntity<BulkProductResponse> importProducts(
             @Parameter(description = "CSV file with products", required = true,
@@ -90,6 +96,7 @@ public class ProductController {
             @ApiResponse(responseCode = "200", description = "Product found"),
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
+    @PreAuthorize("hasAuthority('READ')")
     @GetMapping("/{productID}")
     public ResponseEntity<EntityModel<ProductResponse>> getProductById(
             @Parameter(description = "ID of the product") @PathVariable Long productID) {
@@ -104,6 +111,8 @@ public class ProductController {
             @ApiResponse(responseCode = "400", description = "Validation failed")
     })
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ProductResponse>> createProduct(
             @Valid @RequestBody ProductRequest product) {
         return ResponseEntity.ok(productModelAssembler.toModel(productService.save(product)));
@@ -116,6 +125,8 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
     @DeleteMapping("/{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('DELETE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('DELETE')")
     public ResponseEntity<Void> deleteProduct(
             @Parameter(description = "ID of the product") @PathVariable Long productID) {
         productService.deleteById(productID);
@@ -130,6 +141,8 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
     @PutMapping("/{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ProductResponse>> updateProduct(
             @Parameter(description = "ID of the product") @PathVariable Long productID,
             @Valid @RequestBody ProductRequest product) {
@@ -144,6 +157,8 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Product not found")
     })
     @PatchMapping("/{productID}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_MANAGER') and hasAuthority('WRITE')")
     public ResponseEntity<EntityModel<ProductResponse>> patchProduct(
             @Parameter(description = "ID of the product") @PathVariable Long productID,
             @Valid @RequestBody ProductRequest product) {

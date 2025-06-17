@@ -27,6 +27,7 @@ import org.stockify.model.assembler.PosModelAssembler;
 import org.stockify.model.assembler.SessionPosCreateModelAssembler;
 import org.stockify.model.assembler.SessionPosModelAssembler;
 import org.stockify.model.service.PosService;
+import org.stockify.security.service.JwtService;
 
 
 @RestController
@@ -39,6 +40,7 @@ public class PosController {
     private final PosModelAssembler posModelAssembler;
     private final SessionPosModelAssembler sessionPosModelAssembler;
     private final SessionPosCreateModelAssembler sessionPosCreateModelAssembler;
+    private final JwtService jwtService;
 
     @Operation(summary = "Create a new POS")
     @ApiResponses({
@@ -106,7 +108,9 @@ public class PosController {
     @PatchMapping("/close/{id}")
     public ResponseEntity<EntityModel<SessionPosResponse>> closePos(
             @Parameter(description = "POS ID") @PathVariable Long id,
-            @Valid @RequestBody SessionPosCloseRequest sessionPosRequest) {
+            @Valid @RequestBody SessionPosCloseRequest sessionPosRequest,
+            @RequestHeader("Authorization") String token) {
+        jwtService.invalidateToken(token);
         SessionPosResponse response = posService.closePos(id, sessionPosRequest);
         return ResponseEntity.ok(sessionPosModelAssembler.toModel(response));
     }

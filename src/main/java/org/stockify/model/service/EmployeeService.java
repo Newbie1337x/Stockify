@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.stockify.model.enums.Status;
 import org.stockify.dto.request.employee.EmployeeRequest;
@@ -13,6 +14,7 @@ import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
 import org.stockify.model.specification.EmployeeSpecifications;
+import org.stockify.security.model.entity.CredentialsEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +72,15 @@ public class EmployeeService {
 
         Page<EmployeeEntity> entities = employeeRepository.findAll(spec, pageable);
         return entities.map(employeeMapper::toResponseDto);
+    }
+
+    public EmployeeEntity getProfile(Authentication authentication){
+        CredentialsEntity credentials = (CredentialsEntity) authentication.getPrincipal();
+
+        // Accedés al empleado autenticado
+        EmployeeEntity authenticatedEmployee = credentials.getEmployee();
+
+        return authenticatedEmployee;
     }
 
     /**
