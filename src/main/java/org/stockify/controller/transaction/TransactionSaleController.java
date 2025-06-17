@@ -43,13 +43,10 @@ public class TransactionSaleController {
             @Parameter(description = "Sale request body", required = true)
             @Valid @RequestBody SaleRequest request,
 
-            @Parameter(description = "ID of the store", required = true, example = "1")
-            @PathVariable Long storeID,
-
             @Parameter(description = "ID of the POS", required = true, example = "10")
             @PathVariable Long posID) {
 
-        SaleResponse saleResponse = saleService.createSale(request, storeID, posID);
+        SaleResponse saleResponse = saleService.createSale(request,posID);
         EntityModel<SaleResponse> entityModel = saleModelAssembler.toModel(saleResponse);
 
         return ResponseEntity

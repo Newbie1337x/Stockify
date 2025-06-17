@@ -134,6 +134,29 @@ public class ProviderService {
     }
 
     /**
+     * Updates an existing provider in the system.
+     * Only allows updating active providers.
+     *
+     * @param id ID of the provider to update
+     * @param providerRequest DTO containing the provider's updated data
+     * @return DTO with the details of the updated provider
+     * @throws NotFoundException if no active provider is found with the specified ID
+     */
+    public ProviderResponse update(Long id, ProviderRequest providerRequest) {
+        ProviderEntity existingProvider = getProviderById(id);
+
+        if (!existingProvider.isActive()) {
+            throw new NotFoundException("Cannot update inactive provider with ID: " + id);
+        }
+
+        ProviderEntity updatedProvider = providerMapper.toEntity(providerRequest);
+        updatedProvider.setId(id);
+        updatedProvider.setActive(true); // Ensure active status is preserved
+
+        return providerMapper.toResponseDTO(providerRepository.save(updatedProvider));
+    }
+
+    /**
      * Logically deletes a provider (marks it as inactive).
      *
      * @param id ID of the provider to delete logically
@@ -143,6 +166,21 @@ public class ProviderService {
     public ProviderResponse logicalDelete(Long id) {
         ProviderEntity provider = getProviderById(id);
         provider.setActive(false);
+        return providerMapper.toResponseDTO(providerRepository.save(provider));
+    }
+
+    /**
+     * Logically reactivates a provider (marks it as active).
+     *
+     * @param id ID of the provider to reactivate
+     * @return DTO with the updated provider details
+     * @throws NotFoundException if no provider is found with the specified ID
+     */
+    public ProviderResponse logicalReactivate(Long id) {
+        // Use the custom method that bypasses the @Where clause to find inactive providers
+        ProviderEntity provider = providerRepository.findByIdIncludingInactive(id)
+                .orElseThrow(() -> new NotFoundException("Provider with ID " + id + " not found"));
+        provider.setActive(true);
         return providerMapper.toResponseDTO(providerRepository.save(provider));
     }
 

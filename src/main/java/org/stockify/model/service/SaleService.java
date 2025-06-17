@@ -10,6 +10,7 @@ import org.stockify.dto.request.sale.SaleFilterRequest;
 import org.stockify.dto.request.sale.SaleRequest;
 import org.stockify.dto.response.SaleResponse;
 import org.stockify.dto.response.TransactionResponse;
+import org.stockify.model.entity.PosEntity;
 import org.stockify.model.entity.SaleEntity;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
@@ -50,38 +51,40 @@ public class SaleService {
      * updates the POS session amount, and saves the sale.
      *
      * @param request DTO containing the sale data to be created
-     * @param storeID ID of the store where the sale is taking place
      * @param posID   ID of the POS where the sale is taking place
      * @return {@link SaleResponse} containing the saved sale information
      * @throws NotFoundException              if the POS or client is not found
      * @throws InvalidSessionStatusException if the POS session is not open
      */
-    public SaleResponse createSale(SaleRequest request, long storeID, long posID) {
-        if (!posRepository.existsById(posID)) {
-            throw new NotFoundException("POS with ID " + posID + " not found.");
-        }
+    public SaleResponse createSale(SaleRequest request, long posID) {
 
         if (!sessionPosService.isOpened(posID, null)) {
             throw new InvalidSessionStatusException("POS with ID " + posID + " is closed. Please open it before creating a sale.");
         }
 
+        PosEntity posEntity = posRepository.findById(posID)
+                .orElseThrow
+                        (() -> new NotFoundException("POS with ID " + posID + " not found."));
+
+        Long localId =  posEntity.getStore().getId();
+
         // Decrease stock for each product in the sale
         request.getTransaction()
                 .getDetailTransactions()
                 .forEach(detail ->
-                        stockService.decreaseStock(detail.getProductID(), storeID, detail.getQuantity()));
+                        stockService.decreaseStock(detail.getProductID(), localId, detail.getQuantity()));
 
         // Map sale request to entity and create associated transaction
         SaleEntity sale = saleMapper.toEntity(request);
         sale.setTransaction(
-                transactionService.createTransaction(request.getTransaction(), storeID, posID, TransactionType.SALE)
+                transactionService.createTransaction(request.getTransaction(), localId, posID, TransactionType.SALE)
         );
 
         // Associate client if provided
-        if (request.getClientId() != null) {
-            sale.setClient(clientRepository.findById(request.getClientId())
-                    .orElseThrow(() ->
-                            new NotFoundException("Client not found with ID " + request.getClientId())));
+            if (request.getClientId() != null) {
+                sale.setClient(clientRepository.findById(request.getClientId())
+                        .orElseThrow(() ->
+                                new NotFoundException("Client not found with ID " + request.getClientId())));
         }
 
         // Update the POS session with the sale total

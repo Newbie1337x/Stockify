@@ -76,11 +76,7 @@ public class EmployeeService {
 
     public EmployeeEntity getProfile(Authentication authentication){
         CredentialsEntity credentials = (CredentialsEntity) authentication.getPrincipal();
-
-        // Accedés al empleado autenticado
-        EmployeeEntity authenticatedEmployee = credentials.getEmployee();
-
-        return authenticatedEmployee;
+        return credentials.getEmployee();
     }
 
     /**
@@ -112,20 +108,45 @@ public class EmployeeService {
 
     /**
      *
+     * Performs a logical reactivation of an employee by marking it as active.
+     *
+     * @param id the unique ID of the employee to reactivate
+     * @return EmployeeResponse DTO containing the reactivated employee data
+     * @throws NotFoundException if no employee with the specified ID exists
+     */
+    public EmployeeResponse reactivate(Long id) {
+        // Use the custom method that bypasses the @Where clause to find inactive employees
+        EmployeeEntity employee = employeeRepository.findByIdIncludingInactive(id)
+                .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
+        employee.setActive(true);
+        return employeeMapper.toResponseDto(employeeRepository.save(employee));
+    }
+
+    /**
+     *
      * Updates an existing employee's data.
      * <p>
      * Converts the provided EmployeeRequest DTO into an entity and sets its ID before saving.
+     * Only allows updating active employees.
      * </p>
      *
      * @param employeeRequest DTO containing the new employee data
      * @param id              the unique ID of the employee to update
      * @return The updated EmployeeEntity after persistence
+     * @throws NotFoundException if no active employee with the specified ID exists
      */
     public EmployeeEntity updateEmployee(EmployeeRequest employeeRequest, Long id) {
+        EmployeeEntity existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
+
+        if (!existingEmployee.getActive()) {
+            throw new NotFoundException("Cannot update inactive employee with ID: " + id);
+        }
+
         EmployeeEntity employee = employeeMapper.toEntity(employeeRequest);
         employee.setId(id);
-        employeeRepository.save(employee);
-        return employee;
+        employee.setActive(true); // Ensure active status is preserved
+        return employeeRepository.save(employee);
     }
 
     /**

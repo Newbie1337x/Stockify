@@ -9,11 +9,13 @@ import org.springframework.stereotype.Service;
 import org.stockify.dto.request.purchase.PurchaseFilterRequest;
 import org.stockify.dto.request.purchase.PurchaseRequest;
 import org.stockify.dto.response.PurchaseResponse;
+import org.stockify.model.entity.PosEntity;
 import org.stockify.model.entity.PurchaseEntity;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.NotFoundException;
 import org.stockify.model.mapper.PurchaseMapper;
+import org.stockify.model.repository.PosRepository;
 import org.stockify.model.repository.ProviderRepository;
 import org.stockify.model.repository.PurchaseRepository;
 import org.stockify.model.repository.TransactionRepository;
@@ -35,25 +37,31 @@ public class PurchaseService {
     private final TransactionService transactionService;
     private final TransactionRepository transactionRepository;
     private final ProviderRepository providerRepository;
+    private final PosRepository posRepository;
 
     /**
      * Creates a new purchase and updates the stock of the corresponding products.
      *
      * @param request the DTO containing the details of the purchase to be created
-     * @param storeID the ID of the store where the purchase takes place
      * @param posID the ID of the point of sale associated with the purchase
      * @return the response DTO with the created purchase details
      * @throws NotFoundException if the transaction or provider cannot be found
      */
     @Transactional
-    public PurchaseResponse createPurchase(PurchaseRequest request, Long storeID, Long posID) {
+    public PurchaseResponse createPurchase(PurchaseRequest request, Long posID) {
+
+        PosEntity posEntity = posRepository.findById(posID)
+                .orElseThrow
+                        (() -> new NotFoundException("POS with ID " + posID + " not found."));
+        Long localId = posEntity.getStore().getId();
 
         request.getTransaction().getDetailTransactions()
                 .forEach(detail -> stockService.increaseStock(
-                        detail.getProductID(), storeID, detail.getQuantity()));
+                        detail.getProductID(), localId, detail.getQuantity()));
+
 
         TransactionEntity transaction = transactionService.createTransaction(
-                request.getTransaction(), storeID, posID, TransactionType.PURCHASE);
+                request.getTransaction(), localId, posID, TransactionType.PURCHASE);
 
         PurchaseEntity purchase = purchaseMapper.toEntity(request);
 

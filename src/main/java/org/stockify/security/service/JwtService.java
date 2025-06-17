@@ -5,9 +5,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Key;
 import java.util.*;
@@ -84,6 +89,28 @@ public class JwtService {
         }
         invalidatedToken.add(token);
     }
+
+    /**
+     * Extracts the JWT token from the Authorization header of the current HTTP request.
+     *
+     * @return the JWT token as a String, or null if not present.
+     */
+    public String extractTokenFromSecurityContext() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No se pudo obtener la request actual");
+        }
+
+        HttpServletRequest request = attributes.getRequest();
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token no válido o no presente");
+        }
+
+        return authHeader.substring(7);
+    }
+
 
     public boolean isTokenInvalidated(String token) {
         return invalidatedToken.contains(token);

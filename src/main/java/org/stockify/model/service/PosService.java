@@ -182,6 +182,7 @@ public class PosService {
     }
 
     /**
+     *
      * Opens a POS terminal if it is currently OFFLINE and no session is active.
      * <p>
      * This method verifies that the employee exists, the POS is offline, and that
@@ -197,8 +198,8 @@ public class PosService {
      */
     @Transactional
     public SessionPosCreateResponse openPos(Long id, SessionPosRequest sessionPosRequest) {
-        String employeeDni = sessionPosRequest.getEmployeeDni();
 
+        String employeeDni = sessionPosRequest.getEmployeeDni();
         PosEntity pos = posRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("POS with ID " + id + " was not found."));
 
@@ -227,6 +228,7 @@ public class PosService {
     }
 
     /**
+     *
      * Closes a POS terminal if it is currently ONLINE and has an open session.
      * Updates the session close time, close amount, expected amount,
      * and calculates cash difference. Also sets the POS status to OFFLINE,

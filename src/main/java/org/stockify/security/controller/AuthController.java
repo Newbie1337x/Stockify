@@ -1,11 +1,11 @@
 package org.stockify.security.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.stockify.dto.request.employee.EmployeeRequest;
 import org.stockify.security.model.dto.request.AuthRequest;
-import org.stockify.security.model.dto.request.CredentialRequest;
 import org.stockify.security.model.dto.request.RegisterEmployeeRequest;
 import org.stockify.security.model.dto.response.AuthResponse;
 import org.stockify.security.service.AuthService;
@@ -31,17 +31,22 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/cerrar_sesion")
-    public ResponseEntity<String> cerrarSesion(@RequestHeader("Authorization") String token){
+    @PostMapping("/logout")
+    @Operation(summary = "Logout", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<String> cerrarSesion() {
+        String token = jwtService.extractTokenFromSecurityContext();
         jwtService.invalidateToken(token);
-        return ResponseEntity.ok("Se ha cerrado el sesion");
+        return ResponseEntity.ok("Sesión cerrada correctamente");
     }
 
-    @PostMapping("/iniciar_sesion")
+
+    @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticateUser(@RequestBody
                                                          AuthRequest authRequest){
         UserDetails user = authService.authenticate(authRequest);
         String token = jwtService.generateToken(user);
         return ResponseEntity.ok(new AuthResponse(token));
     }
+
+
 }

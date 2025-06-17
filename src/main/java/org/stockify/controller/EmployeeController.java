@@ -92,18 +92,32 @@ public class EmployeeController {
         return ResponseEntity.status(201).body(employeeService.createEmployee(employeeRequest));
     }
 
-    @Operation(summary = "Delete an employee by ID")
+    @Operation(summary = "Logically disable an employee by ID")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Employee deleted successfully"),
+            @ApiResponse(responseCode = "200", description = "Employee logically disabled successfully"),
             @ApiResponse(responseCode = "404", description = "Employee not found")
     })
-    @DeleteMapping("/{employeeID}")
-    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('DELETE') or " +
-            "hasRole('ROLE_ADMIN') and hasAuthority('DELETE')")
-    public ResponseEntity<Void> deleteEmployee(
+    @PatchMapping("/{employeeID}/disable")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
+    public ResponseEntity<Void> disableEmployee(
             @Parameter(description = "ID of the employee") @PathVariable Long employeeID) {
         employeeService.delete(employeeID);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Logically reactivate an employee by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Employee reactivated successfully"),
+            @ApiResponse(responseCode = "404", description = "Employee not found")
+    })
+    @PatchMapping("/{employeeID}/enable")
+    @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
+    public ResponseEntity<EntityModel<EmployeeResponse>> enableEmployee(
+            @Parameter(description = "ID of the employee") @PathVariable Long employeeID) {
+        EmployeeResponse employee = employeeService.reactivate(employeeID);
+        return ResponseEntity.ok(employeeModelAssembler.toModel(employee));
     }
 
     @Operation(summary = "Fully update an employee")
