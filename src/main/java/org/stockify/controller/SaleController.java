@@ -1,6 +1,7 @@
 package org.stockify.controller;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Validated
 @Tag(name = "Sale", description = "Endpoints for managing sales")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class SaleController {
     private final SaleService saleService;
     private final SaleModelAssembler saleModelAssembler;

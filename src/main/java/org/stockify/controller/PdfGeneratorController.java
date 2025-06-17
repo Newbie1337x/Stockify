@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
@@ -20,6 +21,7 @@ import org.stockify.model.service.PdfGeneratorService;
 @RequestMapping
 @RequiredArgsConstructor
 @Tag(name = "Pdf-Generator", description = "Operations related to PDF generation")
+@SecurityRequirement(name = "bearerAuth")
 public class PdfGeneratorController {
 
     private final PdfGeneratorService pdfGeneratorService;

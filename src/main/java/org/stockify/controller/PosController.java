@@ -35,6 +35,7 @@ import org.stockify.security.service.JwtService;
 @RequestMapping("/pos")
 @RequiredArgsConstructor
 @Tag(name = "POS", description = "API REST for POS management (Point of Sale)")
+@SecurityRequirement(name = "bearerAuth")
 public class PosController {
 
     private final PosService posService;

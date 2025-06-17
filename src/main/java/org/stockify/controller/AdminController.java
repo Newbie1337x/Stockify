@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +19,11 @@ import org.stockify.security.service.AuthService;
  */
 @RestController
 @RequestMapping("/admin")
+
 @Tag(name = "Administration", description = "Operations for system administration and user management")
+
+
+  
 public class AdminController {
 
     private final AuthService authService;
