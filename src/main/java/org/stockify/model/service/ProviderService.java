@@ -81,7 +81,7 @@ public class ProviderService {
      *
      * @param file CSV file containing provider data
      * @return BulkProviderResponse containing created providers and errors
-     * @throws Exception if there is an error reading the file or processing the data
+     * @throws Exception if there is an error, reading the file or processing the data
      */
     public BulkProviderResponse importProvidersCsv(MultipartFile file) throws Exception {
         InputStreamReader reader = new InputStreamReader(file.getInputStream());

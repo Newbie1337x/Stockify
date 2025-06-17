@@ -2,6 +2,7 @@ package org.stockify.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -101,16 +102,15 @@ public class PosController {
         return ResponseEntity.ok(sessionPosCreateModelAssembler.toModel(response));
     }
 
-    @Operation(summary = "POS close operation")
+    @Operation(summary = "POS close operation", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "POS closed successfully"),
     })
     @PatchMapping("/close/{id}")
     public ResponseEntity<EntityModel<SessionPosResponse>> closePos(
             @Parameter(description = "POS ID") @PathVariable Long id,
-            @Valid @RequestBody SessionPosCloseRequest sessionPosRequest,
-            @RequestHeader("Authorization") String token) {
-        jwtService.invalidateToken(token);
+            @Valid @RequestBody SessionPosCloseRequest sessionPosRequest) {
+
         SessionPosResponse response = posService.closePos(id, sessionPosRequest);
         return ResponseEntity.ok(sessionPosModelAssembler.toModel(response));
     }

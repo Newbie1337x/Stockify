@@ -13,6 +13,7 @@ import org.stockify.dto.response.TransactionResponse;
 import org.stockify.model.entity.PosEntity;
 import org.stockify.model.entity.SaleEntity;
 import org.stockify.model.entity.TransactionEntity;
+import org.stockify.model.enums.Status;
 import org.stockify.model.enums.TransactionType;
 import org.stockify.model.exception.InvalidSessionStatusException;
 import org.stockify.model.exception.NotFoundException;

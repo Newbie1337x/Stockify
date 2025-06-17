@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.pos.PosAmountRequest;
 import org.stockify.dto.request.pos.PosFilterRequest;
@@ -26,6 +27,9 @@ import org.stockify.model.mapper.SessionPosMapper;
 import org.stockify.model.repository.PosRepository;
 import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.specification.PosSpecification;
+import org.stockify.security.model.entity.CredentialsEntity;
+import org.stockify.security.repository.CredentialRepository;
+import org.stockify.security.service.JwtService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -49,6 +53,8 @@ public class PosService {
     private final EmployeeService employeeService;
     private final SessionPosMapper sessionPosMapper;
     private final StoreRepository storeRepository;
+    private final JwtService jwtService;
+    private final CredentialRepository credentialsRepository;
 
     /**
      * Creates and saves a new POS terminal associated with a store.
@@ -199,9 +205,17 @@ public class PosService {
     @Transactional
     public SessionPosCreateResponse openPos(Long id, SessionPosRequest sessionPosRequest) {
 
-        String employeeDni = sessionPosRequest.getEmployeeDni();
+        String token = jwtService.extractTokenFromSecurityContext();
+        // Extraer el email del usuario del token
+        String userEmail = jwtService.extractUsername(token);
+        // Cargar los detalles del usuario (CredentialsEntity)
+        CredentialsEntity credentials = credentialsRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        // Obtener el empleado asociado a las credenciales
+        EmployeeEntity authenticatedEmployee = credentials.getEmployee();
         PosEntity pos = posRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("POS with ID " + id + " was not found."));
+        String employeeDni = authenticatedEmployee.getDni();
 
         boolean isOffline = pos.getStatus() == Status.OFFLINE;
         boolean isSessionClosed = !sessionPosService.isOpened(pos.getId(), null);
@@ -262,6 +276,9 @@ public class PosService {
         pos.setEmployee(null);
         pos.setCurrentAmount(BigDecimal.ZERO);
         posRepository.save(pos);
+
+        String token = jwtService.extractTokenFromSecurityContext();
+        jwtService.invalidateToken(token);
 
         return sessionPosService.update(session);
     }

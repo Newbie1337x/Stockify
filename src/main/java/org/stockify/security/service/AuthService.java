@@ -1,5 +1,6 @@
 package org.stockify.security.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +16,7 @@ import org.stockify.model.exception.DuplicatedUniqueConstraintException;
 import org.stockify.model.mapper.CredentialMapper;
 import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
+import org.stockify.security.exception.AuthenticationException;
 import org.stockify.security.model.dto.request.CredentialRequest;
 import org.stockify.security.model.dto.request.RegisterEmployeeRequest;
 import org.stockify.security.model.dto.request.RoleAndPermitsDTO;
@@ -34,7 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+@Transactional
 @Service
 public class AuthService {
 
@@ -199,9 +201,12 @@ public class AuthService {
             CredentialsEntity credentials = credentialsRepository.findByEmail(input.email())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + input.email()));
 
-            // Cambiar el estado del empleado a ONLINE
+
             EmployeeEntity employee = credentials.getEmployee();
             if (employee != null) {
+                if (employee.getStatus() == Status.ONLINE) {
+                    throw new AuthenticationException("User is already logged in", null);
+                }
                 employee.setStatus(Status.ONLINE);
                 employeeRepository.save(employee); // Guardás el cambio
             }
@@ -211,6 +216,17 @@ public class AuthService {
             throw new org.springframework.security.authentication.BadCredentialsException("Invalid email or password");
         } catch (Exception e) {
             throw new org.stockify.security.exception.AuthenticationException("Authentication failed: " + e.getMessage(), e);
+        }
+    }
+
+    public void logout(String email) {
+        CredentialsEntity credentials = credentialsRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
+        EmployeeEntity employee = credentials.getEmployee();
+        if (employee != null) {
+            employee.setStatus(Status.OFFLINE);
+            employeeRepository.save(employee);
         }
     }
 

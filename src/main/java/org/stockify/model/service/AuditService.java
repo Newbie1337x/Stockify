@@ -4,11 +4,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.stockify.dto.request.audit.PurchaseAuditDTO;
 import org.stockify.dto.request.audit.SaleAuditDTO;
@@ -21,9 +19,6 @@ import org.stockify.model.entity.PurchaseEntity;
 import org.stockify.model.entity.SaleEntity;
 import org.stockify.model.entity.TransactionEntity;
 import org.stockify.model.mapper.TransactionMapper;
-import org.stockify.model.specification.PurchaseAuditSpecification;
-import org.stockify.model.specification.SaleAuditSpecification;
-import org.stockify.model.specification.TransactionAuditSpecification;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -43,7 +38,6 @@ public class AuditService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
     private TransactionMapper transactionMapper;
 
     /**

@@ -35,6 +35,8 @@ public class AuthController {
     @Operation(summary = "Logout", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<String> cerrarSesion() {
         String token = jwtService.extractTokenFromSecurityContext();
+        String email = jwtService.extractUsername(token);
+        authService.logout(email);
         jwtService.invalidateToken(token);
         return ResponseEntity.ok("Sesión cerrada correctamente");
     }
