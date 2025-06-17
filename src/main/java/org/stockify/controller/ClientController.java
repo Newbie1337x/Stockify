@@ -42,7 +42,7 @@ public class ClientController {
             @ApiResponse(responseCode = "400", description = "Validation error")
     })
     @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('WRITE') or " +
-            "hasRole('ROLE_ADMIN') and hasAuthority('WHITE')")
+            "hasRole('ROLE_ADMIN') and hasAuthority('WRITE')")
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping
     public ResponseEntity<EntityModel<ClientResponse>> createClient(

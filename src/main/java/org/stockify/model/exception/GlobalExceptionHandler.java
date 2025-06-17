@@ -7,6 +7,7 @@ import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -78,7 +79,6 @@ public class GlobalExceptionHandler implements ProblemHandling {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(
-            BadCredentialsException ex,
             HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, 
                 new BadCredentialsException("The username or password is incorrect"), 
@@ -88,6 +88,12 @@ public class GlobalExceptionHandler implements ProblemHandling {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(
             AuthenticationException ex,
+            HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex, request);
+    }
+    @ExceptionHandler(InsufficientAuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientAuthenticationException(
+            InsufficientAuthenticationException ex,
             HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex, request);
     }

@@ -87,49 +87,49 @@ INSERT INTO credentials_roles (credential_id, role_id) VALUES (4, 3); -- employe
 INSERT INTO credentials_roles (credential_id, role_id) VALUES (5, 3); -- employee3 -> EMPLOYEE
 
 -- Inserción de datos en la tabla providers
-INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active)
+INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active) 
 VALUES ('Electro SA', 'A12345678', 'Calle Electrónica 123', '1122334455', 'contacto@electrosa.com', 'Roberto Gómez', true);
-INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active)
+INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active) 
 VALUES ('Textil Moda', 'B23456789', 'Av. Moda 456', '2233445566', 'ventas@textilmoda.com', 'Laura Sánchez', true);
-INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active)
+INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active) 
 VALUES ('Alimentos Frescos', 'C34567890', 'Ruta 7 Km 5', '3344556677', 'pedidos@alimentosfrescos.com', 'Miguel Fernández', true);
-INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active)
+INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active) 
 VALUES ('Hogar y Deco', 'D45678901', 'Calle Decoración 789', '4455667788', 'info@hogarydeco.com', 'Silvia Ramírez', true);
-INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active)
+INSERT INTO providers (business_name, tax_id, tax_address, phone, email, contact_name, active) 
 VALUES ('Juguetes Divertidos', 'E56789012', 'Av. Juegos 101', '5566778899', 'ventas@juguetesdivertidos.com', 'Fernando Torres', true);
 
 -- Inserción de datos en la tabla clients
-INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration)
+INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration) 
 VALUES ('Pablo', 'García', '11223344', 'pablo@email.com', '1122334455', CURRENT_DATE);
-INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration)
+INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration) 
 VALUES ('Lucía', 'Fernández', '22334455', 'lucia@email.com', '2233445566', CURRENT_DATE);
-INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration)
+INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration) 
 VALUES ('Martín', 'López', '33445566', 'martin@email.com', '3344556677', CURRENT_DATE);
-INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration)
+INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration) 
 VALUES ('Valentina', 'Rodríguez', '44556677', 'valentina@email.com', '4455667788', CURRENT_DATE);
-INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration)
+INSERT INTO clients (client_first_name, client_last_name, client_dni, client_email, client_phone, client_date_of_registration) 
 VALUES ('Santiago', 'Martínez', '55667788', 'santiago@email.com', '5566778899', CURRENT_DATE);
 
 -- Inserción de datos en la tabla products
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Smartphone X', 'Smartphone de última generación', 1200.00, 1000.00, 'SP001', 'SP001BAR', 'TechBrand');
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Laptop Pro', 'Laptop para profesionales', 2500.00, 2200.00, 'LP002', 'LP002BAR', 'TechBrand');
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Camiseta Casual', 'Camiseta de algodón', 25.00, 15.00, 'CC003', 'CC003BAR', 'FashionBrand');
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Pantalón Jeans', 'Pantalón de mezclilla', 45.00, 30.00, 'PJ004', 'PJ004BAR', 'FashionBrand');
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Arroz Premium', 'Arroz de grano largo', 5.00, 3.50, 'AP005', 'AP005BAR', 'FoodBrand');
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Aceite de Oliva', 'Aceite de oliva extra virgen', 8.00, 6.00, 'AO006', 'AO006BAR', 'FoodBrand');
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Sillón Reclinable', 'Sillón reclinable de cuero', 350.00, 280.00, 'SR007', 'SR007BAR', 'HomeBrand');
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Mesa de Centro', 'Mesa de centro de madera', 120.00, 90.00, 'MC008', 'MC008BAR', 'HomeBrand');
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Muñeca Interactiva', 'Muñeca con funciones interactivas', 35.00, 25.00, 'MI009', 'MI009BAR', 'ToyBrand');
-INSERT INTO products (name, description, price, unit_price, sku, barcode, brand)
+INSERT INTO products (name, description, price, unit_price, sku, barcode, brand) 
 VALUES ('Set de Bloques', 'Set de bloques de construcción', 20.00, 15.00, 'SB010', 'SB010BAR', 'ToyBrand');
 
 -- Inserción de datos en la tabla products_categories
@@ -169,9 +169,9 @@ INSERT INTO stock (store_id, product_id, quantity, low_stock_alert_sent) VALUES 
 INSERT INTO stock (store_id, product_id, quantity, low_stock_alert_sent) VALUES (3, 10, 60.0, false);
 
 -- Inserción de datos en la tabla pos
-INSERT INTO pos (current_amount, status, employee_id, store_id) VALUES (1000.00, 'OFFLINE', '1', 1);
-INSERT INTO pos (current_amount, status, employee_id, store_id) VALUES (1500.00, 'OFFLINE', '2', 2);
-INSERT INTO pos (current_amount, status, employee_id, store_id) VALUES (2000.00, 'OFFLINE', '3', 3);
+INSERT INTO pos (current_amount, status, employee_id, store_id) VALUES (1000.00, 'OFFLINE', '12345678', 1);
+INSERT INTO pos (current_amount, status, employee_id, store_id) VALUES (1500.00, 'OFFLINE', '23456789', 2);
+INSERT INTO pos (current_amount, status, employee_id, store_id) VALUES (2000.00, 'OFFLINE', '34567890', 3);
 
 -- Inserción de datos en la tabla shifts
 INSERT INTO shifts (shift_day, entry_time, exit_time) VALUES (CURRENT_DATE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
@@ -179,33 +179,33 @@ INSERT INTO shifts (shift_day, entry_time, exit_time) VALUES (CURRENT_DATE, CURR
 INSERT INTO shifts (shift_day, entry_time, exit_time) VALUES (CURRENT_DATE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Inserción de datos en la tabla shift_employee
-INSERT INTO shift_employee (shift_id, employee_id) VALUES (1, 1);
-INSERT INTO shift_employee (shift_id, employee_id) VALUES (2, 2);
-INSERT INTO shift_employee (shift_id, employee_id) VALUES (3, 3);
+INSERT INTO shift_employee (shift_id, employee_id) VALUES (1, '12345678');
+INSERT INTO shift_employee (shift_id, employee_id) VALUES (2, '23456789');
+INSERT INTO shift_employee (shift_id, employee_id) VALUES (3, '34567890');
 
 -- Inserción de datos en la tabla time_log
 -- Commented out due to schema issues, uncomment and adjust as needed
--- INSERT INTO time_log (date, clock_in_time, clock_out_time, employee_id, store_id)
+-- INSERT INTO time_log (date, clock_in_time, clock_out_time, employee_id, store_id) 
 -- VALUES (CURRENT_DATE, '08:00:00', '16:00:00', '12345678', 1);
--- INSERT INTO time_log (date, clock_in_time, clock_out_time, employee_id, store_id)
+-- INSERT INTO time_log (date, clock_in_time, clock_out_time, employee_id, store_id) 
 -- VALUES (CURRENT_DATE, '09:00:00', '17:00:00', '23456789', 2);
--- INSERT INTO time_log (date, clock_in_time, clock_out_time, employee_id, store_id)
+-- INSERT INTO time_log (date, clock_in_time, clock_out_time, employee_id, store_id) 
 -- VALUES (CURRENT_DATE, '10:00:00', '18:00:00', '34567890', 3);
 
 -- Inserción de datos en la tabla session_pos
-INSERT INTO session_pos (opening_time, close_time, opening_amount, close_amount, cash_difference, expected_amount, employee_id, pos_id)
-VALUES (CURRENT_TIMESTAMP, NULL, 1000.00, NULL, NULL, NULL, 1, 1);
-INSERT INTO session_pos (opening_time, close_time, opening_amount, close_amount, cash_difference, expected_amount, employee_id, pos_id)
-VALUES (CURRENT_TIMESTAMP, NULL, 1500.00, NULL, NULL, NULL, 2, 2);
-INSERT INTO session_pos (opening_time, close_time, opening_amount, close_amount, cash_difference, expected_amount, employee_id, pos_id)
-VALUES (CURRENT_TIMESTAMP, NULL, 2000.00, NULL, NULL, NULL, 3, 3);
+INSERT INTO session_pos (opening_time, close_time, opening_amount, close_amount, cash_difference, expected_amount, employee_id, pos_id) 
+VALUES (CURRENT_TIMESTAMP, NULL, 1000.00, NULL, NULL, NULL, '12345678', 1);
+INSERT INTO session_pos (opening_time, close_time, opening_amount, close_amount, cash_difference, expected_amount, employee_id, pos_id) 
+VALUES (CURRENT_TIMESTAMP, NULL, 1500.00, NULL, NULL, NULL, '23456789', 2);
+INSERT INTO session_pos (opening_time, close_time, opening_amount, close_amount, cash_difference, expected_amount, employee_id, pos_id) 
+VALUES (CURRENT_TIMESTAMP, NULL, 2000.00, NULL, NULL, NULL, '34567890', 3);
 
 -- Inserción de datos en la tabla transactions (ejemplos de ventas)
-INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id)
+INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id) 
 VALUES (1225.00, CURRENT_TIMESTAMP, 'CASH', 'Venta de smartphone', 'SALE', 1, 1);
-INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id)
+INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id) 
 VALUES (70.00, CURRENT_TIMESTAMP, 'CREDIT', 'Venta de ropa', 'SALE', 2, 2);
-INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id)
+INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id) 
 VALUES (55.00, CURRENT_TIMESTAMP, 'DEBIT', 'Venta de juguetes', 'SALE', 3, 3);
 
 -- Inserción de datos en la tabla sales
@@ -222,11 +222,11 @@ INSERT INTO details_transactions (product_id, quantity, subtotal, transaction_id
 INSERT INTO details_transactions (product_id, quantity, subtotal, transaction_id) VALUES (10, 1.0, 20.00, 3);
 
 -- Inserción de datos en la tabla transactions (ejemplos de compras)
-INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id)
+INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id) 
 VALUES (10000.00, CURRENT_TIMESTAMP, 'BANK_TRANSFER', 'Compra de electrónicos', 'PURCHASE', 1, 1);
-INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id)
+INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id) 
 VALUES (5000.00, CURRENT_TIMESTAMP, 'BANK_TRANSFER', 'Compra de ropa', 'PURCHASE', 2, 2);
-INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id)
+INSERT INTO transactions (total, date_time, payment_method, description, type, session_pos_id, store_id) 
 VALUES (3000.00, CURRENT_TIMESTAMP, 'BANK_TRANSFER', 'Compra de juguetes', 'PURCHASE', 3, 3);
 
 -- Inserción de datos en la tabla purchases
