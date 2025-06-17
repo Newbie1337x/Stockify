@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Builder
+@Schema(name = "SessionPosRequest", description = "Request object for opening a new POS session with initial cash amount.")
 public class SessionPosRequest {
 
     @Schema(description = "Initial amount when opening the POS session, must be zero or positive.", example = "1000.00")

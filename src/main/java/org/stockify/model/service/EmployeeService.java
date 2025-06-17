@@ -75,6 +75,12 @@ public class EmployeeService {
         return entities.map(employeeMapper::toResponseDto);
     }
 
+    /**
+     * Retrieves the employee profile associated with the current authentication context.
+     *
+     * @param authentication The Spring Security authentication object containing the user's credentials
+     * @return The EmployeeEntity associated with the authenticated user
+     */
     public EmployeeEntity getProfile(Authentication authentication){
         CredentialsEntity credentials = (CredentialsEntity) authentication.getPrincipal();
         return credentials.getEmployee();

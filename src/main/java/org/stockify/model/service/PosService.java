@@ -185,6 +185,13 @@ public class PosService {
             posRepository.save(posEntity);
         });
     }
+    /**
+     * Checks if a POS terminal associated with the given employee ID is currently open (ONLINE).
+     *
+     * @param employeeId ID of the employee to check
+     * @return true if the POS is open (ONLINE), false otherwise
+     * @throws NotFoundException if no POS is associated with the given employee ID
+     */
     public Boolean itOpenedByEmployeeId(Long employeeId) {
         if (posRepository.findByEmployeeId(employeeId)
                 .orElseThrow(()-> new NotFoundException("This pos is not found"))
