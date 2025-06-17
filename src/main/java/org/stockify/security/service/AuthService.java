@@ -176,16 +176,23 @@ public class AuthService {
 
     private List<PermitEntity> permitEmployee(){
         List<PermitEntity> permits = new ArrayList<>();
-        PermitEntity permit = PermitEntity.builder().permit(Permit.READ).build();
-        if (permitRepository.findByPermit(permit.getPermit()).isEmpty()){
-            permitRepository.save(permit);
-        }
-        PermitEntity permit1 = PermitEntity.builder().permit(Permit.WRITE).build();
-        if (permitRepository.findByPermit(permit1.getPermit()).isEmpty()){
-            permitRepository.save(permit1);
-        }
-        permits.add(permit);
-        permits.add(permit1);
+
+        // Get or create READ permit
+        PermitEntity readPermit = permitRepository.findByPermit(Permit.READ)
+                .orElseGet(() -> {
+                    PermitEntity newPermit = PermitEntity.builder().permit(Permit.READ).build();
+                    return permitRepository.save(newPermit);
+                });
+        permits.add(readPermit);
+
+        // Get or create WRITE permit
+        PermitEntity writePermit = permitRepository.findByPermit(Permit.WRITE)
+                .orElseGet(() -> {
+                    PermitEntity newPermit = PermitEntity.builder().permit(Permit.WRITE).build();
+                    return permitRepository.save(newPermit);
+                });
+        permits.add(writePermit);
+
         return permits;
     }
 
@@ -213,7 +220,7 @@ public class AuthService {
 
             return credentials;
         } catch (org.springframework.security.authentication.BadCredentialsException e) {
-            throw new org.springframework.security.authentication.BadCredentialsException("Invalid email or password");
+            throw new org.stockify.security.exception.AuthenticationException("Invalid email or password", e);
         } catch (Exception e) {
             throw new org.stockify.security.exception.AuthenticationException("Authentication failed: " + e.getMessage(), e);
         }
