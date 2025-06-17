@@ -32,7 +32,7 @@ public class AuthController {
     @PostMapping("/cerrar_sesion")
     public ResponseEntity<String> cerrarSesion(@RequestHeader String token){
         jwtService.invalidateToken(token);
-        return ResponseEntity.ok("Se ha cerrado el sesion");
+        return ResponseEntity.ok("Session out successfully");
     }
 
     @PostMapping("/iniciar_sesion")
