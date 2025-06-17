@@ -7,6 +7,7 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 import org.stockify.controller.AuditController;
 import org.stockify.dto.request.audit.SaleAuditDTO;
+import org.stockify.dto.request.audit.filter.PurchaseAuditFilterRequest;
 import org.stockify.dto.request.audit.filter.SaleAuditFilterRequest;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -20,7 +21,10 @@ public class SaleAuditModelAssembler implements RepresentationModelAssembler<Sal
     public EntityModel<SaleAuditDTO> toModel(@NotNull SaleAuditDTO saleAuditDTO) {
         return EntityModel.of(saleAuditDTO,
                 linkTo(methodOn(AuditController.class)
-                        .getAllSaleAudit(PageRequest.of(0, 20), new SaleAuditFilterRequest(), null))
+                        .getAllPurchaseAudit(PageRequest.of(0, 10), new PurchaseAuditFilterRequest(), null))
+                        .withRel("saleAudits"),
+                linkTo(methodOn(AuditController.class)
+                        .getAllSaleAudit(PageRequest.of(0, 10), new SaleAuditFilterRequest(), null))
                         .withRel("saleAudits")
         );
     }

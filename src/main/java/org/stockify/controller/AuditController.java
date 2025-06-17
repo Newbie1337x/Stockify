@@ -28,8 +28,6 @@ import org.stockify.model.assembler.SaleAuditModelAssembler;
 import org.stockify.model.assembler.TransactionAuditModelAssembler;
 import org.stockify.model.service.AuditService;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/audit")
@@ -71,8 +69,6 @@ public class AuditController {
     @GetMapping("/purchases")
     @PreAuthorize("hasRole('ROLE_ADMIN') and hasAuthority('READ') or " +
             "hasRole('ROLE_MANAGER') and hasAuthority('READ')")
-    public ResponseEntity<List<PurchaseAuditDTO>> getAllPurchaseAudit() {
-        return ResponseEntity.ok(auditService.getAllPurchaseAudits());
     public ResponseEntity<PagedModel<EntityModel<PurchaseAuditDTO>>> getAllPurchaseAudit(
             @Parameter(hidden = true) Pageable pageable,
             @ParameterObject PurchaseAuditFilterRequest filter,
@@ -90,6 +86,7 @@ public class AuditController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Sale audit logs retrieved successfully")
     })
+    @PreAuthorize("hasAuthority('READ')")
     @GetMapping("/sales")
     public ResponseEntity<PagedModel<EntityModel<SaleAuditDTO>>> getAllSaleAudit(
             @Parameter(hidden = true) Pageable pageable,
@@ -99,8 +96,5 @@ public class AuditController {
         Page<SaleAuditDTO> page = auditService.getAllSaleAudits(pageable, filter);
         PagedModel<EntityModel<SaleAuditDTO>> pagedModel = assembler.toModel(page, saleAuditModelAssembler);
         return ResponseEntity.ok(pagedModel);
-    @PreAuthorize("hasAuthority('READ')")
-    public ResponseEntity<List<SaleAuditDTO>> getAllSaleAudit() {
-        return ResponseEntity.ok(auditService.getAllSaleAudits());
     }
 }
