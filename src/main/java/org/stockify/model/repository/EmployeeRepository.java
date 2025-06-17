@@ -13,5 +13,6 @@ public interface EmployeeRepository extends JpaRepository<EmployeeEntity, Long>,
 
 
    Optional<EmployeeEntity> getEmployeeEntityByDni(String dni);
+   Optional<EmployeeEntity> findByDni(String dni);
 
 }

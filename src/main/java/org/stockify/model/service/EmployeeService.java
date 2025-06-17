@@ -47,7 +47,10 @@ public class EmployeeService {
         EmployeeEntity employee = employeeMapper.toEntity(employeeRequest);
         employee.setActive(true);
         employee.setStatus(Status.OFFLINE);
-        return employeeMapper.toResponseDto(employeeRepository.save(employee));
+        employeeRepository.save(employee);
+        EmployeeEntity employee1 = employeeRepository.findByDni(employee.getDni()).orElseThrow();
+        employee.setId(employee1.getId());
+        return employeeMapper.toResponseDto(employee);
     }
 
     /**
