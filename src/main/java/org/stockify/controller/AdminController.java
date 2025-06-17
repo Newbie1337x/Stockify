@@ -10,7 +10,7 @@ import org.stockify.security.model.dto.request.RoleAndPermitsDTO;
 import org.stockify.security.service.AuthService;
 
 @RestController
-@RequestMapping("/auth/admin")
+@RequestMapping("/admin")
 public class AdminController {
 
     private final AuthService authService;
@@ -20,7 +20,7 @@ public class AdminController {
     }
 
     @PatchMapping("/update-role/{email}")
-    //@PreAuthorize("hasRole('ROLE_ADMIN') AND hasAuthority('WRITE')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') AND hasAuthority('WRITE')")
     public ResponseEntity<EmployeeResponse> setPermitsOrRole(@PathVariable String email, @RequestBody RoleAndPermitsDTO roleAndPermitsDTO) {
         return authService.setPermitsAndRole(email, roleAndPermitsDTO);
     }
