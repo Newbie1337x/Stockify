@@ -42,7 +42,7 @@ public class EmployeeEntity {
     @ColumnDefault("true")
     private Boolean active;
 
-    @ManyToMany(mappedBy = "employeeEntities")
+    @OneToMany(mappedBy = "employee")
     private List<ShiftEntity> shiftEntities;
 
 

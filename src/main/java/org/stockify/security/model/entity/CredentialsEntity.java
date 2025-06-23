@@ -31,7 +31,7 @@ public class CredentialsEntity implements UserDetails {
 
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "dni", unique = true)
+    @JoinColumn(name = "employee_dni", referencedColumnName = "dni", unique = true)
     private EmployeeEntity employee;
 
     @ManyToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
@@ -51,11 +51,9 @@ public class CredentialsEntity implements UserDetails {
                 new SimpleGrantedAuthority("ROLE_" + role.getRole().name())));
 
         // Permisos que vienen del rol
-        roles.forEach(role -> {
-            role.getPermits().forEach(permit ->
-                    authorities.add(new SimpleGrantedAuthority(permit.getPermit().name()))
-            );
-        });
+        roles.forEach(role -> role.getPermits().forEach(permit ->
+                authorities.add(new SimpleGrantedAuthority(permit.getPermit().name()))
+        ));
 
         return authorities;
     }

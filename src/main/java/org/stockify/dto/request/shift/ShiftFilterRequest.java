@@ -31,6 +31,5 @@ public class ShiftFilterRequest {
     @Schema(description = "Filter shifts with exit time until this date/time (inclusive)", example = "2025-06-01T23:00:00", nullable = true)
     private LocalDateTime exitTimeTo;
 
-    @Schema(description = "Filter shifts by list of employee IDs", example = "[1, 2, 5]", nullable = true)
-    private List<Long> employeesIds;
+   private String employeeDni;
 }

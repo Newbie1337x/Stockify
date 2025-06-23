@@ -73,11 +73,11 @@ INSERT INTO employee (name, last_name, dni, status, active) VALUES ('Pedro', 'L�
 
 -- Inserción de datos en la tabla credentials
 -- Contraseña: password123 (debe estar encriptada en producción)
-INSERT INTO credentials (username, email, password, user_id) VALUES ('admin', 'admin@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '12345678');
-INSERT INTO credentials (username, email, password, user_id) VALUES ('manager', 'manager@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '23456789');
-INSERT INTO credentials (username, email, password, user_id) VALUES ('employee1', 'employee1@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '34567890');
-INSERT INTO credentials (username, email, password, user_id) VALUES ('employee2', 'employee2@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '45678901');
-INSERT INTO credentials (username, email, password, user_id) VALUES ('employee3', 'employee3@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '56789012');
+INSERT INTO credentials (username, email, password, employee_dni) VALUES ('admin', 'admin@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '12345678');
+INSERT INTO credentials (username, email, password, employee_dni) VALUES ('manager', 'manager@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '23456789');
+INSERT INTO credentials (username, email, password, employee_dni) VALUES ('employee1', 'employee1@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '34567890');
+INSERT INTO credentials (username, email, password, employee_dni) VALUES ('employee2', 'employee2@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '45678901');
+INSERT INTO credentials (username, email, password, employee_dni) VALUES ('employee3', 'employee3@stockify.com', '$2a$10$rPiEAgQNIT1TCoKi.Iy9wuaZMhDU9Ocs9XTTaP.IS6xCxfGtJ9ZYy', '56789012');
 
 -- Inserción de datos en la tabla credentials_roles
 INSERT INTO credentials_roles (credential_id, role_id) VALUES (1, 1); -- admin -> ADMIN

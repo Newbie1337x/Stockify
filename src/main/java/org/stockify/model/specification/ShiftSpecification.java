@@ -48,11 +48,15 @@ public class ShiftSpecification {
         };
     }
 
-    public static Specification<ShiftEntity> hasAnyEmployeeId (List<Long> employeeIds) {
+    public static Specification<ShiftEntity> employeeDni(String dni) {
         return (root, query, criteriaBuilder) -> {
-            if (employeeIds == null || employeeIds.isEmpty()) return null;
-            Join<ShiftEntity, EmployeeEntity> join = root.join("employeeEntities");
-            return join.get("id").in(employeeIds);
+            if (dni != null && !dni.isEmpty()) {
+                Join<ShiftEntity, EmployeeEntity> employeeJoin = root.join("employee");
+                return criteriaBuilder.equal(employeeJoin.get("dni"), dni);
+            }
+            return null;
         };
     }
+
+
 }

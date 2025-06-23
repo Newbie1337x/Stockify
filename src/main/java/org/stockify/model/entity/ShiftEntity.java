@@ -28,11 +28,10 @@ public class ShiftEntity {
     @Column(name = "exit_time", nullable = false, length = 20)
     private LocalDateTime exitTime;
 
-    @ManyToMany
-    @JoinTable(
-            name = "shift_employee", // nombre de la tabla intermedia
-            joinColumns = @JoinColumn(name = "shift_id"), // columna que referencia a ShiftEntity
-            inverseJoinColumns = @JoinColumn(name = "employee_id") // columna que referencia a EmployeeEntity
-    )
-    private List<EmployeeEntity> employeeEntities;
+    @Column(name = "description")
+    private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "employee_id", nullable = false)
+    private EmployeeEntity employee;
 }

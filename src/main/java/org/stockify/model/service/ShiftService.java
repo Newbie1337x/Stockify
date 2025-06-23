@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
  * It provides methods to create, retrieve, update, and delete shifts,
  * as well as to assign or remove employees from shifts.
  */
+@Deprecated
 @RequiredArgsConstructor
 @Service
 public class ShiftService {
