@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.stockify.dto.response.EmployeeResponse;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,7 +28,7 @@ public class ShiftResponse {
     @Schema(description = "Exit time of the shift", example = "2025-06-15T17:30:00")
     private LocalDateTime exitTime;
 
-    @Schema(description = "List of employee IDs assigned to the shift", example = "[101, 102, 103]")
-    private List<Long> employeeIds;
+    @Schema(description = "Employee associated with the shift")
+   private EmployeeResponse employee;
 }
 

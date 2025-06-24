@@ -20,7 +20,6 @@ import org.stockify.model.exception.InvalidSessionStatusException;
 import org.stockify.model.mapper.CredentialMapper;
 import org.stockify.model.mapper.EmployeeMapper;
 import org.stockify.model.repository.EmployeeRepository;
-import org.stockify.model.service.PosService;
 import org.stockify.security.exception.AuthenticationException;
 import org.stockify.security.model.dto.request.RegisterEmployeeRequest;
 import org.stockify.security.model.dto.request.RoleAndPermitsDTO;
@@ -93,11 +92,6 @@ public class AuthService {
     private final RolRepository rolRepository;
 
     /**
-     * Service for Point of Sale operations
-     */
-    private final PosService posService;
-
-    /**
      * Constructor for AuthService
      *
      * @param credentialsRepository Repository for user credentials
@@ -109,7 +103,6 @@ public class AuthService {
      * @param jwtService Service for JWT token operations
      * @param permitRepository Repository for permission data
      * @param rolRepository Repository for role data
-     * @param posService Service for Point of Sale operations
      */
     public AuthService(CredentialRepository credentialsRepository,
                        AuthenticationManager authenticationManager,
@@ -119,7 +112,7 @@ public class AuthService {
                        CredentialMapper credentialMapper,
                        JwtService jwtService,
                        PermitRepository permitRepository,
-                       RolRepository rolRepository, PosService posService) {
+                       RolRepository rolRepository) {
         this.credentialsRepository = credentialsRepository;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
@@ -129,7 +122,6 @@ public class AuthService {
         this.jwtService = jwtService;
         this.permitRepository = permitRepository;
         this.rolRepository = rolRepository;
-        this.posService = posService;
     }
 
     /**
@@ -312,10 +304,8 @@ public class AuthService {
                             input.password()
                     )
             );
-
             CredentialsEntity credentials = credentialsRepository.findByEmail(input.email())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + input.email()));
-
 
             EmployeeEntity employee = credentials.getEmployee();
             if (employee != null) {
@@ -350,14 +340,17 @@ public class AuthService {
 
         EmployeeEntity employee = credentials.getEmployee();
         if (employee != null) {
-            if (!posService.itOpenedByEmployeeId(employee.getId()))
-            {
-                throw new InvalidSessionStatusException("The POS is opened To be able to close it, you first need to end the session.");
-            }
             employee.setStatus(Status.OFFLINE);
             employeeRepository.save(employee);
         }
         jwtService.invalidateToken(token);
+    }
+    public EmployeeEntity getAuthenticatedEmployee() {
+        String token = jwtService.extractTokenFromSecurityContext();
+        String userEmail = jwtService.extractUsername(token);
+        CredentialsEntity credentials = credentialsRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+        return credentials.getEmployee();
     }
 
 

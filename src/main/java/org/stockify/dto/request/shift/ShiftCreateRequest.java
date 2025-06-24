@@ -2,20 +2,19 @@ package org.stockify.dto.request.shift;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.stockify.dto.request.employee.EmployeeRequest;
+import org.stockify.dto.response.EmployeeResponse;
+import org.stockify.model.entity.EmployeeEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class ShiftRequest {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ShiftCreateRequest {
 
     @Schema(description = "Date of the shift", example = "2025-06-15")
     @NotNull(message = "Shift day must not be null")
@@ -29,6 +28,8 @@ public class ShiftRequest {
     @NotNull(message = "Exit time must not be null")
     private LocalDateTime exitTime;
 
-    @Schema(description = "List of employee IDs assigned to the shift", example = "[1, 2, 3]", nullable = true)
-    private List<Long> employeeIds;
+    private String employeeDni;
+
 }
+
+

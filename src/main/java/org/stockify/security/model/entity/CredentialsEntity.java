@@ -31,7 +31,7 @@ public class CredentialsEntity implements UserDetails {
 
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "dni", unique = true)
+    @JoinColumn(name = "employee_dni", referencedColumnName = "dni", unique = true)
     private EmployeeEntity employee;
 
     @ManyToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)

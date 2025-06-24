@@ -28,6 +28,7 @@ import org.stockify.model.repository.StoreRepository;
 import org.stockify.model.specification.PosSpecification;
 import org.stockify.security.model.entity.CredentialsEntity;
 import org.stockify.security.repository.CredentialRepository;
+import org.stockify.security.service.AuthService;
 import org.stockify.security.service.JwtService;
 
 import java.math.BigDecimal;
@@ -54,6 +55,7 @@ public class PosService {
     private final StoreRepository storeRepository;
     private final JwtService jwtService;
     private final CredentialRepository credentialsRepository;
+    private final AuthService authService;
 
     /**
      * Creates and saves a new POS terminal associated with a store.
@@ -225,15 +227,7 @@ public class PosService {
      */
     @Transactional
     public SessionPosCreateResponse openPos(Long id, SessionPosRequest sessionPosRequest) {
-
-        String token = jwtService.extractTokenFromSecurityContext();
-        // Extraer el email del usuario del token
-        String userEmail = jwtService.extractUsername(token);
-        // Cargar los detalles del usuario (CredentialsEntity)
-        CredentialsEntity credentials = credentialsRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-        // Obtener el empleado asociado a las credenciales
-        EmployeeEntity authenticatedEmployee = credentials.getEmployee();
+        EmployeeEntity authenticatedEmployee = authService.getAuthenticatedEmployee();
         PosEntity pos = posRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("POS with ID " + id + " was not found."));
         String employeeDni = authenticatedEmployee.getDni();
