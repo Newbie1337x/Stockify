@@ -29,7 +29,7 @@ import java.net.URI;
 @Tag(name = "Shifts", description = "API REST for managing employee work shifts")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
-public class ShiftsController {
+public class ShiftController {
 
     private final ShiftService shiftService;
     private final ShiftModelAssembler shiftModelAssembler;
