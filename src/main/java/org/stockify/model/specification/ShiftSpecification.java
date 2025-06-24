@@ -6,7 +6,6 @@ import org.stockify.model.entity.EmployeeEntity;
 import org.stockify.model.entity.ShiftEntity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class ShiftSpecification {
     public static Specification<ShiftEntity> dayBetween (LocalDate start, LocalDate end) {
@@ -48,7 +47,7 @@ public class ShiftSpecification {
         };
     }
 
-    public static Specification<ShiftEntity> employeeDni(String dni) {
+    public static Specification<ShiftEntity> hasEmployeeDni(String dni) {
         return (root, query, criteriaBuilder) -> {
             if (dni != null && !dni.isEmpty()) {
                 Join<ShiftEntity, EmployeeEntity> employeeJoin = root.join("employee");
