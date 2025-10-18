@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.stockify.dto.response.ErrorResponse;
 import org.zalando.problem.spring.web.advice.ProblemHandling;
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler implements ProblemHandling {
@@ -29,7 +29,8 @@ public class GlobalExceptionHandler implements ProblemHandling {
 
     @ExceptionHandler(PropertyReferenceException.class)
     public ResponseEntity<ErrorResponse> handleInvalidSort(PropertyReferenceException ex, HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, new InvalidSortParameterException("'Sort' value is invalid.  " + ex.getMessage()), request);
+        return buildErrorResponse(HttpStatus.BAD_REQUEST,
+                new InvalidSortParameterException("'Sort' value is invalid.  " + ex.getMessage()), request);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -39,12 +40,31 @@ public class GlobalExceptionHandler implements ProblemHandling {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex, request);
     }
 
+    /**
+     * ⚠️ Simplificado para usuario final:
+     * Detecta campos únicos duplicados y devuelve un mensaje entendible.
+     */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrity(HttpServletRequest request,
-    DataIntegrityViolationException ex) {
-        String msg = ex.getMostSpecificCause().getMessage();
+                                                             DataIntegrityViolationException ex) {
+        String raw = ex.getMostSpecificCause().getMessage().toLowerCase();
+        String field = "campo único";
 
-        return buildErrorResponse(HttpStatus.CONFLICT,new DuplicatedUniqueConstraintException(msg) , request);
+        if (raw.contains("barcode")) {
+            field = "barcode";
+        } else if (raw.contains("name")) {
+            field = "nombre";
+        } else if (raw.contains("email")) {
+            field = "email";
+        }
+
+        String msg = "Ya existe un registro con el mismo " + field + ".";
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
+                new DuplicatedUniqueConstraintException(msg),
+                request
+        );
     }
 
     @ExceptionHandler(InvalidSessionStatusException.class)
@@ -79,8 +99,8 @@ public class GlobalExceptionHandler implements ProblemHandling {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(
             HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, 
-                new BadCredentialsException("The username or password is incorrect"), 
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED,
+                new BadCredentialsException("El nombre de usuario o la contraseña son incorrectos."),
                 request);
     }
 
@@ -91,7 +111,9 @@ public class GlobalExceptionHandler implements ProblemHandling {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex, request);
     }
 
-
+    /**
+     * Método genérico para construir la respuesta de error.
+     */
     private <T extends Throwable> ResponseEntity<ErrorResponse> buildErrorResponse(
             HttpStatus status, T ex, HttpServletRequest request) {
 
