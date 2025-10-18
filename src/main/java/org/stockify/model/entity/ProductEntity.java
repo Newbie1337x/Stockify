@@ -43,6 +43,9 @@ public class ProductEntity {
     @Column(name = "brand")
     private String brand;
 
+    @Column(name = "img_URL")
+    private String imgURL;
+
     @ColumnDefault("0")
     @Column(name = "stock_quantity", precision = 15, scale = 2)
     private BigDecimal stock = BigDecimal.ZERO;

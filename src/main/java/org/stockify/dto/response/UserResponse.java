@@ -27,4 +27,7 @@ public class UserResponse extends RepresentationModel<UserResponse> {
 
     @Schema(description = "Client's phone number", example = "+541112345678")
     private String phone;
+
+    @Schema(description = "Client's image", example = "http//:image.com", maxLength = 20)
+    private String img;
 }

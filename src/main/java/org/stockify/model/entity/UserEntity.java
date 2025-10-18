@@ -42,4 +42,8 @@ public class UserEntity {
     @OneToMany(mappedBy = "client", fetch = FetchType.LAZY)
     private Set<SaleEntity> sales;
 
+
+    @Column(name = "client_img")
+    private String img;
+
 }

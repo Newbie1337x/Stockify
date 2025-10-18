@@ -9,6 +9,7 @@ import org.stockify.model.entity.ProductEntity;
 import org.stockify.model.entity.ProviderEntity;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,7 +41,7 @@ public interface ProductMapper {
     }
 
     /**
-     * L�gica interna del update (excepto categor�as)
+     * Lógica interna del update (excepto categorías)
      */
     @Mapping(target = "detailTransactions", ignore = true)
     @Mapping(target = "providers", ignore = true)
@@ -59,32 +60,33 @@ public interface ProductMapper {
     @Mapping(source = "categories", target = "categories", qualifiedByName = "namesToEntities")
     void patchEntityFromRequest(ProductRequest dto, @MappingTarget ProductEntity entity);
 
+    // ✅ Todos estos devuelven colecciones MUTABLES (ya no Set.of())
     @Named("entitiesToNames")
     default Set<String> entitiesToNames(Set<CategoryEntity> categories) {
-        if (categories == null || categories.isEmpty()) return Set.of();
+        if (categories == null || categories.isEmpty()) return new LinkedHashSet<>();
         return categories.stream()
                 .map(CategoryEntity::getName)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Named("namesToEntities")
     default Set<CategoryEntity> namesToEntities(Set<String> names) {
-        if (names == null || names.isEmpty()) return Set.of();
+        if (names == null || names.isEmpty()) return new LinkedHashSet<>();
         return names.stream()
                 .map(name -> {
                     CategoryEntity e = new CategoryEntity();
                     e.setName(name);
                     return e;
                 })
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Named("providerEntitiesToIds")
     default Set<Long> providerEntitiesToIds(Set<ProviderEntity> providers) {
-        if (providers == null || providers.isEmpty()) return Set.of();
+        if (providers == null || providers.isEmpty()) return new LinkedHashSet<>();
         return providers.stream()
                 .map(ProviderEntity::getId)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     @Mapping(target = "id", ignore = true)
@@ -99,11 +101,11 @@ public interface ProductMapper {
 
     @Named("stringToCategorySet")
     static Set<String> mapCategories(String value) {
-        if (value == null || value.isBlank()) return Set.of();
+        if (value == null || value.isBlank()) return new LinkedHashSet<>();
         return Stream.of(value.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     default double mapStock(BigDecimal stock) {

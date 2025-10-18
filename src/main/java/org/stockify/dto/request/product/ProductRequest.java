@@ -14,6 +14,9 @@ public record ProductRequest(
         @NotNull
         String name,
 
+        @Schema(description = "Url from the product", example = "http://image.com")
+        String imgURL,
+
         @Schema(description = "Detailed description of the product", example = "Latest model with advanced features")
         String description,
 

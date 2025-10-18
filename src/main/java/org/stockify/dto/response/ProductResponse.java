@@ -32,6 +32,9 @@ public record ProductResponse(
         @Schema(description = "Brand of the product", example = "LogiTech")
         String brand,
 
+        @Schema(description = "Image Url", example = "HTTP://image.com")
+        String imgURL,
+
         @Schema(description = "Categories that the product belongs to")
         Set<String> categories,
 

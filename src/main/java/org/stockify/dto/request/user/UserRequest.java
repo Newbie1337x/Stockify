@@ -13,6 +13,13 @@ import lombok.*;
 @Schema(name = "ClientRequest", description = "Request body for creating or updating a client.")
 public class UserRequest {
 
+
+
+
+    @Schema(description = "Client's image", example = "http//:image.com", maxLength = 20)
+    private String img;
+
+
     @NotBlank
     @Size(max = 20, message = "Max length for first name is 20 characters")
     @Schema(description = "Client's first name", example = "María", maxLength = 20)
